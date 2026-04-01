@@ -804,9 +804,14 @@
         tp: tp,
         sl: sl
       })
-    }).then(function(res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
+    }).then(async function(res) {
+      let data = {};
+      try { data = await res.json(); } catch (_) { data = {}; }
+      if (!res.ok || data?.ok === false) {
+        const detail = String((data && (data.error || data.msg || data.sMsg)) || ('HTTP ' + res.status));
+        throw new Error(detail);
+      }
+      return data;
     }).then(function(data) {
       btn.style.opacity = '1';
       btn.textContent = '✓ 已下单';
@@ -844,9 +849,14 @@
         qty: qty,
         positionSide: positionSide
       })
-    }).then(function(res) {
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      return res.json();
+    }).then(async function(res) {
+      let data = {};
+      try { data = await res.json(); } catch (_) { data = {}; }
+      if (!res.ok || data?.ok === false) {
+        const detail = String((data && (data.error || data.msg || data.sMsg)) || ('HTTP ' + res.status));
+        throw new Error(detail);
+      }
+      return data;
     }).then(function() {
       if (btn) {
         btn.style.opacity = '1';
