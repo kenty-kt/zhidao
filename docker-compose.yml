@@ -1,0 +1,12 @@
+services:
+  finance-ui:
+    build: .
+    container_name: finance-ui-preview
+    ports:
+      - "8080:80"
+    environment:
+      - OKX_API_KEY=${OKX_API_KEY}
+      - OKX_API_SECRET=${OKX_API_SECRET}
+      - OKX_API_PASSPHRASE=${OKX_API_PASSPHRASE}
+      - OKX_SIMULATED_TRADING=${OKX_SIMULATED_TRADING:-0}
+    restart: unless-stopped
