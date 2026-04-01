@@ -2368,15 +2368,20 @@
       { name: 'QQQ', keys: ['qqq', 'nasdaq'] },
       { name: 'TLT', keys: ['tlt', 'treasury', '美债'] }
     ];
-    const CRYPTO_ASSET_RULES = [
-      { symbol: 'BTC', pair: 'BTCUSDT', keys: ['btc', 'bitcoin', '比特币', 'crypto', 'etf'] },
-      { symbol: 'ETH', pair: 'ETHUSDT', keys: ['eth', 'ethereum', '以太坊'] },
-      { symbol: 'BNB', pair: 'BNBUSDT', keys: ['bnb', 'binance coin', '币安币'] },
-      { symbol: 'SOL', pair: 'SOLUSDT', keys: ['sol', 'solana'] },
-      { symbol: 'XRP', pair: 'XRPUSDT', keys: ['xrp', 'ripple'] },
-      { symbol: 'ADA', pair: 'ADAUSDT', keys: ['ada', 'cardano'] },
-      { symbol: 'DOGE', pair: 'DOGEUSDT', keys: ['doge', 'dogecoin'] }
-    ];
+	    const CRYPTO_ASSET_RULES = [
+	      { symbol: 'BTC', pair: 'BTCUSDT', keys: ['btc', 'bitcoin', '比特币', 'crypto', 'etf'] },
+	      { symbol: 'ETH', pair: 'ETHUSDT', keys: ['eth', 'ethereum', '以太坊'] },
+	      { symbol: 'BNB', pair: 'BNBUSDT', keys: ['bnb', 'binance coin', '币安币'] },
+	      { symbol: 'SOL', pair: 'SOLUSDT', keys: ['sol', 'solana'] },
+	      { symbol: 'XRP', pair: 'XRPUSDT', keys: ['xrp', 'ripple'] },
+	      { symbol: 'ADA', pair: 'ADAUSDT', keys: ['ada', 'cardano'] },
+	      { symbol: 'DOGE', pair: 'DOGEUSDT', keys: ['doge', 'dogecoin'] },
+	      { symbol: 'AVAX', pair: 'AVAXUSDT', keys: ['avax', 'avalanche'] },
+	      { symbol: 'LINK', pair: 'LINKUSDT', keys: ['link', 'chainlink'] },
+	      { symbol: 'SUI', pair: 'SUIUSDT', keys: ['sui'] },
+	      { symbol: 'ARB', pair: 'ARBUSDT', keys: ['arb', 'arbitrum'] },
+	      { symbol: 'OP', pair: 'OPUSDT', keys: ['op', 'optimism'] }
+	    ];
     const PM_SOURCE_ENDPOINTS = [
       'https://gamma-api.polymarket.com/markets?closed=false&limit=200',
       'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://gamma-api.polymarket.com/markets?closed=false&limit=200'),
@@ -2753,39 +2758,66 @@
       return tags.length ? tags : ['市场动态', 'BTC'];
     }
 
-    function recommendAssetsForNews(text, score) {
-      const lower = String(text || '').toLowerCase();
-      const matched = CRYPTO_ASSET_RULES
-        .map((asset) => ({
-          symbol: asset.symbol,
-          pair: asset.pair,
+	    function assetSymbolSeed(symbol = '') {
+	      return Array.from(String(symbol || '')).reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % 7;
+	    }
+
+	    function pickFallbackAssets(lower, count = 4) {
+	      const base = CRYPTO_ASSET_RULES.map((x) => ({ symbol: x.symbol, pair: x.pair, hits: 0 }));
+	      if (!base.length) return [];
+	      const seed = Array.from(lower || '').reduce((acc, ch) => acc + ch.charCodeAt(0), 0) % base.length;
+	      const out = [];
+	      for (let i = 0; i < count; i += 1) {
+	        out.push(base[(seed + i) % base.length]);
+	      }
+	      return out;
+	    }
+
+	    function deriveAssetView(baseScore, pick, idx = 0, marketChange = null) {
+	      const hitBoost = Math.min(1.2, Number(pick?.hits || 0) * 0.35);
+	      const symbolBias = (assetSymbolSeed(pick?.symbol || '') - 3) * 0.12;
+	      const rankAdjust = idx === 0 ? 0.2 : (idx === 1 ? 0.05 : -0.05 * idx);
+	      const momentum = Number.isFinite(Number(marketChange))
+	        ? Math.max(-1.1, Math.min(1.1, Number(marketChange) / 2.2))
+	        : 0;
+	      const signal = baseScore * 0.85 + hitBoost + symbolBias + rankAdjust + momentum;
+	      const bullish = signal >= 0;
+	      return {
+	        view: bullish ? '看多' : '看空',
+	        viewClass: bullish ? 'text-emerald-400' : 'text-red-400'
+	      };
+	    }
+
+	    function recommendAssetsForNews(text, score) {
+	      const lower = String(text || '').toLowerCase();
+	      const matched = CRYPTO_ASSET_RULES
+	        .map((asset) => ({
+	          symbol: asset.symbol,
+	          pair: asset.pair,
           hits: asset.keys.reduce((acc, key) => acc + (lower.includes(key) ? 1 : 0), 0)
         }))
-        .filter((x) => x.hits > 0)
-        .sort((a, b) => b.hits - a.hits);
+	        .filter((x) => x.hits > 0)
+	        .sort((a, b) => b.hits - a.hits);
 
-      const pool = matched.length ? matched : [
-        { symbol: 'BTC', pair: 'BTCUSDT', hits: 0 },
-        { symbol: 'ETH', pair: 'ETHUSDT', hits: 0 }
-      ];
-      const picks = pool.slice(0, 2);
-      while (picks.length < 2) {
-        picks.push(pool[0]?.symbol === 'BTC'
-          ? { symbol: 'ETH', pair: 'ETHUSDT', hits: 0 }
-          : { symbol: 'BTC', pair: 'BTCUSDT', hits: 0 });
-      }
+	      const pool = matched.length ? matched : pickFallbackAssets(lower, 4);
+	      const picks = pool.slice(0, 4);
+	      while (picks.length < 4) {
+	        const next = pickFallbackAssets(lower + String(picks.length), 1)[0];
+	        if (!next || picks.some((p) => p.symbol === next.symbol)) break;
+	        picks.push(next);
+	      }
 
-      return picks.map((pick, idx) => {
-        const directionalScore = score + (idx === 0 ? 0.4 : -0.2);
-        const bullish = directionalScore >= 0;
-        return {
-          symbol: pick.symbol,
-          pair: pick.pair,
-          view: bullish ? '看多' : '看空',
-          viewClass: bullish ? 'text-emerald-400' : 'text-red-400'
-        };
-      });
-    }
+	      return picks.map((pick, idx) => {
+	        const viewInfo = deriveAssetView(score, pick, idx);
+	        return {
+	          symbol: pick.symbol,
+	          pair: pick.pair,
+	          hits: pick.hits || 0,
+	          view: viewInfo.view,
+	          viewClass: viewInfo.viewClass
+	        };
+	      });
+	    }
 
     async function fetchBinanceMarketSnapshot(pairs) {
       const uniqPairs = Array.from(new Set((pairs || []).filter(Boolean)));
@@ -3413,10 +3445,16 @@
           bubbleLabelStats[primaryCategory.key][primaryCategory.label] =
             (bubbleLabelStats[primaryCategory.key][primaryCategory.label] || 0) + 1;
         }
-        const assets = recommendAssetsForNews(rawText, itemScore).map((asset) => {
-          const mk = marketMap[asset.pair] || {};
-          return { ...asset, price: mk.price ?? null, changePct: mk.changePct ?? null };
-        });
+	        const assets = recommendAssetsForNews(rawText, itemScore).map((asset, idx) => {
+	          const mk = marketMap[asset.pair] || {};
+	          const viewInfo = deriveAssetView(itemScore, asset, idx, mk.changePct);
+	          return {
+	            ...asset,
+	            ...viewInfo,
+	            price: mk.price ?? null,
+	            changePct: mk.changePct ?? null
+	          };
+	        });
         const aiInterpretation = buildAiInterpretation(item, tags, assets, itemScore);
         const polyBlock = renderPolymarketBlock(rawText, assets, itemScore, pmMarkets);
         return `
@@ -3456,10 +3494,10 @@
                           ${asset.changePct === null ? '' : `<span class="${asset.changePct >= 0 ? 'text-emerald-400' : 'text-red-400'}">${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%</span>`}
                         </div>
                       </div>
-                      <span class="text-[10px] font-bold ${asset.viewClass}">AI ${escapeHtml(asset.view)}</span>
-                    </div>
-                  `).join('')}
-                </div>
+	                      <span class="text-[10px] font-bold ${asset.viewClass}">${escapeHtml(asset.view)}</span>
+	                    </div>
+	                  `).join('')}
+	                </div>
               </div>
               ${polyBlock}
             </div>
