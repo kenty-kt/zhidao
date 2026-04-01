@@ -2410,13 +2410,19 @@
     }
 
     async function fetchRssXml(feedUrl) {
-      const urls = [feedUrl, ...RSS_PROXY_URLS.map((build) => build(feedUrl))];
+      const urls = [
+        `/api/feed/rss?url=${encodeURIComponent(feedUrl)}`,
+        feedUrl,
+        ...RSS_PROXY_URLS.map((build) => build(feedUrl))
+      ];
       let lastErr = null;
       for (const url of urls) {
         try {
           const res = await fetch(url, { cache: 'no-store' });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const text = await res.text();
+          const text = url.startsWith('/api/feed/rss')
+            ? ((await res.json())?.xml || '')
+            : await res.text();
           if (text && text.includes('<rss')) return text;
           throw new Error('返回内容不是 RSS XML');
         } catch (err) {
