@@ -3697,13 +3697,13 @@
         flex-direction: column;
         justify-content: flex-end;
         padding: 5px 7px 5px;
-        cursor: pointer;
+        cursor: default;
         transition: filter 0.18s, transform 0.18s;
         position: relative;
         overflow: hidden;
         border: 1px solid transparent;
       }
-      .tm-cell:hover { filter: brightness(1.22); transform: scale(1.018); z-index: 2; }
+      .tm-cell:hover { filter: none; transform: none; z-index: auto; }
       .tm-cell .tm-dom  { font-size: 8px; color: rgba(255,255,255,0.4); font-weight: 500; }
       .tm-cell .tm-name { font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2; }
       .tm-cell .tm-chg  { font-size: 11px; font-weight: 700; line-height: 1.3; }
@@ -3728,13 +3728,13 @@
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;">
-        <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.22);" onclick="openTradeModal('BTC')">
+        <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.22);">
           <span class="tm-dom">57.64%</span><span class="tm-name">BTC</span><span class="tm-chg" style="color:#34d399">+0.34%</span>
         </div>
         <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.15);">
           <span class="tm-dom">10.70%</span><span class="tm-name">Stable</span><span class="tm-chg" style="color:#f87171">-0.01%</span>
         </div>
-        <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.15);" onclick="openTradeModal('ETH')">
+        <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.15);">
           <span class="tm-dom">10.61%</span><span class="tm-name">ETH</span><span class="tm-chg" style="color:#34d399">+0.88%</span>
         </div>
         <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e40af);border-color:rgba(96,165,250,0.15);">
@@ -3755,7 +3755,7 @@
         <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e293b);border-color:rgba(148,163,184,0.08);">
           <span class="tm-dom">0.58%</span><span class="tm-name">Others</span><span class="tm-chg" style="color:#94a3b8">+1.67%</span>
         </div>
-        <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#312e81,#4c1d95);border-color:rgba(167,139,250,0.4);box-shadow:0 0 12px rgba(139,92,246,0.3);" onclick="openTradeModal('NVDA')">
+        <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#312e81,#4c1d95);border-color:rgba(167,139,250,0.4);box-shadow:0 0 12px rgba(139,92,246,0.3);">
           <span class="tm-dom" style="color:rgba(196,181,253,0.65);">0.40%</span><span class="tm-name">AI</span><span class="tm-chg" style="color:#c4b5fd">+9.89%</span>
         </div>
         <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e40af);border-color:rgba(96,165,250,0.1);">
