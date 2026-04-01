@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "api/**/*.py", "use": "@vercel/python" },
+    { "src": "index.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "^/$", "dest": "/index.html" },
+    { "src": "^/api/panews/calendar$", "dest": "/api/panews/calendar.py" },
+    { "src": "^/api/soso/sectors$", "dest": "/api/soso/sectors.py" },
+    { "src": "^/api/okx/positions$", "dest": "/api/okx/positions.py" },
+    { "src": "^/api/okx/ticker$", "dest": "/api/okx/ticker.py" },
+    { "src": "^/api/okx/account$", "dest": "/api/okx/account.py" },
+    { "src": "^/api/okx/order$", "dest": "/api/okx/order.py" },
+    { "src": "^/api/okx/close-position$", "dest": "/api/okx/close-position.py" },
+    { "src": "^(.*)$", "dest": "/index.html" }
+  ]
+}
