@@ -3907,12 +3907,12 @@
 
       <!-- 范围切换 -->
       <div style="display:flex;align-items:center;gap:4px;margin-bottom:10px;">
-        <button class="cal-range-btn active" id="calR0" onclick="selectRange(0)">今天</button>
-        <button class="cal-range-btn" id="calR1" onclick="selectRange(1)">近7天</button>
+        <button class="cal-range-btn" id="calR0" onclick="selectRange(0)">今天</button>
+        <button class="cal-range-btn active" id="calR1" onclick="selectRange(1)">近7天</button>
       </div>
 
       <!-- 事件列表标题 -->
-      <div style="font-size:10px;color:#334155;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;" id="calEventTitle">今日事件</div>
+      <div style="font-size:10px;color:#334155;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;" id="calEventTitle">本周事件</div>
 
       <!-- 事件列表（含正文拓展） -->
       <div id="calEventList"></div>
@@ -4031,7 +4031,9 @@
         const titleEl = document.getElementById('calEventTitle');
         if (!listEl || !titleEl) return;
 
-        let rows = __calState.filteredItems.filter(it => __calDateKeyFromTs(it.startAt) === __calState.selectedDate);
+        let rows = __calState.rangeIdx === 1
+          ? __calState.filteredItems.slice()
+          : __calState.filteredItems.filter(it => __calDateKeyFromTs(it.startAt) === __calState.selectedDate);
         rows.sort((a, b) => String(a.startAt || '').localeCompare(String(b.startAt || '')));
         rows = rows.slice(0, 12);
 
