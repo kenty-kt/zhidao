@@ -3273,9 +3273,12 @@
       if (listEl) {
         listEl.innerHTML = normalized.map((p) => {
           const st = healthStyleByScore(p.health);
-          const icon = (p.symbol || '?').slice(0, 1);
-	          const pnlSign = p.pnlPct >= 0 ? '+' : '';
-          const pnlValueSign = p.pnlValue >= 0 ? '+' : '';
+	          const icon = (p.symbol || '?').slice(0, 1);
+	          const pnlPctVal = Number.isFinite(Number(p.pnlPct)) ? Number(p.pnlPct) : 0;
+	          const pnlValueVal = Number.isFinite(Number(p.pnlValue)) ? Number(p.pnlValue) : 0;
+	          const pnlPctSign = pnlPctVal >= 0 ? '+' : '-';
+	          const pnlValueSign = pnlValueVal >= 0 ? '+' : '-';
+	          const pnlToneClass = pnlValueVal >= 0 ? 'text-emerald-400' : 'text-red-400';
 	          const sideTag = p.side === 'SHORT' ? '空' : '多';
           const instLabel = formatInstrumentLabel(p.instrument);
           const markPxText = p.markPx > 0 ? Number(p.markPx).toLocaleString('en-US', { maximumFractionDigits: p.markPx >= 100 ? 2 : 4 }) : '--';
@@ -3288,8 +3291,11 @@
               <div class="w-6 h-6 rounded bg-white/5 flex items-center justify-center text-[9px] font-bold ${st.text}">${escapeHtml(icon)}</div>
               <div class="flex-1 min-w-0">
 	                <div class="flex justify-between">
-	                  <span class="text-[11px] font-medium text-white">${escapeHtml(instLabel)} · ${escapeHtml(p.leverage)}x ${sideTag}</span>
-	                  <span class="text-[11px] ${p.pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}">${pnlValueSign}${Math.abs(p.pnlValue).toLocaleString('en-US', { maximumFractionDigits: 2 })} (${pnlSign}${p.pnlPct.toFixed(2)}%)</span>
+		                  <span class="text-[11px] font-medium text-white">${escapeHtml(instLabel)} · ${escapeHtml(p.leverage)}x ${sideTag}</span>
+		                  <span class="flex flex-col items-end leading-tight ${pnlToneClass}">
+		                    <span class="text-[11px] font-semibold">${pnlValueSign}${Math.abs(pnlValueVal).toLocaleString('en-US', { maximumFractionDigits: 2 })}</span>
+		                    <span class="text-[10px]">${pnlPctSign}${Math.abs(pnlPctVal).toFixed(2)}%</span>
+		                  </span>
 	                </div>
                 <div class="text-[9px] text-slate-400">持仓量 ${qtyText} · 标记价 ${markPxText}</div>
                 <div class="text-[9px] text-slate-400">开仓价 ${entryPxText} · 名义 ${p.usdtValue.toLocaleString('en-US', { maximumFractionDigits: 2 })} USD</div>
