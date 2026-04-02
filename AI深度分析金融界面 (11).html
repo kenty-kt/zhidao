@@ -3289,7 +3289,7 @@
               <div class="flex-1 min-w-0">
 	                <div class="flex justify-between">
 	                  <span class="text-[11px] font-medium text-white">${escapeHtml(instLabel)} · ${escapeHtml(p.leverage)}x ${sideTag}</span>
-	                  <span class="text-[11px] ${p.pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}">PnL ${pnlValueSign}${Math.abs(p.pnlValue).toLocaleString('en-US', { maximumFractionDigits: 2 })} (${pnlSign}${p.pnlPct.toFixed(2)}%)</span>
+	                  <span class="text-[11px] ${p.pnlPct >= 0 ? 'text-emerald-400' : 'text-red-400'}">${pnlValueSign}${Math.abs(p.pnlValue).toLocaleString('en-US', { maximumFractionDigits: 2 })} (${pnlSign}${p.pnlPct.toFixed(2)}%)</span>
 	                </div>
                 <div class="text-[9px] text-slate-400">持仓量 ${qtyText} · 标记价 ${markPxText}</div>
                 <div class="text-[9px] text-slate-400">开仓价 ${entryPxText} · 名义 ${p.usdtValue.toLocaleString('en-US', { maximumFractionDigits: 2 })} USD</div>
