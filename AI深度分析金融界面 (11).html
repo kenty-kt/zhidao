@@ -658,7 +658,11 @@
     tokenCurrentPrice = Number(markPx || 0);
     tokenCurrentPosQty = Number(posQty || 0);
     tokenCurrentPosSide = String(posSide || '').toUpperCase();
-    tokenOpenSide = asset.direction === '空' ? 'SHORT' : 'LONG';
+    tokenOpenSide = tokenCurrentPosSide === 'SHORT'
+      ? 'SHORT'
+      : (tokenCurrentPosSide === 'LONG'
+        ? 'LONG'
+        : (asset.direction === '空' ? 'SHORT' : 'LONG'));
 
     // 填充头部
     var titleEl = document.getElementById('tkModalTitle');
@@ -3493,10 +3497,10 @@
                 <p class="text-[11px] text-slate-300 leading-relaxed">${escapeHtml(aiInterpretation)}</p>
               </div>
               <div class="card-inner p-2.5 mb-3">
-                <div class="text-[10px] text-slate-500 mb-1.5">AI 内通推荐资产</div>
+                <div class="text-[10px] text-slate-500 mb-1.5">推荐</div>
                 <div class="grid grid-cols-2 gap-2">
                   ${assets.map((asset) => `
-                    <div class="card-inner p-2 flex items-center justify-between" style="cursor:pointer;transition:border-color 0.15s;" onmouseenter="this.style.borderColor='rgba(96,165,250,0.35)'" onmouseleave="this.style.borderColor=''" onclick='openTradeModal(${JSON.stringify(asset.symbol)}, ${JSON.stringify(inferSwapInstId(asset.symbol, asset.pair))}, ${Number.isFinite(asset.price) ? asset.price : 0})'>
+                    <div class="card-inner p-2 flex items-center justify-between" style="cursor:pointer;transition:border-color 0.15s;" onmouseenter="this.style.borderColor='rgba(96,165,250,0.35)'" onmouseleave="this.style.borderColor=''" onclick='openTradeModal(${JSON.stringify(asset.symbol)}, ${JSON.stringify(inferSwapInstId(asset.symbol, asset.pair))}, ${Number.isFinite(asset.price) ? asset.price : 0}, 0, ${JSON.stringify(asset.view === "看空" ? "SHORT" : "LONG")})'>
                       <div>
                         <div class="text-[11px] font-bold text-white">${escapeHtml(asset.symbol)}</div>
                         <div class="text-[10px] text-slate-500">
