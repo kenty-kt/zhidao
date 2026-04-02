@@ -13,6 +13,8 @@ import urllib.request
 import urllib.error
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 
+from api import admin as admin_api
+
 
 OKX_BASE = "https://www.okx.com"
 SOSO_MIRROR_URL = "https://r.jina.ai/http://sosovalue.com/zh"
@@ -469,13 +471,41 @@ def place_okx_close_position(payload: dict):
 
 class Handler(SimpleHTTPRequestHandler):
     def do_OPTIONS(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path.startswith("/api/admin"):
+            json_resp(self, 200, {"ok": True})
+            return
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
 
+    def _dispatch_admin_if_needed(self, method: str) -> bool:
+        parsed = urllib.parse.urlparse(self.path)
+        path = parsed.path
+        if not path.startswith("/api/admin"):
+            return False
+        query = urllib.parse.parse_qs(parsed.query)
+        body = {}
+        if method in {"POST", "PUT"}:
+            try:
+                cl = int(self.headers.get("Content-Length", "0") or 0)
+            except Exception:
+                cl = 0
+            raw = self.rfile.read(cl) if cl > 0 else b"{}"
+            try:
+                decoded = json.loads(raw.decode("utf-8") or "{}")
+                body = decoded if isinstance(decoded, dict) else {}
+            except Exception:
+                body = {}
+        code, payload = admin_api.handle_request(self, method, path, query, body)
+        json_resp(self, code, payload)
+        return True
+
     def do_GET(self):
+        if self._dispatch_admin_if_needed("GET"):
+            return
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         query = urllib.parse.parse_qs(parsed.query)
@@ -563,6 +593,8 @@ class Handler(SimpleHTTPRequestHandler):
         return super().do_GET()
 
     def do_POST(self):
+        if self._dispatch_admin_if_needed("POST"):
+            return
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
         if path == "/api/okx/order":
@@ -584,6 +616,16 @@ class Handler(SimpleHTTPRequestHandler):
                 json_resp(self, 200, data)
             except Exception as e:
                 json_resp(self, 500, {"ok": False, "error": str(e)})
+            return
+        json_resp(self, 404, {"ok": False, "error": "not found"})
+
+    def do_PUT(self):
+        if self._dispatch_admin_if_needed("PUT"):
+            return
+        json_resp(self, 404, {"ok": False, "error": "not found"})
+
+    def do_DELETE(self):
+        if self._dispatch_admin_if_needed("DELETE"):
             return
         json_resp(self, 404, {"ok": False, "error": "not found"})
 

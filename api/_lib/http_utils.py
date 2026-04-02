@@ -9,7 +9,7 @@ def json_resp(handler, code, payload):
     handler.send_header('Content-Length', str(len(body)))
     handler.send_header('Access-Control-Allow-Origin', '*')
     handler.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
-    handler.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+    handler.send_header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
     handler.end_headers()
     handler.wfile.write(body)
 

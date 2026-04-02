@@ -454,6 +454,269 @@
   }
   #backToTop.visible { opacity: 1; transform: translateY(0); }
   #backToTop:hover { background: linear-gradient(135deg, #2563eb, #0284c7); box-shadow: 0 6px 24px rgba(30,64,175,0.6); }
+
+  /* ═══ 管理后台面板 ═══ */
+  #adminPanel {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: none;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  #adminPanelBackdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+  }
+  #adminPanelShell {
+    position: relative;
+    width: min(1120px, 92vw);
+    height: 100vh;
+    background: #050a14;
+    border-left: 1px solid rgba(96, 165, 250, 0.25);
+    display: flex;
+    flex-direction: column;
+    animation: slideInRight 0.24s ease;
+    box-shadow: -20px 0 50px rgba(2, 6, 23, 0.65);
+  }
+  .admin-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.6));
+  }
+  .admin-header-title { font-size: 14px; font-weight: 700; color: #e2e8f0; }
+  .admin-header-sub { font-size: 11px; color: #64748b; margin-top: 2px; }
+  .admin-close-btn {
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: rgba(15, 23, 42, 0.75);
+    color: #cbd5e1;
+    border-radius: 8px;
+    height: 30px;
+    padding: 0 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .admin-close-btn:hover { border-color: rgba(96, 165, 250, 0.4); color: #eff6ff; }
+  .admin-main {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 170px 1fr;
+  }
+  .admin-side {
+    border-right: 1px solid rgba(148, 163, 184, 0.12);
+    padding: 16px 10px;
+    background: #070f1f;
+  }
+  .admin-tab-btn {
+    width: 100%;
+    text-align: left;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 10px;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    cursor: pointer;
+    background: transparent;
+  }
+  .admin-tab-btn:hover { color: #e2e8f0; background: rgba(30, 41, 59, 0.55); }
+  .admin-tab-btn.active {
+    color: #dbeafe;
+    border-color: rgba(96, 165, 250, 0.3);
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.5), rgba(14, 116, 144, 0.35));
+  }
+  .admin-content-wrap {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    background: radial-gradient(circle at top right, rgba(14, 116, 144, 0.16), transparent 42%);
+  }
+  .admin-tab-content {
+    display: none;
+    height: 100%;
+    overflow-y: auto;
+    padding: 16px 18px 20px;
+  }
+  .admin-tab-content.active { display: block; }
+  .admin-block {
+    background: #0b1528;
+    border: 1px solid rgba(148, 163, 184, 0.14);
+    border-radius: 12px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .admin-block-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #e2e8f0;
+    margin-bottom: 8px;
+  }
+  .admin-muted { color: #64748b; font-size: 11px; }
+  .admin-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .admin-label {
+    display: block;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .admin-input, .admin-select, .admin-textarea {
+    width: 100%;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    background: #111d34;
+    color: #e2e8f0;
+    font-size: 12px;
+    padding: 0 10px;
+    outline: none;
+  }
+  .admin-textarea {
+    min-height: 70px;
+    height: auto;
+    padding: 8px 10px;
+    resize: vertical;
+  }
+  .admin-input:focus, .admin-select:focus, .admin-textarea:focus {
+    border-color: rgba(96, 165, 250, 0.45);
+    box-shadow: 0 0 0 2px rgba(30, 64, 175, 0.18);
+  }
+  .admin-btn {
+    border: 1px solid rgba(96, 165, 250, 0.35);
+    background: linear-gradient(135deg, #1d4ed8, #0e7490);
+    color: #eff6ff;
+    border-radius: 8px;
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .admin-btn:hover { filter: brightness(1.08); }
+  .admin-btn-ghost {
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(15, 23, 42, 0.45);
+    color: #cbd5e1;
+  }
+  .admin-btn-red {
+    border-color: rgba(248, 113, 113, 0.35);
+    background: linear-gradient(135deg, #9f1239, #7f1d1d);
+  }
+  .admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .admin-table th, .admin-table td {
+    border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+    padding: 9px 8px;
+    text-align: left;
+    color: #cbd5e1;
+    vertical-align: top;
+  }
+  .admin-table th {
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .admin-table td .small {
+    display: block;
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 3px;
+  }
+  .admin-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .admin-pill.active {
+    border-color: rgba(52, 211, 153, 0.5);
+    color: #34d399;
+    background: rgba(6, 78, 59, 0.35);
+  }
+  .admin-pill.draft {
+    border-color: rgba(251, 191, 36, 0.42);
+    color: #fbbf24;
+    background: rgba(120, 53, 15, 0.32);
+  }
+  .admin-pill.archived {
+    border-color: rgba(148, 163, 184, 0.32);
+    color: #94a3b8;
+    background: rgba(30, 41, 59, 0.4);
+  }
+  #adminEventDrawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(480px, 100%);
+    border-left: 1px solid rgba(96, 165, 250, 0.22);
+    background: #081224;
+    transform: translateX(102%);
+    transition: transform 0.2s ease;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+  }
+  #adminEventDrawer.open { transform: translateX(0); }
+  .admin-drawer-head {
+    padding: 12px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .admin-drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+  }
+  .admin-action-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .admin-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .admin-inline .admin-input, .admin-inline .admin-select { flex: 1; }
+  .admin-note {
+    font-size: 10px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+  .admin-news-item, .admin-analysis-item {
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.65);
+    padding: 8px;
+    font-size: 11px;
+    color: #cbd5e1;
+  }
+  .admin-analysis-item.primary {
+    border-color: rgba(52, 211, 153, 0.45);
+    background: rgba(6, 78, 59, 0.28);
+  }
 </style>
 <script>
   // 全局交易弹窗函数，提前到顶部确保 inline onclick 可调用
@@ -1404,6 +1667,9 @@
     <span class="ai-badge">AI POWERED</span>
   </div>
   <div class="flex items-center gap-3">
+    <button id="adminPanelToggle" onclick="openAdminPanel()" class="text-[11px] font-semibold px-3 h-7 rounded-lg border border-blue-400/35 bg-blue-500/10 text-blue-200 hover:bg-blue-500/20 transition-all">
+      管理后台
+    </button>
     <div class="flex items-center gap-1.5 text-xs text-emerald-400">
       <span class="signal-dot" style="background:#34d399"></span>
       <span>实时分析中</span>
@@ -1412,6 +1678,255 @@
     <div class="w-7 h-7 rounded-full bg-white/5 flex items-center justify-center text-xs">👤</div>
   </div>
 </nav>
+
+<!-- 管理后台面板 -->
+<div id="adminPanel">
+  <div id="adminPanelBackdrop" onclick="closeAdminPanel()"></div>
+  <div id="adminPanelShell">
+    <div class="admin-header">
+      <div>
+        <div class="admin-header-title">后台管理控制台</div>
+        <div class="admin-header-sub">Event 配置 · 分析触发 · Trade 参数</div>
+      </div>
+      <button class="admin-close-btn" onclick="closeAdminPanel()">关闭</button>
+    </div>
+    <div class="admin-main">
+      <aside class="admin-side">
+        <button id="adminTabEventsBtn" class="admin-tab-btn active" onclick="adminSwitchTab('events')">Events</button>
+        <button id="adminTabTradeBtn" class="admin-tab-btn" onclick="adminSwitchTab('trade')">Trade Settings</button>
+        <button id="adminTabAnalysisBtn" class="admin-tab-btn" onclick="adminSwitchTab('analysis')">Analysis</button>
+        <button id="adminTabUsersBtn" class="admin-tab-btn" onclick="adminSwitchTab('users')">账号与权限</button>
+      </aside>
+      <section class="admin-content-wrap">
+        <div id="adminTabEvents" class="admin-tab-content active">
+          <div class="admin-block">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+              <div>
+                <div class="admin-block-title" style="margin-bottom:4px;">Event 列表</div>
+                <div class="admin-muted">管理主题 / 关键词 / 关联标的，影响 AI 分析目标</div>
+              </div>
+              <div class="admin-inline" style="width:min(460px, 100%);">
+                <input id="adminEventSearch" class="admin-input" placeholder="搜索主题、关键词或标的..." />
+                <select id="adminEventStatusFilter" class="admin-select" style="max-width:120px;">
+                  <option value="">全部状态</option>
+                  <option value="active">active</option>
+                  <option value="draft">draft</option>
+                  <option value="archived">archived</option>
+                </select>
+                <button class="admin-btn admin-btn-ghost" onclick="adminRenderEventsTable()">筛选</button>
+                <button class="admin-btn" onclick="adminOpenEventDrawer()">+ 新建</button>
+              </div>
+            </div>
+          </div>
+          <div class="admin-block" style="margin-bottom:0;">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>主题</th>
+                  <th>关键词</th>
+                  <th>关联标的</th>
+                  <th>主分析</th>
+                  <th>状态</th>
+                  <th style="width:190px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminEventsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="adminTabTrade" class="admin-tab-content">
+          <div class="admin-block">
+            <div class="admin-block-title">全局 Trade 参数</div>
+            <div class="admin-row">
+              <div>
+                <label class="admin-label">风险等级（1-10）</label>
+                <input id="adminTradeGlobalRisk" class="admin-input" type="number" min="1" max="10" />
+              </div>
+              <div>
+                <label class="admin-label">仓位比例（%）</label>
+                <input id="adminTradeGlobalPosition" class="admin-input" type="number" min="1" max="100" />
+              </div>
+              <div>
+                <label class="admin-label">止盈（%）</label>
+                <input id="adminTradeGlobalTP" class="admin-input" type="number" step="0.1" />
+              </div>
+              <div>
+                <label class="admin-label">止损（%）</label>
+                <input id="adminTradeGlobalSL" class="admin-input" type="number" step="0.1" />
+              </div>
+              <div>
+                <label class="admin-label">买入阈值</label>
+                <input id="adminTradeGlobalBuy" class="admin-input" type="number" step="0.01" />
+              </div>
+              <div>
+                <label class="admin-label">卖出阈值</label>
+                <input id="adminTradeGlobalSell" class="admin-input" type="number" step="0.01" />
+              </div>
+            </div>
+            <div style="margin-top:10px;">
+              <button class="admin-btn" onclick="adminSaveGlobalTradeSettings()">保存全局参数</button>
+            </div>
+          </div>
+          <div class="admin-block">
+            <div class="admin-block-title">Event 覆盖参数</div>
+            <div class="admin-row">
+              <div>
+                <label class="admin-label">目标 Event</label>
+                <select id="adminTradeEventSelect" class="admin-select"></select>
+              </div>
+              <div>
+                <label class="admin-label">覆盖模式</label>
+                <select id="adminTradeUseGlobal" class="admin-select">
+                  <option value="false">使用 Event 覆盖</option>
+                  <option value="true">使用全局默认</option>
+                </select>
+              </div>
+            </div>
+            <div class="admin-row" style="margin-top:10px;">
+              <div>
+                <label class="admin-label">风险等级（覆盖）</label>
+                <input id="adminTradeEventRisk" class="admin-input" type="number" min="1" max="10" />
+              </div>
+              <div>
+                <label class="admin-label">仓位比例（覆盖%）</label>
+                <input id="adminTradeEventPosition" class="admin-input" type="number" min="1" max="100" />
+              </div>
+              <div>
+                <label class="admin-label">止盈（覆盖%）</label>
+                <input id="adminTradeEventTP" class="admin-input" type="number" step="0.1" />
+              </div>
+              <div>
+                <label class="admin-label">止损（覆盖%）</label>
+                <input id="adminTradeEventSL" class="admin-input" type="number" step="0.1" />
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="admin-btn" onclick="adminSaveEventTradeSettings()">保存 Event 覆盖</button>
+              <button class="admin-btn admin-btn-ghost" onclick="adminLoadEventTradeSettings()">重载</button>
+            </div>
+            <div class="admin-note" style="margin-top:8px;">说明：当 Event 使用覆盖参数时，右侧交易区域会优先读取 Event 配置。</div>
+          </div>
+        </div>
+
+        <div id="adminTabAnalysis" class="admin-tab-content">
+          <div class="admin-block">
+            <div class="admin-block-title">分析任务中心</div>
+            <div class="admin-muted">在 Event 抽屉里触发分析后，会同步写入这里用于查看和重试。</div>
+          </div>
+          <div id="adminAnalysisList" class="admin-action-list"></div>
+        </div>
+
+        <div id="adminTabUsers" class="admin-tab-content">
+          <div class="admin-block">
+            <div class="admin-block-title">Privy 账号体系（当前最小方案）</div>
+            <div class="admin-note">当前采用人工注入的 admin 账号。后续可由该 admin 在后台继续分配 operator / viewer 权限。</div>
+            <div id="adminAuthStatus" class="admin-note" style="margin-top:8px;">登录状态：未校验</div>
+            <div style="margin-top:10px;display:flex;gap:8px;">
+              <button class="admin-btn" onclick="adminPromptLogin()">管理员登录</button>
+              <button class="admin-btn admin-btn-ghost" onclick="adminLogout()">退出登录</button>
+              <button class="admin-btn admin-btn-ghost" onclick="adminPersistState()">保存当前数据快照</button>
+              <button class="admin-btn admin-btn-red" onclick="adminResetToDefaultState()">重置模拟数据</button>
+            </div>
+            <div style="margin-top:10px;">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>用户</th>
+                    <th>角色</th>
+                    <th>状态</th>
+                    <th>备注</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>privy_admin_seed_001</td>
+                    <td><span class="admin-pill active">admin</span></td>
+                    <td>enabled</td>
+                    <td>人工初始化，可管理 Event / Trade / 主分析切换</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <aside id="adminEventDrawer">
+          <div class="admin-drawer-head">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:#e2e8f0;" id="adminDrawerTitle">新建 Event</div>
+              <div class="admin-muted" id="adminDrawerSubtitle">配置主题、关键词和关联标的</div>
+            </div>
+            <button class="admin-close-btn" onclick="adminCloseEventDrawer()">关闭</button>
+          </div>
+          <div class="admin-drawer-body">
+            <div class="admin-block">
+              <div class="admin-block-title">基础信息</div>
+              <div>
+                <label class="admin-label">主题（title）</label>
+                <input id="adminFormTitle" class="admin-input" placeholder="如：美联储降息预期" />
+              </div>
+              <div style="margin-top:8px;">
+                <label class="admin-label">topic</label>
+                <input id="adminFormTopic" class="admin-input" placeholder="如：Fed Rate Path" />
+              </div>
+              <div style="margin-top:8px;">
+                <label class="admin-label">描述</label>
+                <textarea id="adminFormDescription" class="admin-textarea" placeholder="简述该 Event 的分析目标"></textarea>
+              </div>
+              <div class="admin-row" style="margin-top:8px;">
+                <div>
+                  <label class="admin-label">关键词（逗号分隔）</label>
+                  <input id="adminFormKeywords" class="admin-input" placeholder="fed, cpi, rate cut" />
+                </div>
+                <div>
+                  <label class="admin-label">关联标的（逗号分隔）</label>
+                  <input id="adminFormSymbols" class="admin-input" placeholder="BTC, GOLD, SPX" />
+                </div>
+              </div>
+              <div style="margin-top:8px;">
+                <label class="admin-label">状态</label>
+                <select id="adminFormStatus" class="admin-select">
+                  <option value="draft">draft</option>
+                  <option value="active">active</option>
+                  <option value="archived">archived</option>
+                </select>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="admin-btn" onclick="adminSaveEventFromDrawer()">保存 Event</button>
+                <button class="admin-btn admin-btn-red" onclick="adminDeleteCurrentEvent()">删除</button>
+              </div>
+            </div>
+            <div class="admin-block">
+              <div class="admin-block-title">Event 内部操作</div>
+              <div class="admin-inline" style="margin-bottom:8px;">
+                <input id="adminNewsInput" class="admin-input" placeholder="输入新闻标题或 URL" />
+                <button class="admin-btn admin-btn-ghost" onclick="adminAddNews()">添加新闻</button>
+              </div>
+              <div class="admin-inline" style="margin-bottom:8px;">
+                <input id="adminSourceInput" class="admin-input" placeholder="输入新闻源（RSS/API）" />
+                <button class="admin-btn admin-btn-ghost" onclick="adminAddSource()">添加新闻源</button>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="admin-btn" onclick="adminTriggerAnalysis()">触发分析</button>
+                <button class="admin-btn admin-btn-ghost" onclick="adminSetSelectedPrimary()">设为主分析</button>
+              </div>
+              <div class="admin-note" style="margin-top:8px;">修改主题 + 关键词 + 关联标的后，请触发分析以刷新 AI 目标。</div>
+            </div>
+            <div class="admin-block">
+              <div class="admin-block-title">新闻记录</div>
+              <div id="adminDrawerNewsList" class="admin-action-list"></div>
+            </div>
+            <div class="admin-block">
+              <div class="admin-block-title">分析记录</div>
+              <div id="adminDrawerAnalysisList" class="admin-action-list"></div>
+            </div>
+          </div>
+        </aside>
+      </section>
+    </div>
+  </div>
+</div>
 
 <!-- 主体三栏布局 -->
 <div class="flex h-[calc(100vh-49px)]">
@@ -4272,6 +4787,857 @@
   </aside>
 </div>
 
+
+<script>
+  const ADMIN_STORAGE_KEY = 'zhidao_admin_state_v1';
+  const ADMIN_AUTH_STORAGE_KEY = 'zhidao_admin_auth_v1';
+  const ADMIN_STORAGE_SCHEMA_VERSION = 1;
+  const ADMIN_API_BASE = '/api/admin';
+  let adminApiAvailable = true;
+  let adminApiBootstrapped = false;
+
+  function adminGetAuth() {
+    try {
+      const raw = window.localStorage.getItem(ADMIN_AUTH_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !parsed.accessToken) return null;
+      return parsed;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  function adminSetAuth(auth) {
+    if (!auth) return;
+    window.localStorage.setItem(ADMIN_AUTH_STORAGE_KEY, JSON.stringify(auth));
+    adminUpdateAuthStatus();
+  }
+
+  function adminClearAuth() {
+    window.localStorage.removeItem(ADMIN_AUTH_STORAGE_KEY);
+    adminUpdateAuthStatus();
+  }
+
+  function adminUpdateAuthStatus() {
+    const el = document.getElementById('adminAuthStatus');
+    if (!el) return;
+    const auth = adminGetAuth();
+    if (!auth || !auth.user) {
+      el.textContent = '登录状态：未登录';
+      return;
+    }
+    const exp = auth.expiresAt ? `，过期时间：${new Date(auth.expiresAt * 1000).toLocaleString()}` : '';
+    el.textContent = `登录状态：${auth.user.privyUserId} (${auth.user.role})${exp}`;
+  }
+
+  function adminCreateDefaultState() {
+    return {
+    activeTab: 'events',
+    editingEventId: null,
+    selectedEventId: 'evt-001',
+    events: [
+      {
+        id: 'evt-001',
+        title: '美联储降息预期',
+        topic: 'Fed Rate Path',
+        description: '跟踪利率路径、通胀与就业数据变化，评估风险资产方向。',
+        keywords: [
+          { term: 'fed', weight: 0.9, enabled: true },
+          { term: 'cpi', weight: 0.8, enabled: true },
+          { term: 'rate cut', weight: 0.75, enabled: true }
+        ],
+        symbols: [
+          { symbol: 'BTC', name: 'Bitcoin', assetType: 'crypto' },
+          { symbol: 'GOLD', name: 'Gold', assetType: 'commodity' },
+          { symbol: 'SPX', name: 'S&P 500', assetType: 'index' }
+        ],
+        status: 'active',
+        version: 3,
+        primaryAnalysisId: 'ana-1002',
+        analyses: [
+          { id: 'ana-1001', trigger: 'schedule', status: 'done', isPrimary: false, createdAt: '2026-04-02 09:20' },
+          { id: 'ana-1002', trigger: 'manual', status: 'done', isPrimary: true, createdAt: '2026-04-02 10:05' }
+        ],
+        news: [
+          { id: 'news-1', type: 'manual', text: '美国3月CPI同比回落但核心项仍偏高', createdAt: '2026-04-02 09:10' }
+        ],
+        sources: ['https://example.com/rss/fed']
+      },
+      {
+        id: 'evt-002',
+        title: 'AI 算力链景气度',
+        topic: 'AI Compute Cycle',
+        description: '追踪算力供需、财报指引与估值扩张节奏。',
+        keywords: [
+          { term: 'gpu', weight: 0.9, enabled: true },
+          { term: 'datacenter', weight: 0.7, enabled: true }
+        ],
+        symbols: [
+          { symbol: 'NVDA', name: 'NVIDIA', assetType: 'stock' },
+          { symbol: 'TSM', name: 'TSMC', assetType: 'stock' }
+        ],
+        status: 'draft',
+        version: 1,
+        primaryAnalysisId: '',
+        analyses: [],
+        news: [],
+        sources: []
+      }
+    ],
+    globalTradeSettings: {
+      riskLevel: 6,
+      positionSize: 25,
+      takeProfit: 6.5,
+      stopLoss: 3.5,
+      thresholds: { buy: 0.68, sell: 0.38, warning: 0.55 }
+    },
+    eventTradeSettings: {
+      'evt-001': {
+        useGlobal: false,
+        overrides: { riskLevel: 7, positionSize: 30, takeProfit: 7.2, stopLoss: 3.2 }
+      }
+    },
+      analysisTasks: []
+    };
+  }
+
+  function adminClone(obj) {
+    return JSON.parse(JSON.stringify(obj));
+  }
+
+  function adminLoadPersistedState() {
+    try {
+      const raw = window.localStorage.getItem(ADMIN_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.schemaVersion !== ADMIN_STORAGE_SCHEMA_VERSION) return null;
+      return parsed.state || null;
+    } catch (err) {
+      console.warn('adminLoadPersistedState failed:', err);
+      return null;
+    }
+  }
+
+  function adminPersistStateLocal() {
+    try {
+      const payload = {
+        schemaVersion: ADMIN_STORAGE_SCHEMA_VERSION,
+        savedAt: Date.now(),
+        state: adminState
+      };
+      window.localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(payload));
+    } catch (err) {
+      console.warn('adminPersistState failed:', err);
+    }
+  }
+
+  async function adminApiRequest(method, path, data) {
+    const auth = adminGetAuth();
+    const opts = {
+      method,
+      headers: { 'Content-Type': 'application/json' }
+    };
+    if (auth && auth.accessToken) opts.headers.Authorization = `Bearer ${auth.accessToken}`;
+    if (data !== undefined) opts.body = JSON.stringify(data);
+    const resp = await fetch(`${ADMIN_API_BASE}${path}`, opts);
+    const text = await resp.text();
+    let payload = {};
+    try {
+      payload = text ? JSON.parse(text) : {};
+    } catch (err) {
+      payload = { ok: false, error: 'invalid json response' };
+    }
+    if (resp.status === 401) {
+      adminClearAuth();
+      throw new Error(payload.error || 'unauthorized');
+    }
+    if (!resp.ok || payload.ok === false) {
+      throw new Error(payload.error || `HTTP ${resp.status}`);
+    }
+    return payload;
+  }
+
+  async function adminPromptLogin() {
+    const privyUserId = window.prompt('请输入 Privy User ID（默认可用：admin 种子）', 'privy_admin_seed_001');
+    if (!privyUserId) return false;
+    const bootstrapTip = '如配置了 ADMIN_BOOTSTRAP_TOKEN，请输入；未配置可留空。';
+    const privyToken = window.prompt(bootstrapTip, '') || '';
+    try {
+      const payload = await fetch(`${ADMIN_API_BASE}/auth/privy/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ privyUserId, privyToken })
+      }).then(async (resp) => {
+        const text = await resp.text();
+        let data = {};
+        try { data = text ? JSON.parse(text) : {}; } catch (e) { data = {}; }
+        if (!resp.ok || data.ok === false) throw new Error(data.error || `HTTP ${resp.status}`);
+        return data;
+      });
+      adminSetAuth({
+        accessToken: payload.accessToken,
+        expiresAt: payload.expiresAt,
+        user: payload.user
+      });
+      return true;
+    } catch (err) {
+      window.alert(`登录失败：${err.message || err}`);
+      return false;
+    }
+  }
+
+  function adminLogout() {
+    adminClearAuth();
+    adminApiBootstrapped = false;
+    window.alert('已退出后台登录');
+  }
+
+  async function adminEnsureAuthenticated() {
+    const auth = adminGetAuth();
+    if (!auth || !auth.accessToken) {
+      const ok = await adminPromptLogin();
+      if (!ok) return false;
+    }
+    try {
+      const me = await adminApiRequest('GET', '/me');
+      adminSetAuth({
+        ...adminGetAuth(),
+        user: { id: me.id, privyUserId: me.privyUserId, role: me.role, status: me.status }
+      });
+      return true;
+    } catch (err) {
+      const ok = await adminPromptLogin();
+      if (!ok) return false;
+      try {
+        await adminApiRequest('GET', '/me');
+        return true;
+      } catch (e2) {
+        window.alert(`管理员校验失败：${e2.message || e2}`);
+        return false;
+      }
+    }
+  }
+
+  function adminApplyRemoteState(nextState) {
+    if (!nextState || typeof nextState !== 'object') return;
+    Object.keys(adminState).forEach((k) => delete adminState[k]);
+    Object.assign(adminState, adminClone(nextState));
+    adminPersistStateLocal();
+  }
+
+  function adminPersistState() {
+    adminPersistStateLocal();
+  }
+
+  async function adminBootstrapFromApi(force) {
+    if (adminApiBootstrapped && !force) return;
+    try {
+      const [eventsRes, globalTradeRes, tasksRes] = await Promise.all([
+        adminApiRequest('GET', '/events'),
+        adminApiRequest('GET', '/trade-settings/global'),
+        adminApiRequest('GET', '/analysis/tasks')
+      ]);
+      if (Array.isArray(eventsRes.items)) adminState.events = eventsRes.items;
+      adminState.globalTradeSettings = {
+        riskLevel: Number(globalTradeRes.riskLevel || 5),
+        positionSize: Number(globalTradeRes.positionSize || 20),
+        takeProfit: Number(globalTradeRes.takeProfit || 5),
+        stopLoss: Number(globalTradeRes.stopLoss || 3),
+        thresholds: {
+          buy: Number((globalTradeRes.thresholds || {}).buy || 0.65),
+          sell: Number((globalTradeRes.thresholds || {}).sell || 0.35),
+          warning: Number((globalTradeRes.thresholds || {}).warning || 0.55)
+        }
+      };
+      adminState.analysisTasks = Array.isArray(tasksRes.items) ? tasksRes.items : [];
+      if (!adminState.selectedEventId || !adminState.events.some(e => e.id === adminState.selectedEventId)) {
+        adminState.selectedEventId = adminState.events[0] ? adminState.events[0].id : null;
+      }
+      adminApiAvailable = true;
+      adminApiBootstrapped = true;
+      adminPersistStateLocal();
+    } catch (err) {
+      adminApiAvailable = false;
+      console.warn('adminBootstrapFromApi failed, use local state:', err);
+    }
+  }
+
+  async function adminRefreshEventDetail(eventId) {
+    if (!eventId || !adminApiAvailable) return;
+    try {
+      const res = await adminApiRequest('GET', `/events/${encodeURIComponent(eventId)}`);
+      if (!res || !res.item) return;
+      const idx = adminState.events.findIndex(x => x.id === eventId);
+      if (idx >= 0) adminState.events[idx] = res.item;
+      else adminState.events.unshift(res.item);
+      adminPersistStateLocal();
+    } catch (err) {
+      adminApiAvailable = false;
+      console.warn('adminRefreshEventDetail failed:', err);
+    }
+  }
+
+  async function adminRefreshEventTradeSettings(eventId) {
+    if (!eventId || !adminApiAvailable) return;
+    try {
+      const res = await adminApiRequest('GET', `/events/${encodeURIComponent(eventId)}/trade-settings`);
+      adminState.eventTradeSettings[eventId] = {
+        useGlobal: !!res.useGlobal,
+        overrides: {
+          riskLevel: Number((res.overrides || {}).riskLevel || adminState.globalTradeSettings.riskLevel),
+          positionSize: Number((res.overrides || {}).positionSize || adminState.globalTradeSettings.positionSize),
+          takeProfit: Number((res.overrides || {}).takeProfit || adminState.globalTradeSettings.takeProfit),
+          stopLoss: Number((res.overrides || {}).stopLoss || adminState.globalTradeSettings.stopLoss)
+        }
+      };
+      adminPersistStateLocal();
+    } catch (err) {
+      adminApiAvailable = false;
+      console.warn('adminRefreshEventTradeSettings failed:', err);
+    }
+  }
+
+  async function adminResetToDefaultState() {
+    const ok = window.confirm('确认重置后台数据？若 API 可用会优先重载服务器数据。');
+    if (!ok) return;
+    if (adminApiAvailable) {
+      await adminBootstrapFromApi(true);
+    } else {
+      const next = adminCreateDefaultState();
+      Object.keys(adminState).forEach((k) => delete adminState[k]);
+      Object.assign(adminState, next);
+    }
+    adminPersistState();
+    adminHydrateAll();
+    adminCloseEventDrawer();
+    window.alert(adminApiAvailable ? '已重载服务器数据' : 'API 不可用，已恢复本地默认数据');
+  }
+
+  const adminState = adminClone(adminCreateDefaultState());
+  const adminPersistedState = adminLoadPersistedState();
+  if (adminPersistedState) {
+    Object.assign(adminState, adminPersistedState);
+  }
+
+  async function openAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    if (!panel) return;
+    panel.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    adminUpdateAuthStatus();
+    const authed = await adminEnsureAuthenticated();
+    if (!authed) {
+      closeAdminPanel();
+      return;
+    }
+    adminHydrateAll();
+    await adminBootstrapFromApi(false);
+    adminHydrateAll();
+    adminUpdateAuthStatus();
+  }
+
+  function closeAdminPanel() {
+    const panel = document.getElementById('adminPanel');
+    if (!panel) return;
+    panel.style.display = 'none';
+    document.body.style.overflow = '';
+    adminCloseEventDrawer();
+  }
+
+  function adminSwitchTab(tab) {
+    adminState.activeTab = tab;
+    adminPersistState();
+    const tabs = ['events', 'trade', 'analysis', 'users'];
+    tabs.forEach((id) => {
+      const btn = document.getElementById('adminTab' + id.charAt(0).toUpperCase() + id.slice(1) + 'Btn');
+      const content = document.getElementById('adminTab' + id.charAt(0).toUpperCase() + id.slice(1));
+      if (btn) btn.classList.toggle('active', id === tab);
+      if (content) content.classList.toggle('active', id === tab);
+    });
+    if (tab === 'trade') {
+      adminRenderTradeSelect();
+      adminLoadGlobalTradeSettings();
+      adminLoadEventTradeSettings();
+    }
+    if (tab === 'analysis') adminRenderAnalysisTasks();
+  }
+
+  function adminHydrateAll() {
+    adminRenderEventsTable();
+    adminRenderTradeSelect();
+    adminLoadGlobalTradeSettings();
+    adminLoadEventTradeSettings();
+    adminRenderAnalysisTasks();
+    adminSwitchTab(adminState.activeTab || 'events');
+  }
+
+  function adminStatusPillClass(status) {
+    if (status === 'active') return 'active';
+    if (status === 'archived') return 'archived';
+    return 'draft';
+  }
+
+  function adminRenderEventsTable() {
+    const body = document.getElementById('adminEventsTableBody');
+    if (!body) return;
+    const q = (document.getElementById('adminEventSearch')?.value || '').trim().toLowerCase();
+    const status = document.getElementById('adminEventStatusFilter')?.value || '';
+    const list = adminState.events.filter((evt) => {
+      const keywords = evt.keywords.map(k => k.term).join(',');
+      const symbols = evt.symbols.map(s => s.symbol).join(',');
+      const hitQ = !q || (evt.title + ' ' + evt.topic + ' ' + keywords + ' ' + symbols).toLowerCase().includes(q);
+      const hitStatus = !status || evt.status === status;
+      return hitQ && hitStatus;
+    });
+    if (!list.length) {
+      body.innerHTML = '<tr><td colspan="6" class="admin-muted">暂无匹配 Event</td></tr>';
+      return;
+    }
+    body.innerHTML = list.map((evt) => {
+      const primary = evt.analyses.find(a => a.isPrimary);
+      const primaryText = primary ? primary.id : '未设置';
+      return `
+        <tr>
+          <td>
+            <div style="font-weight:700;color:#e2e8f0;">${evt.title}</div>
+            <span class="small">${evt.topic}</span>
+          </td>
+          <td>${evt.keywords.map(k => k.term).join(', ') || '-'}</td>
+          <td>${evt.symbols.map(s => s.symbol).join(', ') || '-'}</td>
+          <td>${primaryText}</td>
+          <td><span class="admin-pill ${adminStatusPillClass(evt.status)}">${evt.status}</span></td>
+          <td>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <button class="admin-btn admin-btn-ghost" onclick="adminOpenEventDrawer('${evt.id}')">编辑</button>
+              <button class="admin-btn admin-btn-ghost" onclick="adminQuickRunAnalysis('${evt.id}')">触发分析</button>
+              <button class="admin-btn admin-btn-red" onclick="adminDeleteEventById('${evt.id}')">删除</button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  async function adminOpenEventDrawer(eventId) {
+    const drawer = document.getElementById('adminEventDrawer');
+    if (!drawer) return;
+    if (eventId && adminApiAvailable) {
+      await adminRefreshEventDetail(eventId);
+    }
+    const evt = eventId ? adminState.events.find(item => item.id === eventId) : null;
+    adminState.editingEventId = evt ? evt.id : null;
+    if (evt) adminState.selectedEventId = evt.id;
+    document.getElementById('adminDrawerTitle').textContent = evt ? '编辑 Event' : '新建 Event';
+    document.getElementById('adminDrawerSubtitle').textContent = evt ? `ID: ${evt.id}` : '创建后可继续添加新闻源和分析';
+    document.getElementById('adminFormTitle').value = evt ? evt.title : '';
+    document.getElementById('adminFormTopic').value = evt ? evt.topic : '';
+    document.getElementById('adminFormDescription').value = evt ? (evt.description || '') : '';
+    document.getElementById('adminFormKeywords').value = evt ? evt.keywords.map(k => k.term).join(', ') : '';
+    document.getElementById('adminFormSymbols').value = evt ? evt.symbols.map(s => s.symbol).join(', ') : '';
+    document.getElementById('adminFormStatus').value = evt ? evt.status : 'draft';
+    document.getElementById('adminNewsInput').value = '';
+    document.getElementById('adminSourceInput').value = '';
+    adminRenderDrawerLists(evt);
+    drawer.classList.add('open');
+  }
+
+  function adminCloseEventDrawer() {
+    const drawer = document.getElementById('adminEventDrawer');
+    if (drawer) drawer.classList.remove('open');
+    adminState.editingEventId = null;
+    adminPersistState();
+  }
+
+  function adminRenderDrawerLists(evt) {
+    const newsEl = document.getElementById('adminDrawerNewsList');
+    const anaEl = document.getElementById('adminDrawerAnalysisList');
+    if (!newsEl || !anaEl) return;
+    const news = evt ? evt.news : [];
+    const analyses = evt ? evt.analyses : [];
+    newsEl.innerHTML = news.length ? news.map(item => `<div class="admin-news-item">${item.text}<div class="admin-note">${item.type} · ${item.createdAt}</div></div>`).join('') : '<div class="admin-note">暂无新闻记录</div>';
+    anaEl.innerHTML = analyses.length ? analyses.map(item => `<div class="admin-analysis-item ${item.isPrimary ? 'primary' : ''}">${item.id} · ${item.status}<div class="admin-note">${item.trigger} · ${item.createdAt}${item.isPrimary ? ' · 主分析' : ''}</div></div>`).join('') : '<div class="admin-note">暂无分析记录</div>';
+  }
+
+  function adminParseKeywords(raw) {
+    return raw.split(',').map(s => s.trim()).filter(Boolean).map((term, idx) => ({ term, weight: Math.max(0.4, 0.9 - idx * 0.08), enabled: true }));
+  }
+
+  function adminParseSymbols(raw) {
+    return raw.split(',').map(s => s.trim().toUpperCase()).filter(Boolean).map((symbol) => ({ symbol, name: symbol, assetType: 'stock' }));
+  }
+
+  async function adminSaveEventFromDrawer() {
+    const title = document.getElementById('adminFormTitle').value.trim();
+    const topic = document.getElementById('adminFormTopic').value.trim();
+    if (!title || !topic) {
+      window.alert('请先填写主题和 topic');
+      return;
+    }
+    const payload = {
+      title,
+      topic,
+      description: document.getElementById('adminFormDescription').value.trim(),
+      keywords: adminParseKeywords(document.getElementById('adminFormKeywords').value),
+      symbols: adminParseSymbols(document.getElementById('adminFormSymbols').value),
+      status: document.getElementById('adminFormStatus').value || 'draft'
+    };
+    let usedApi = false;
+    if (adminApiAvailable) {
+      try {
+        if (adminState.editingEventId) {
+          const res = await adminApiRequest('PUT', `/events/${encodeURIComponent(adminState.editingEventId)}`, payload);
+          if (res && res.item) {
+            const idx = adminState.events.findIndex(x => x.id === adminState.editingEventId);
+            if (idx >= 0) adminState.events[idx] = res.item;
+          }
+        } else {
+          const res = await adminApiRequest('POST', '/events', payload);
+          if (res && res.item) {
+            adminState.events.unshift(res.item);
+            adminState.editingEventId = res.item.id;
+            adminState.selectedEventId = res.item.id;
+          }
+        }
+        usedApi = true;
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSaveEventFromDrawer api failed, fallback local:', err);
+      }
+    }
+    if (!usedApi) {
+      if (adminState.editingEventId) {
+        const idx = adminState.events.findIndex(x => x.id === adminState.editingEventId);
+        if (idx >= 0) {
+          adminState.events[idx] = {
+            ...adminState.events[idx],
+            ...payload,
+            version: (adminState.events[idx].version || 1) + 1
+          };
+        }
+      } else {
+        const id = 'evt-' + String(Date.now()).slice(-6);
+        adminState.events.unshift({
+          id,
+          ...payload,
+          version: 1,
+          primaryAnalysisId: '',
+          analyses: [],
+          news: [],
+          sources: []
+        });
+        adminState.editingEventId = id;
+        adminState.selectedEventId = id;
+      }
+    }
+    adminRenderEventsTable();
+    adminRenderTradeSelect();
+    adminPersistState();
+    window.alert('Event 已保存');
+  }
+
+  function adminDeleteCurrentEvent() {
+    if (!adminState.editingEventId) return;
+    adminDeleteEventById(adminState.editingEventId, true);
+  }
+
+  async function adminDeleteEventById(eventId, fromDrawer) {
+    const idx = adminState.events.findIndex(item => item.id === eventId);
+    if (idx < 0) return;
+    const yes = window.confirm('确认删除该 Event？此操作会影响 AI 分析目标。');
+    if (!yes) return;
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('DELETE', `/events/${encodeURIComponent(eventId)}`);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminDeleteEventById api failed, fallback local:', err);
+      }
+    }
+    adminState.events.splice(idx, 1);
+    delete adminState.eventTradeSettings[eventId];
+    adminState.analysisTasks = adminState.analysisTasks.filter(x => x.eventId !== eventId);
+    if (adminState.selectedEventId === eventId) {
+      adminState.selectedEventId = adminState.events[0] ? adminState.events[0].id : null;
+    }
+    adminRenderEventsTable();
+    adminRenderTradeSelect();
+    adminRenderAnalysisTasks();
+    adminPersistState();
+    if (fromDrawer) adminCloseEventDrawer();
+  }
+
+  function adminGetEditingEvent() {
+    return adminState.events.find(item => item.id === adminState.editingEventId);
+  }
+
+  function adminNow() {
+    const d = new Date();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const mi = String(d.getMinutes()).padStart(2, '0');
+    return `${d.getFullYear()}-${mm}-${dd} ${hh}:${mi}`;
+  }
+
+  async function adminAddNews() {
+    const evt = adminGetEditingEvent();
+    if (!evt) {
+      window.alert('请先保存 Event，再添加新闻');
+      return;
+    }
+    const val = document.getElementById('adminNewsInput').value.trim();
+    if (!val) return;
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('POST', `/events/${encodeURIComponent(evt.id)}/news`, { content: val });
+        await adminRefreshEventDetail(evt.id);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminAddNews api failed, fallback local:', err);
+        evt.news.unshift({ id: 'news-' + Date.now(), type: 'manual', text: val, createdAt: adminNow() });
+      }
+    } else {
+      evt.news.unshift({ id: 'news-' + Date.now(), type: 'manual', text: val, createdAt: adminNow() });
+    }
+    document.getElementById('adminNewsInput').value = '';
+    adminRenderDrawerLists(adminGetEditingEvent());
+    adminPersistState();
+  }
+
+  async function adminAddSource() {
+    const evt = adminGetEditingEvent();
+    if (!evt) {
+      window.alert('请先保存 Event，再添加新闻源');
+      return;
+    }
+    const val = document.getElementById('adminSourceInput').value.trim();
+    if (!val) return;
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('POST', `/events/${encodeURIComponent(evt.id)}/news-sources`, { url: val, type: 'rss', name: 'manual-source' });
+        await adminRefreshEventDetail(evt.id);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminAddSource api failed, fallback local:', err);
+        evt.sources.push(val);
+        evt.news.unshift({ id: 'source-' + Date.now(), type: 'source', text: '新增新闻源：' + val, createdAt: adminNow() });
+      }
+    } else {
+      evt.sources.push(val);
+      evt.news.unshift({ id: 'source-' + Date.now(), type: 'source', text: '新增新闻源：' + val, createdAt: adminNow() });
+    }
+    document.getElementById('adminSourceInput').value = '';
+    adminRenderDrawerLists(adminGetEditingEvent());
+    adminPersistState();
+  }
+
+  async function adminTriggerAnalysis() {
+    const evt = adminGetEditingEvent();
+    if (!evt) {
+      window.alert('请先保存并选择 Event');
+      return;
+    }
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('POST', `/events/${encodeURIComponent(evt.id)}/analyses/run`, { trigger: 'manual' });
+        await Promise.all([
+          adminRefreshEventDetail(evt.id),
+          adminBootstrapFromApi(true)
+        ]);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminTriggerAnalysis api failed, fallback local:', err);
+        const id = 'ana-' + String(Date.now()).slice(-6);
+        const entry = { id, trigger: 'manual', status: 'done', isPrimary: false, createdAt: adminNow() };
+        evt.analyses.unshift(entry);
+        adminState.analysisTasks.unshift({
+          taskId: 'task-' + String(Date.now()).slice(-6),
+          eventId: evt.id,
+          eventTitle: evt.title,
+          status: 'done',
+          startedAt: adminNow(),
+          endedAt: adminNow()
+        });
+      }
+    } else {
+      const id = 'ana-' + String(Date.now()).slice(-6);
+      const entry = { id, trigger: 'manual', status: 'done', isPrimary: false, createdAt: adminNow() };
+      evt.analyses.unshift(entry);
+      adminState.analysisTasks.unshift({
+        taskId: 'task-' + String(Date.now()).slice(-6),
+        eventId: evt.id,
+        eventTitle: evt.title,
+        status: 'done',
+        startedAt: adminNow(),
+        endedAt: adminNow()
+      });
+    }
+    adminRenderDrawerLists(adminGetEditingEvent());
+    adminRenderAnalysisTasks();
+    adminRenderEventsTable();
+    adminPersistState();
+  }
+
+  async function adminQuickRunAnalysis(eventId) {
+    await adminOpenEventDrawer(eventId);
+    await adminTriggerAnalysis();
+  }
+
+  async function adminSetSelectedPrimary() {
+    const evt = adminGetEditingEvent();
+    if (!evt || !evt.analyses.length) {
+      window.alert('暂无分析记录可设置');
+      return;
+    }
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('POST', `/events/${encodeURIComponent(evt.id)}/analyses/${encodeURIComponent(evt.analyses[0].id)}/set-primary`);
+        await adminRefreshEventDetail(evt.id);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSetSelectedPrimary api failed, fallback local:', err);
+        evt.analyses.forEach(a => { a.isPrimary = false; });
+        evt.analyses[0].isPrimary = true;
+        evt.primaryAnalysisId = evt.analyses[0].id;
+      }
+    } else {
+      evt.analyses.forEach(a => { a.isPrimary = false; });
+      evt.analyses[0].isPrimary = true;
+      evt.primaryAnalysisId = evt.analyses[0].id;
+    }
+    adminRenderDrawerLists(adminGetEditingEvent());
+    adminRenderEventsTable();
+    adminPersistState();
+  }
+
+  function adminRenderTradeSelect() {
+    const select = document.getElementById('adminTradeEventSelect');
+    if (!select) return;
+    select.innerHTML = adminState.events.map(evt => `<option value="${evt.id}">${evt.title}</option>`).join('');
+    if (adminState.selectedEventId) {
+      select.value = adminState.selectedEventId;
+    } else if (adminState.events[0]) {
+      adminState.selectedEventId = adminState.events[0].id;
+      select.value = adminState.selectedEventId;
+    }
+    select.onchange = function () {
+      adminState.selectedEventId = this.value;
+      adminLoadEventTradeSettings();
+      adminPersistState();
+    };
+  }
+
+  function adminLoadGlobalTradeSettings() {
+    const s = adminState.globalTradeSettings;
+    document.getElementById('adminTradeGlobalRisk').value = s.riskLevel;
+    document.getElementById('adminTradeGlobalPosition').value = s.positionSize;
+    document.getElementById('adminTradeGlobalTP').value = s.takeProfit;
+    document.getElementById('adminTradeGlobalSL').value = s.stopLoss;
+    document.getElementById('adminTradeGlobalBuy').value = s.thresholds.buy;
+    document.getElementById('adminTradeGlobalSell').value = s.thresholds.sell;
+  }
+
+  async function adminSaveGlobalTradeSettings() {
+    adminState.globalTradeSettings = {
+      riskLevel: Number(document.getElementById('adminTradeGlobalRisk').value || 5),
+      positionSize: Number(document.getElementById('adminTradeGlobalPosition').value || 20),
+      takeProfit: Number(document.getElementById('adminTradeGlobalTP').value || 5),
+      stopLoss: Number(document.getElementById('adminTradeGlobalSL').value || 3),
+      thresholds: {
+        buy: Number(document.getElementById('adminTradeGlobalBuy').value || 0.65),
+        sell: Number(document.getElementById('adminTradeGlobalSell').value || 0.35),
+        warning: 0.55
+      }
+    };
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('PUT', '/trade-settings/global', adminState.globalTradeSettings);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSaveGlobalTradeSettings api failed, fallback local:', err);
+      }
+    }
+    adminPersistState();
+    window.alert('全局 Trade 参数已保存');
+  }
+
+  async function adminLoadEventTradeSettings() {
+    const eventId = adminState.selectedEventId || document.getElementById('adminTradeEventSelect')?.value;
+    if (!eventId) return;
+    if (adminApiAvailable) {
+      await adminRefreshEventTradeSettings(eventId);
+    }
+    const record = adminState.eventTradeSettings[eventId] || {
+      useGlobal: true,
+      overrides: {
+        riskLevel: adminState.globalTradeSettings.riskLevel,
+        positionSize: adminState.globalTradeSettings.positionSize,
+        takeProfit: adminState.globalTradeSettings.takeProfit,
+        stopLoss: adminState.globalTradeSettings.stopLoss
+      }
+    };
+    document.getElementById('adminTradeUseGlobal').value = record.useGlobal ? 'true' : 'false';
+    document.getElementById('adminTradeEventRisk').value = record.overrides.riskLevel;
+    document.getElementById('adminTradeEventPosition').value = record.overrides.positionSize;
+    document.getElementById('adminTradeEventTP').value = record.overrides.takeProfit;
+    document.getElementById('adminTradeEventSL').value = record.overrides.stopLoss;
+  }
+
+  async function adminSaveEventTradeSettings() {
+    const eventId = adminState.selectedEventId || document.getElementById('adminTradeEventSelect')?.value;
+    if (!eventId) return;
+    adminState.eventTradeSettings[eventId] = {
+      useGlobal: document.getElementById('adminTradeUseGlobal').value === 'true',
+      overrides: {
+        riskLevel: Number(document.getElementById('adminTradeEventRisk').value || adminState.globalTradeSettings.riskLevel),
+        positionSize: Number(document.getElementById('adminTradeEventPosition').value || adminState.globalTradeSettings.positionSize),
+        takeProfit: Number(document.getElementById('adminTradeEventTP').value || adminState.globalTradeSettings.takeProfit),
+        stopLoss: Number(document.getElementById('adminTradeEventSL').value || adminState.globalTradeSettings.stopLoss)
+      }
+    };
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('PUT', `/events/${encodeURIComponent(eventId)}/trade-settings`, adminState.eventTradeSettings[eventId]);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSaveEventTradeSettings api failed, fallback local:', err);
+      }
+    }
+    adminPersistState();
+    window.alert('Event Trade 覆盖已保存');
+  }
+
+  function adminRenderAnalysisTasks() {
+    const wrap = document.getElementById('adminAnalysisList');
+    if (!wrap) return;
+    if (!adminState.analysisTasks.length) {
+      wrap.innerHTML = '<div class="admin-block"><div class="admin-note">暂无任务，触发分析后自动出现。</div></div>';
+      return;
+    }
+    wrap.innerHTML = adminState.analysisTasks.map(task => `
+      <div class="admin-block">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:#e2e8f0;">${task.taskId} · ${task.eventTitle || task.eventId}</div>
+            <div class="admin-note">开始: ${task.startedAt}${task.endedAt ? ` · 结束: ${task.endedAt}` : ''}</div>
+          </div>
+          <span class="admin-pill ${task.status === 'done' ? 'active' : 'draft'}">${task.status}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') {
+      const panel = document.getElementById('adminPanel');
+      if (panel && panel.style.display === 'flex') closeAdminPanel();
+    }
+  });
+
+  adminUpdateAuthStatus();
+  if (!adminPersistedState) adminPersistState();
+</script>
 
 <script>window.parent.postMessage({ action: "ready" }, "*"); 
  
