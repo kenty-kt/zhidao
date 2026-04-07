@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI盯盘</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .font-headline { font-family: 'Manrope', sans-serif; }
+    .status-bar-safe { padding-top: env(safe-area-inset-top); }
+    .bottom-safe { padding-bottom: env(safe-area-inset-bottom); }
+
+    /* Readability polish for AI answer cards (visual only, no data changes) */
+    main > .flex.items-start.gap-3 > section {
+      border-color: #e6e9ee;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+      border-radius: 18px;
+    }
+
+    main > .flex.items-start.gap-3 > section > div:first-child {
+      background: linear-gradient(180deg, #fafcff 0%, #f5f8fc 100%);
+      border-bottom-color: #e8edf4;
+    }
+
+    main section h2,
+    main section h3 {
+      letter-spacing: 0.01em;
+      color: #111827;
+    }
+
+    main section .p-4,
+    main section .px-4.pb-4 {
+      line-height: 1.62;
+    }
+
+    main section p {
+      color: #374151;
+    }
+
+    main section .rounded-lg.border.border-gray-200.p-3,
+    main section .rounded-xl.border.border-gray-200.p-3 {
+      border-color: #e6ebf2;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcfe 100%);
+      box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    }
+
+    main section .text-\[11px\].text-gray-500 {
+      color: #6b7280;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    main section .grid.grid-cols-6,
+    main section .grid.grid-cols-4,
+    main section .grid.grid-cols-3,
+    main section .grid.grid-cols-2 {
+      border-radius: 10px;
+    }
+
+    main section .bg-gray-50 {
+      background-color: #f7f9fc !important;
+    }
+
+    main section .text-xs {
+      line-height: 1.55;
+    }
+
+    @media (max-width: 640px) {
+      main > .flex.items-start.gap-3 {
+        gap: 10px;
+      }
+      main > .flex.items-start.gap-3 > section {
+        border-radius: 16px;
+      }
+      main section .p-4 {
+        padding: 14px;
+      }
+    }
+
+    /* Advanced structured answer layout (content unchanged) */
+    .answer-body {
+      background: linear-gradient(180deg, #fcfdff 0%, #f8fafd 100%);
+      border-top: 1px solid #eef2f7;
+    }
+
+    .answer-flow-pro {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr;
+    }
+
+    .answer-card-shell {
+      position: relative;
+      padding-left: 0;
+    }
+
+    .answer-card-shell:first-child {
+      padding-left: 0;
+    }
+
+    .answer-card {
+      display: block;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+      transition: none;
+    }
+
+    .answer-card:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .answer-card.featured {
+      border-radius: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    .answer-card.featured .answer-content {
+      font-size: 14px;
+      line-height: 1.68;
+    }
+
+    .answer-content {
+      min-width: 0;
+    }
+
+    .answer-content > .rounded-lg.border.border-gray-200.p-3,
+    .answer-content > .rounded-xl.border.border-gray-200.p-3 {
+      border: 1px solid #d6dde7 !important;
+      background: #f3f5f9 !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+      padding: 16px 20px !important;
+      border-radius: 20px !important;
+    }
+
+    .answer-content > p {
+      border: 1px solid #d6dde7;
+      background: #f3f5f9;
+      border-radius: 16px;
+      padding: 12px 16px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .answer-content p + p {
+      margin-top: 6px;
+    }
+
+    .answer-content .text-\[11px\].text-gray-500 {
+      color: #4b5563;
+      font-weight: 700;
+      letter-spacing: 0.015em;
+    }
+
+    .answer-content .rounded-lg p:first-child,
+    .answer-content .rounded-xl p:first-child {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2d3748;
+      letter-spacing: 0.01em;
+    }
+
+    @media (min-width: 860px) {
+      .answer-flow-pro {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      .answer-card-shell:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .answer-card {
+        padding: 9px 10px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#f5f6f7] text-[#2c2f30] min-h-screen">
+  <header class="status-bar-safe sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-gray-100">
+    <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+      <a href="code.html" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-gray-900">
+        <span>←</span><span>返回</span>
+      </a>
+      <div class="text-center">
+        <p class="font-headline font-extrabold tracking-tight">AI盯盘</p>
+        <p class="text-[11px] text-gray-400">监控预警 · 主动推送</p>
+      </div>
+      <div class="w-8"></div>
+    </div>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-4 py-5 pb-28 space-y-3">
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">把账户资产管理功能都给我列出来。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h2 class="font-headline font-extrabold text-base">账户资产管理（F-001~F-008）</h2></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-xl border border-gray-200 p-3">F-001 资产总览：现货+合约总资产，USDT 折算，支持分账户明细</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-002 持仓查询：数量、成本价、当前价、浮盈亏、盈亏比例</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-003 合约仓位详情：方向/杠杆/保证金/强平价/资金费率</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-004 保证金率监控：健康/警告/危险三档状态</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-005 资金费率查询：当前费率与下次结算时间</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-006 交易历史：按时间、币种、买卖方向筛选</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-007 盈亏统计：日/周/月统计，支持导出</div>
+          <div class="rounded-xl border border-gray-200 p-3">F-008 挂单管理：查询未成交挂单 + 自然语言撤单</div>
+        </div>
+        <div class="px-4 pb-4 space-y-2.5">
+          <div class="text-sm font-semibold text-gray-700">我的持仓（模拟）</div>
+          <div class="rounded-xl border border-gray-200 overflow-hidden">
+            <div class="grid grid-cols-6 bg-gray-50 text-[11px] text-gray-500 px-3 py-2">
+              <span>币种</span><span>数量</span><span>成本价</span><span>现价</span><span>浮盈亏</span><span class="text-right">盈亏%</span>
+            </div>
+            <div class="grid grid-cols-6 px-3 py-2 text-xs border-t border-gray-100">
+              <span>BTC/USDT</span><span>0.0182</span><span>63,200</span><span>65,800</span><span class="text-emerald-600">+47.32U</span><span class="text-right text-emerald-600">+3.95%</span>
+            </div>
+            <div class="grid grid-cols-6 px-3 py-2 text-xs border-t border-gray-100">
+              <span>ETH/USDT</span><span>0.2500</span><span>3,500</span><span>3,400</span><span class="text-rose-500">-25.00U</span><span class="text-right text-rose-500">-2.86%</span>
+            </div>
+            <div class="grid grid-cols-6 px-3 py-2 text-xs border-t border-gray-100">
+              <span>SOL/USDT</span><span>2.0000</span><span>142.5</span><span>148.0</span><span class="text-emerald-600">+11.00U</span><span class="text-right text-emerald-600">+3.86%</span>
+            </div>
+          </div>
+          <div class="rounded-xl border border-gray-200 p-3 text-xs text-gray-700">
+            <p>现货总浮盈亏：<span class="text-emerald-600 font-semibold">+33.32 USDT</span></p>
+            <p class="mt-1">合约未实现盈亏：<span class="text-emerald-600 font-semibold">+90.00 USDT</span></p>
+            <p class="mt-1">组合总浮盈亏：<span class="text-emerald-600 font-semibold">+123.32 USDT</span></p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我账户现在有多少钱？（F-001）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-001 资产总览（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="grid grid-cols-3 text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2"><span>账户类型</span><span>资产(USDT)</span><span class="text-right">占比</span></div>
+          <div class="grid grid-cols-3 text-sm px-3 py-2 border border-gray-200 rounded-lg"><span>现货账户</span><span>2,350.45</span><span class="text-right">82.4%</span></div>
+          <div class="grid grid-cols-3 text-sm px-3 py-2 border border-gray-200 rounded-lg"><span>合约账户</span><span>500.00</span><span class="text-right">17.6%</span></div>
+          <div class="grid grid-cols-3 text-sm px-3 py-2 border border-gray-200 rounded-lg font-semibold"><span>合计</span><span>2,850.45</span><span class="text-right">100%</span></div>
+          <p class="text-xs text-emerald-600">24h 变化：+88.32 USDT（+3.2%）</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我现在持仓情况怎么样？（F-002）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-002 持仓查询（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="font-semibold">BTC/USDT</p>
+            <p class="text-xs text-gray-600 mt-1">数量 0.0182 · 成本 63,200 · 现价 65,800</p>
+            <p class="text-xs text-emerald-600 mt-1">浮盈亏 +47.32 USDT（+3.95%）</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="font-semibold">ETH/USDT</p>
+            <p class="text-xs text-gray-600 mt-1">数量 0.2500 · 成本 3,500 · 现价 3,400</p>
+            <p class="text-xs text-rose-500 mt-1">浮盈亏 -25.00 USDT（-2.86%）</p>
+          </div>
+          <p class="text-xs text-gray-700">整体浮动盈亏：<span class="text-emerald-600 font-semibold">+22.32 USDT（+0.94%）</span></p>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我合约有哪些仓位？（F-003）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-003 合约仓位详情（模拟）</h3></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="font-semibold">BTC 永续 · 多单</p>
+            <p class="text-xs text-gray-600 mt-1">开仓 64,500 · 现价 65,800 · 持仓 0.05 BTC</p>
+            <p class="text-xs text-gray-600 mt-1">杠杆 10x 逐仓 · 保证金 329U · 强平 58,500</p>
+            <p class="text-xs text-emerald-600 mt-1">浮盈 +65U（+19.76%）</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="font-semibold">ETH 永续 · 空单</p>
+            <p class="text-xs text-gray-600 mt-1">开仓 3,450 · 现价 3,400 · 持仓 0.5 ETH</p>
+            <p class="text-xs text-gray-600 mt-1">杠杆 5x 全仓 · 保证金 340U · 强平 3,789</p>
+            <p class="text-xs text-emerald-600 mt-1">浮盈 +25U（+7.35%）</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我的合约账户安全吗？（F-004）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-004 保证金率监控（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <p>保证金率：<span class="text-emerald-600 font-semibold">43.2%（健康）</span></p>
+          <div class="h-2 rounded-full bg-gray-100 overflow-hidden"><div class="h-full bg-emerald-500" style="width:43.2%"></div></div>
+          <p class="text-xs text-gray-600">安全 ≥30%｜警告 15%~30%｜危险 &lt;15%</p>
+          <p class="text-xs text-gray-700">账户权益 669U · 占用保证金 669U · 未实现盈亏 +90U</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">ETH 资金费率多少？（F-005）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-005 资金费率查询（模拟）</h3></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-gray-500 text-xs">当前费率</p><p class="font-semibold text-base">+0.0135%</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-gray-500 text-xs">下次结算</p><p class="font-semibold text-base">1小时42分钟后</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-gray-500 text-xs">结算周期</p><p class="font-semibold text-base">8小时/次</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-gray-500 text-xs">年化资金成本</p><p class="font-semibold text-base">≈14.8%</p></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我最近交易记录呢？（F-006）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-006 交易历史（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-xs">
+          <div class="grid grid-cols-6 text-gray-500 bg-gray-50 rounded-lg px-2 py-2"><span>时间</span><span>币种</span><span>方向</span><span>价格</span><span>数量</span><span class="text-right">金额</span></div>
+          <div class="grid grid-cols-6 border border-gray-200 rounded-lg px-2 py-2"><span>03-18 14:32</span><span>BTC</span><span>买入</span><span>64,500</span><span>0.01</span><span class="text-right">645U</span></div>
+          <div class="grid grid-cols-6 border border-gray-200 rounded-lg px-2 py-2"><span>03-17 09:15</span><span>ETH</span><span>卖出</span><span>3,520</span><span>0.10</span><span class="text-right">352U</span></div>
+          <div class="grid grid-cols-6 border border-gray-200 rounded-lg px-2 py-2"><span>03-16 21:40</span><span>SOL</span><span>买入</span><span>142.5</span><span>2.00</span><span class="text-right">285U</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">给我日/周/月盈亏统计。（F-007）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-007 盈亏统计（模拟）</h3></div>
+        <div class="p-4 grid grid-cols-3 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">日统计</p><p class="font-semibold text-emerald-600">+42.50U</p><p class="text-xs text-gray-500 mt-1">手续费 3.20U</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">周统计</p><p class="font-semibold text-emerald-600">+188.90U</p><p class="text-xs text-gray-500 mt-1">手续费 18.60U</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">月统计</p><p class="font-semibold text-rose-500">-56.30U</p><p class="text-xs text-gray-500 mt-1">手续费 72.40U</p></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我现在有哪些未成交挂单？（F-008）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-008 挂单管理（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3 flex items-center justify-between"><div><p class="font-semibold">#001 ETH 限价卖单</p><p class="text-xs text-gray-500">价格 3,800 · 数量 0.10 ETH</p></div><span class="text-xs text-amber-600 font-semibold">未成交</span></div>
+          <div class="rounded-lg border border-gray-200 p-3 flex items-center justify-between"><div><p class="font-semibold">#002 SOL 止损单</p><p class="text-xs text-gray-500">触发价 135.0 · 数量 2.00 SOL</p></div><span class="text-xs text-amber-600 font-semibold">未触发</span></div>
+          <div class="flex flex-wrap gap-2 pt-1">
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">撤销 #001</button>
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">撤销 #002</button>
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">全部撤单</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">行情分析能力也补全给我。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">行情分析能力</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-xl border border-gray-200 p-3">多周期趋势分析：1h / 4h / 日线联动判断</div>
+          <div class="rounded-xl border border-gray-200 p-3">技术指标解读：RSI、MACD、成交量、均线结构</div>
+          <div class="rounded-xl border border-gray-200 p-3">关键位识别：支撑/阻力区间 + 突破回踩提示</div>
+          <div class="rounded-xl border border-gray-200 p-3">情绪与资金侧验证：清算、多空比、资金费率联动</div>
+          <div class="rounded-xl border border-gray-200 p-3">短线/波段建议：进出场区间 + 风险提示</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 现在多少钱？（F-101）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-101 实时价格（模拟）</h3></div>
+        <div class="p-4 grid grid-cols-2 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">当前价格</p><p class="font-semibold text-base">65,820 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">24h 涨跌</p><p class="font-semibold text-emerald-600">+2,150（+3.38%）</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">24h 最高</p><p class="font-semibold">66,200 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">24h 最低</p><p class="font-semibold">63,500 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3 col-span-2"><p class="text-xs text-gray-500">24h 成交量</p><p class="font-semibold">32,450 BTC（约 21.3 亿 USDT）</p></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">SOL、ETH、BNB 今天谁涨得最多？（F-102）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-102 多币种比价（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="grid grid-cols-4 text-xs text-gray-500 bg-gray-50 rounded-lg px-3 py-2"><span>排名</span><span>币种</span><span>当前价</span><span class="text-right">24h 涨跌幅</span></div>
+          <div class="grid grid-cols-4 px-3 py-2 border border-gray-200 rounded-lg"><span>🥇 1</span><span>SOL</span><span>148.30</span><span class="text-right text-emerald-600">+5.62%</span></div>
+          <div class="grid grid-cols-4 px-3 py-2 border border-gray-200 rounded-lg"><span>🥈 2</span><span>ETH</span><span>3,420</span><span class="text-right text-emerald-600">+4.21%</span></div>
+          <div class="grid grid-cols-4 px-3 py-2 border border-gray-200 rounded-lg"><span>🥉 3</span><span>BNB</span><span>562.00</span><span class="text-right text-emerald-600">+1.85%</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 现在 RSI 多少？（F-103）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-103 技术指标计算（模拟）</h3></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">RSI(14)</p><p class="font-semibold">68.3（接近超买）</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">RSI(6)</p><p class="font-semibold text-rose-600">74.1（超买）</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">MACD 柱</p><p class="font-semibold text-emerald-600">+16.5（红柱）</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">布林带位置</p><p class="font-semibold">中轨与上轨之间</p></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 关键支撑和压力在哪？（F-104）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-104 支撑压力位（模拟）</h3></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">当前价</p><p class="font-semibold">65,820 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">近期压力</p><p class="font-semibold">66,200 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">强压力</p><p class="font-semibold">68,500 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">极强压力</p><p class="font-semibold">73,000 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">近期支撑</p><p class="font-semibold">65,000 USDT</p></div>
+          <div class="rounded-lg border border-gray-200 p-3"><p class="text-xs text-gray-500">强支撑</p><p class="font-semibold">63,200 USDT</p></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">看看 BTC 4 小时线趋势。（F-105）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-105 K线趋势分析（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">整体方向：震荡上行（高低点抬升）</div>
+          <div class="rounded-lg border border-gray-200 p-3">均线结构：MA7 &gt; MA25 &gt; MA99（多头排列）</div>
+          <div class="rounded-lg border border-gray-200 p-3">量价关系：上涨放量、回调缩量，结构健康</div>
+          <div class="rounded-lg border border-gray-200 p-3">形态识别：旗形整理，偏上涨中继</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 最近波动大吗？（F-106）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-106 波动率分析（模拟）</h3></div>
+        <div class="p-4 grid grid-cols-3 gap-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3 text-center"><p class="text-xs text-gray-500">7天</p><p class="font-semibold">52.3%</p><p class="text-[11px] text-amber-600">中高</p></div>
+          <div class="rounded-lg border border-gray-200 p-3 text-center"><p class="text-xs text-gray-500">30天</p><p class="font-semibold">44.8%</p><p class="text-[11px] text-gray-500">中等</p></div>
+          <div class="rounded-lg border border-gray-200 p-3 text-center"><p class="text-xs text-gray-500">90天</p><p class="font-semibold">38.5%</p><p class="text-[11px] text-emerald-600">正常</p></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">当前市场情绪怎么样？（F-107）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-107 市场情绪（模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="rounded-lg border border-gray-200 p-3 text-center"><p class="text-xs text-gray-500">多空比</p><p class="font-semibold">49 : 51</p></div>
+            <div class="rounded-lg border border-gray-200 p-3 text-center"><p class="text-xs text-gray-500">大单流向</p><p class="font-semibold text-emerald-600">净流入 +1280万U</p></div>
+            <div class="rounded-lg border border-gray-200 p-3 text-center"><p class="text-xs text-gray-500">资金费率</p><p class="font-semibold">+0.0082%</p></div>
+          </div>
+          <p class="text-xs text-gray-700">综合判断：情绪中性偏谨慎，空头略占优，但买盘承接未明显转弱。</p>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">交易执行模块也要完整。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">交易执行能力（F-201~F-206）</h3></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-xl border border-gray-200 p-3">下单执行：市价 / 限价 / 开仓 / 平仓</div>
+          <div class="rounded-xl border border-gray-200 p-3">撤单与改单：自然语言撤销、批量处理</div>
+          <div class="rounded-xl border border-gray-200 p-3">止盈止损单：支持绝对价格与百分比</div>
+          <div class="rounded-xl border border-gray-200 p-3">条件触发单：上穿/下破触发后执行动作</div>
+          <div class="rounded-xl border border-gray-200 p-3">下单前校验：余额、最小下单量、杠杆限制</div>
+          <div class="rounded-xl border border-gray-200 p-3">高风险二次确认：高杠杆、全仓、大额操作拦截</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">市价买入 500U 的 BTC。（F-201）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-201 现货市价单（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">成交价：65,820 USDT · 成交数量：0.007596 BTC · 成交金额：500 USDT</div>
+          <div class="rounded-lg border border-gray-200 p-3">手续费：0.50 USDT · 订单状态：✅ 已成交</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">挂一个 BTC 限价买单 64,800，数量 0.01。（F-202）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-202 现货限价单（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">订单号：#LMT-1028 · 类型：限价买入 · 价格：64,800</div>
+          <div class="rounded-lg border border-gray-200 p-3">数量：0.0100 BTC · 预计占用：648 USDT · 状态：⏳ 挂单中</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">ETH 10x 做多，保证金 200U，逐仓。（F-203）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-203 合约开仓（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">标的：ETH/USDT 永续 · 方向：多单 · 杠杆：10x 逐仓</div>
+          <div class="rounded-lg border border-gray-200 p-3">开仓均价：3,422 · 名义价值：2,000U · 保证金：200U · 状态：✅ 已开仓</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">把我的 ETH 空单平仓 50%。（F-204）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-204 合约平仓（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">仓位：ETH 空单 0.50 ETH · 平仓比例：50%</div>
+          <div class="rounded-lg border border-gray-200 p-3">已平：0.25 ETH @ 3,395 · 已实现盈亏：+13.75U · 剩余仓位：0.25 ETH</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">给 ETH 多单设置止盈 3800，止损 3200。（F-205）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-205 止盈止损单（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">止盈：3,800（触发条件 +11.1%）</div>
+          <div class="rounded-lg border border-gray-200 p-3">止损：3,200（触发条件 -6.5%）</div>
+          <div class="rounded-lg border border-gray-200 p-3">订单状态：✅ 已生效（双向保护）</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 突破 68,000 就市价买入 0.01。（F-206）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-206 条件触发单（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">触发条件：BTC ≥ 68,000 USDT</div>
+          <div class="rounded-lg border border-gray-200 p-3">触发后动作：市价买入 0.01 BTC（估算约 680U）</div>
+          <div class="rounded-lg border border-gray-200 p-3">状态：⏳ 待触发（当前 65,820，距触发 +3.3%）</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">把我所有挂单都撤掉。（F-207）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-207 批量撤单（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">已撤销挂单：3 笔（ETH 限价卖单、SOL 止损单、BTC 限价买单）</div>
+          <div class="rounded-lg border border-gray-200 p-3">当前挂单数量：0 笔 · 释放冻结资金：1,210 USDT</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">用余额的 30% 买 ETH。（F-208）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-208 按比例下单（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">可用 USDT：1,000 · 下单比例：30% · 下单金额：300 USDT</div>
+          <div class="rounded-lg border border-gray-200 p-3">按现价 3,420 估算买入：0.0877 ETH · 订单状态：✅ 已成交</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 多单加仓 20%。（F-209）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-209 加减仓（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">原仓位：0.0500 BTC · 加仓比例：20% · 加仓数量：0.0100 BTC</div>
+          <div class="rounded-lg border border-gray-200 p-3">加仓后仓位：0.0600 BTC · 新均价：64,980 USDT · 状态：✅ 已执行</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">把 ETH 合约杠杆调到 3x。（F-210）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-210 调整杠杆（模拟）</h3></div>
+        <div class="p-4 text-sm space-y-2">
+          <div class="rounded-lg border border-gray-200 p-3">标的：ETH/USDT 永续 · 当前杠杆：5x → 目标杠杆：3x</div>
+          <div class="rounded-lg border border-gray-200 p-3">调整后预估强平价由 3,789 提升至 3,945（风险下降）</div>
+          <div class="rounded-lg border border-gray-200 p-3">状态：✅ 已调整完成</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">策略与风控也补全。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">策略与风控能力（F-301~F-305）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-xl border border-gray-200 p-3">仓位管理建议：按账户规模 + 可承受风险给仓位</div>
+          <div class="rounded-xl border border-gray-200 p-3">止损位建议：基于入场价、最大亏损、技术位计算</div>
+          <div class="rounded-xl border border-gray-200 p-3">盈亏比评估：当前止盈止损是否达到 ≥2:1</div>
+          <div class="rounded-xl border border-gray-200 p-3">爆仓风险预警：距强平价&lt;10% 触发高优先级提醒</div>
+          <div class="rounded-xl border border-gray-200 p-3">组合风险评估：集中度、方向暴露、相关性风险扫描</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我想开启 AI 盯盘，能监控什么？</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h2 class="font-headline font-extrabold text-base">监控预警能力总览</h2></div>
+        <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+          <div class="rounded-xl border border-gray-200 p-3">价格提醒（上穿/下破/区间突破）</div>
+          <div class="rounded-xl border border-gray-200 p-3">保证金率预警（三档阈值）</div>
+          <div class="rounded-xl border border-gray-200 p-3">持仓浮亏预警（防刷屏重置）</div>
+          <div class="rounded-xl border border-gray-200 p-3">资金费率异常预警</div>
+          <div class="rounded-xl border border-gray-200 p-3">波动率突增预警</div>
+          <div class="rounded-xl border border-gray-200 p-3">成交/止盈止损触发通知</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">设置保证金率预警，低于 20% 提醒我。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-402 保证金率预警</h3></div>
+        <div class="p-4 space-y-3">
+          <div class="grid grid-cols-3 gap-2 text-xs">
+            <div class="rounded-lg border border-gray-200 p-2.5 text-center"><p class="text-gray-500">警告</p><p class="font-bold text-amber-600">20%</p></div>
+            <div class="rounded-lg border border-gray-200 p-2.5 text-center"><p class="text-gray-500">危险</p><p class="font-bold text-rose-600">15%</p></div>
+            <div class="rounded-lg border border-gray-200 p-2.5 text-center"><p class="text-gray-500">强平风险</p><p class="font-bold text-red-700">10%</p></div>
+          </div>
+          <p class="text-sm text-gray-700">✅ 已设置完成：当保证金率跌破 20% 时立即推送；可选触发后自动追加保证金或自动减仓。</p>
+          <div class="flex flex-wrap gap-2">
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">仅提醒</button>
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">触发后自动减仓</button>
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">触发后自动追加保证金</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">给我看一个触发后的推送示例。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">主动推送示例</h3></div>
+        <div class="p-4 space-y-3 text-sm">
+          <div class="rounded-xl border border-rose-200 bg-rose-50/60 p-3">
+            <p class="font-semibold text-rose-700">🚨 爆仓风险预警</p>
+            <p class="mt-1 text-gray-700">ETH 空单距强平仅 8.7%，ETH 上涨约 3% 即触发强平，风险极高。</p>
+            <div class="mt-2 flex flex-wrap gap-2">
+              <button class="rounded-full bg-rose-600 text-white px-3 py-1 text-xs">立即全平</button>
+              <button class="rounded-full border border-gray-300 px-3 py-1 text-xs">部分减仓</button>
+              <button class="rounded-full border border-gray-300 px-3 py-1 text-xs">追加保证金</button>
+            </div>
+          </div>
+          <div class="rounded-xl border border-amber-200 bg-amber-50/60 p-3">
+            <p class="font-semibold text-amber-700">⚠️ 价格提醒触发</p>
+            <p class="mt-1 text-gray-700">BTC 已触发价格提醒：突破 68,000 USDT，当前 68,120 USDT。</p>
+          </div>
+          <div class="rounded-xl border border-blue-200 bg-blue-50/60 p-3">
+            <p class="font-semibold text-blue-700">⚡ 波动率突增预警</p>
+            <p class="mt-1 text-gray-700">BTC 1h 波动率升至 4.2%，超过阈值 3.5%，建议先观察再操作。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我想同时监控所有预警设置。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">预警综合管理（示例）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="flex items-center justify-between rounded-lg border border-gray-200 p-2.5"><span>价格提醒（BTC ≥ 68,000）</span><span class="text-emerald-600 text-xs font-semibold">✅ 监控中</span></div>
+          <div class="flex items-center justify-between rounded-lg border border-gray-200 p-2.5"><span>保证金率预警（20/15/10）</span><span class="text-emerald-600 text-xs font-semibold">✅ 监控中</span></div>
+          <div class="flex items-center justify-between rounded-lg border border-gray-200 p-2.5"><span>持仓浮亏预警（ETH -5%）</span><span class="text-amber-600 text-xs font-semibold">⚠️ 已触发</span></div>
+          <div class="flex items-center justify-between rounded-lg border border-gray-200 p-2.5"><span>资金费率异常（>0.02%）</span><span class="text-emerald-600 text-xs font-semibold">✅ 监控中</span></div>
+          <div class="flex items-center justify-between rounded-lg border border-gray-200 p-2.5"><span>波动率突增（1h >3.5%）</span><span class="text-emerald-600 text-xs font-semibold">✅ 监控中</span></div>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">新增预警</button>
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">批量暂停</button>
+            <button class="rounded-full border border-gray-200 px-3 py-1.5 text-xs">调整阈值</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">复盘报告功能也要完整。</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">复盘报告能力</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-xl border border-gray-200 p-3">日/周/月复盘：胜率、盈亏比、净值变化、手续费占比</div>
+          <div class="rounded-xl border border-gray-200 p-3">交易行为分析：追涨杀跌、扛单、止损纪律执行率</div>
+          <div class="rounded-xl border border-gray-200 p-3">失误归因：策略偏差、风险暴露、执行偏差</div>
+          <div class="rounded-xl border border-gray-200 p-3">改进建议：仓位、入场、止损、节奏、杠杆控制</div>
+          <div class="rounded-xl border border-gray-200 p-3">可导出报告：复盘摘要 + 明细 + 下周期行动计划</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">BTC 涨到 68,000 或跌到 63,200 立刻提醒我。（F-401）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-401 价格到价提醒（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 基础价格提醒设置</p>
+            <p class="mt-1">BTC 上穿 68,000 即提醒，实时监控，状态 ✅ 已开启。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 双向价格提醒</p>
+            <p class="mt-1">上穿 68,000 / 下破 63,200 双阈值并行监控，防止单边漏报。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 触发后主动推送</p>
+            <p class="mt-1">触发消息包含：触发方向、最新价、距目标偏离、可执行动作按钮。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">保证金率低于 20% 提醒我，并展示处理建议。（F-402）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-402 保证金率预警（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 设置保证金预警阈值</p>
+            <p class="mt-1">三档阈值：20% 警告 / 15% 危险 / 10% 强平风险。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 渐进式预警触发</p>
+            <p class="mt-1">按档位逐级升级通知，分别给出减仓、追保、平仓建议。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 自动追保规则</p>
+            <p class="mt-1">可设置触发后自动从现货划转保证金，执行前二次确认。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我的限价单成交后第一时间通知我。（F-403）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-403 成交通知（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 限价单成交通知</p>
+            <p class="mt-1">#LMT-1028 全部成交，均价 64,798，手续费 0.65U。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 止盈单触发通知</p>
+            <p class="mt-1">达到止盈价后推送已止盈数量、已实现盈亏与剩余仓位。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 止损单触发通知</p>
+            <p class="mt-1">触发止损后推送：已平仓 0.25 ETH，已实现亏损 -18.40U，仓位风险值由 72 降至 31，并附本单复盘入口。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">ETH 持仓亏损超过 5% 就提醒我。（F-404）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-404 持仓浮亏预警（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 设置单仓浮亏预警</p>
+            <p class="mt-1">ETH 仓位亏损超过 -5% 触发，首条通知立即推送。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 浮亏预警触发</p>
+            <p class="mt-1">浮亏扩大时按 -7% / -9% 继续推送，防刷屏重置生效。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">资金费率超过 0.05% 就提醒我。（F-405）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-405 资金费率异常预警（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 设置资金费率预警</p>
+            <p class="mt-1">当费率绝对值 ≥ 0.05% 且持续 2 个结算周期时触发。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 异常触发推送</p>
+            <p class="mt-1">推送示例：ETH 资金费率 0.021% → 0.058%，下个结算预计成本 5.80U；建议降杠杆 5x→3x 或对冲 30% 仓位。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">市场波动突然变大时提醒我。（F-406）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-406 波动率突增预警（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 设置波动率预警</p>
+            <p class="mt-1">1h 波动率 &gt; 3.5% 或 15 分钟振幅 &gt; 1.8% 时触发。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 波动突增推送</p>
+            <p class="mt-1">触发后推送示例：1h 波动率 3.5%→4.2%，风险等级 中→高；建议先减仓 25%（约 0.012 BTC）并观察 15 分钟。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我账户有 2,000U，每笔最多亏 2%，该开多大仓位？（F-301）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-301 仓位管理建议（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 基础仓位计算</p>
+            <p class="mt-1">账户 2,000U，单笔风险 2%，最大亏损 40U。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 合约仓位计算</p>
+            <p class="mt-1">止损距离 4% 时建议仓位约 1,000U，分批执行降低滑点风险。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我用 500U 买 ETH，最多亏 50U，止损放哪里？（F-302）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-302 止损位建议（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 按最大亏损反推止损</p>
+            <p class="mt-1">500U 仓位最多亏 50U，对应止损约 -10%。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 基于技术位止损</p>
+            <p class="mt-1">结合 3,200 附近支撑优先放置结构止损，避免噪音扫损。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 合约止损建议</p>
+            <p class="mt-1">10x 仓位模拟建议：止损从 -6.5% 收紧到 -3.8%，单笔风险从 2.0% 降到 1.2%，目标回撤控制在 24U 内。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">ETH 开仓 3420，止盈 3600，止损 3300，合理吗？（F-303）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-303 盈亏比评估（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 现有止盈止损评估</p>
+            <p class="mt-1">当前方案盈亏比 1.5:1，低于推荐阈值 2:1。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 不合理预警与优化</p>
+            <p class="mt-1">建议上调止盈至 3,660 或收紧止损至 3,330。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我的 ETH 空单快接近强平了吗？（F-304）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-304 爆仓风险预警（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 距强平 10% 预警</p>
+            <p class="mt-1">当前 3,400，强平 3,789，距离 11.4%，风险 ⚠️ 中高。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 用户追加保证金</p>
+            <p class="mt-1">追加 120U 后模拟结果：保证金率 18.6% → 26.9%，风险等级 高 → 中；ETH 空单强平价 3,789 上移至 3,945。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 主动查询全仓风险</p>
+            <p class="mt-1">风险分级（模拟）：ETH 空单 高（78分）＞ BTC 多单 中（46分）＞ SOL 现货 低（22分）；优先处理顺序：ETH → BTC → SOL。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">帮我看下整体持仓风险，有没有集中暴露？（F-305）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-305 组合风险评估（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 组合风险扫描</p>
+            <p class="mt-1">方向暴露：多头 68% / 空头 32%，BTC+ETH 集中度 79%。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 方向风险分析</p>
+            <p class="mt-1">组合优化（模拟）：将 BTC+ETH 占比 79% 调整至 58%，新增 21% 低相关资产（BNB 11% + USDT 10%）后，组合波动率约从 41.2% 降至 33.8%。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我想做 ETH 网格，区间 3000-3800，投入 2000U，给参数。（F-306）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-306 网格策略参数（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 基础网格参数计算</p>
+            <p class="mt-1">区间 3,000~3,800，2,000U，等差 12 格，单格约 166U。</p>
+            <p class="text-xs text-gray-500 mt-1">风控：跌破 2,940 停止网格，上破 3,860 分批止盈。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">每周定投 100U 买 BTC，帮我做计划。（F-307）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-307 定投计划（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 创建定投计划</p>
+            <p class="mt-1">每周一 10:00 定投 BTC 100U，周期 24 周，总预算 2,400U。</p>
+            <p class="text-xs text-gray-500 mt-1">增强规则：单周跌幅 &gt;8% 时自动追加 50U。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">给我做个交易风格画像，看看我哪里容易亏。（F-308）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-308 交易风格画像（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">风格标签：短线偏激进 · 追涨概率较高 · 止损执行中等</div>
+          <div class="rounded-lg border border-gray-200 p-3">高风险时段：22:00~00:00（胜率偏低）</div>
+          <div class="rounded-lg border border-gray-200 p-3">改进建议：减少夜间交易，固定止损，单笔风险控制在 1.5%~2%</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">给我生成本周交易周报。（F-501）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-501 周报生成（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 请求本周周报</p>
+            <p class="mt-1">03/25-03/31：12 笔，胜率 58.3%，净盈亏 +96.40U。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 请求上月月报</p>
+            <p class="mt-1">展示交易笔数、净盈亏、环比变化与主要亏损原因。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 系统自动推送周报</p>
+            <p class="mt-1">周一固定推送一句话总结 + 本周关注点 + 报告入口。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我最近三个月的胜率是多少？（F-502）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-502 胜率分析（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 整体胜率查询</p>
+            <p class="mt-1">近三个月 99 笔，胜率 53.5%，3 月修复至 64.3%。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 分维度胜率分析</p>
+            <p class="mt-1">对比做多/做空、币种、策略类型的胜率与盈亏贡献。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 分时段胜率热力</p>
+            <p class="mt-1">高胜率时段（模拟）：06:00-10:00 胜率 73.3%（15 笔，净盈亏 +145U）；低胜率时段：22:00-00:00 胜率 33.3%（9 笔，净盈亏 -58U）。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">帮我复盘亏损最大的交易。（F-503）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-503 最差交易复盘（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 查询最差交易</p>
+            <p class="mt-1">最大亏损：DOGE 多单 -88.00U（02/19）。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 2 · 单笔深度复盘</p>
+            <p class="mt-1">复原关键时间点，定位“逆势 + 未执行止损”问题。</p>
+          </div>
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 3 · 亏损模式识别</p>
+            <p class="mt-1">高频失误（模拟）：逆势开仓 11 笔（胜率 27%）、止损延迟 8 笔（平均多亏 34U）、夜间冲动交易 9 笔（净亏 -126U）；改进清单：逆势单仓位减半、止损触发 5 分钟内强制执行、22:00 后仅保留计划单。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">我这个月手续费花了多少？（F-504）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-504 手续费统计（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 查询手续费统计</p>
+            <p class="mt-1">03/01-03/31 累计 24.60U，现货 8.40U，合约 16.20U。</p>
+            <p class="text-xs text-gray-500 mt-1">手续费占净利润 12.8%，建议减少高频小额交易。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="flex justify-end"><div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">分析一下我的交易风格画像。（F-505）</div></div>
+    <div class="flex items-start gap-3">
+      <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold">AI</div>
+      <section class="flex-1 bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+        <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/70"><h3 class="font-headline font-extrabold text-base">F-505 交易风格画像（新增模拟）</h3></div>
+        <div class="p-4 space-y-2 text-sm">
+          <div class="rounded-lg border border-gray-200 p-3">
+            <p class="text-[11px] text-gray-500">示例 1 · 生成交易风格画像</p>
+            <p class="mt-1">趋势跟随偏短线，入场积极但离场偏慢，亏损单持仓更久。</p>
+            <p class="text-xs text-gray-500 mt-1">建议：统一止损模板，降低情绪化加仓，固定复盘节奏。</p>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 bottom-safe z-50">
+    <div class="max-w-3xl mx-auto px-4 pt-3 pb-2">
+      <div class="flex items-center gap-3">
+        <input id="watchInput" class="flex-1 h-11 rounded-full border border-gray-200 bg-gray-50 px-4 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#ffd308]/50" placeholder="提问或搜索" />
+        <button id="watchSendBtn" class="h-11 px-4 rounded-full bg-[#FFD308] text-[#5a4900] text-sm font-bold">发送</button>
+      </div>
+      <div class="text-[10px] text-gray-400 text-center mt-2">内容由AI生成，不构成投资建议</div>
+    </div>
+  </footer>
+
+  <script>
+    const mainEl = document.querySelector("main");
+    const inputEl = document.getElementById("watchInput");
+    const sendBtn = document.getElementById("watchSendBtn");
+    let isStreaming = false;
+
+    function scrollToBottom() {
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    }
+
+    function resolveTargetTitle(question) {
+      if (/F-201|市价买|市价卖|现货市价/.test(question)) return "F-201 现货市价单（模拟）";
+      if (/F-202|限价单|挂单|限价买|限价卖/.test(question)) return "F-202 现货限价单（模拟）";
+      if (/F-203|合约开仓|做多|做空|开仓/.test(question)) return "F-203 合约开仓（模拟）";
+      if (/F-204|平仓|全平|部分平/.test(question)) return "F-204 合约平仓（模拟）";
+      if (/F-205|止盈|止损|止盈止损/.test(question)) return "F-205 止盈止损单（模拟）";
+      if (/F-206|触发单|条件单|突破.*买入|下破.*卖出/.test(question)) return "F-206 条件触发单（模拟）";
+      if (/F-207|批量撤单|撤所有挂单|全部撤单/.test(question)) return "F-207 批量撤单（模拟）";
+      if (/F-208|余额的|按比例下单|百分比下单/.test(question)) return "F-208 按比例下单（模拟）";
+      if (/F-209|加仓|减仓/.test(question)) return "F-209 加减仓（模拟）";
+      if (/F-210|调整杠杆|杠杆调到/.test(question)) return "F-210 调整杠杆（模拟）";
+      if (/F-101|实时价格|BTC 现在多少钱/.test(question)) return "F-101 实时价格（模拟）";
+      if (/F-102|比价|谁涨得最多|SOL|BNB/.test(question)) return "F-102 多币种比价（模拟）";
+      if (/F-103|RSI|MACD|布林带|技术指标/.test(question)) return "F-103 技术指标计算（模拟）";
+      if (/F-104|支撑|压力|关键价位/.test(question)) return "F-104 支撑压力位（模拟）";
+      if (/F-105|趋势|K线|4 小时线|4H/.test(question)) return "F-105 K线趋势分析（模拟）";
+      if (/F-106|波动率|年化波动|风险等级/.test(question)) return "F-106 波动率分析（模拟）";
+      if (/F-107|市场情绪|多空比|资金费率|大单流向/.test(question)) return "F-107 市场情绪（模拟）";
+      if (/F-401|到价|价格提醒|上穿|下破/.test(question)) return "F-401 价格到价提醒（新增模拟）";
+      if (/F-402|保证金率|20%|阈值/.test(question)) return "F-402 保证金率预警（新增模拟）";
+      if (/F-403|成交通知|限价单成交|已成交提醒/.test(question)) return "F-403 成交通知（新增模拟）";
+      if (/F-404|浮亏预警|亏损超过|持仓亏损/.test(question)) return "F-404 持仓浮亏预警（新增模拟）";
+      if (/F-405|资金费率异常|费率超过|资金费率预警/.test(question)) return "F-405 资金费率异常预警（新增模拟）";
+      if (/F-406|波动率突增|剧烈波动|波动提醒/.test(question)) return "F-406 波动率突增预警（新增模拟）";
+      if (/F-301|仓位管理|开多大仓位|风险仓位/.test(question)) return "F-301 仓位管理建议（新增模拟）";
+      if (/F-302|止损位|止损放哪里|最大亏损/.test(question)) return "F-302 止损位建议（新增模拟）";
+      if (/F-303|盈亏比|止盈止损合理|2:1/.test(question)) return "F-303 盈亏比评估（新增模拟）";
+      if (/F-304|爆仓风险|强平|接近强平/.test(question)) return "F-304 爆仓风险预警（新增模拟）";
+      if (/F-305|组合风险|集中暴露|相关性风险/.test(question)) return "F-305 组合风险评估（新增模拟）";
+      if (/F-306|网格|网格参数|区间网格/.test(question)) return "F-306 网格策略参数（新增模拟）";
+      if (/F-307|定投|每周买|DCA/.test(question)) return "F-307 定投计划（新增模拟）";
+      if (/F-308|风格画像|交易风格|哪里容易亏/.test(question)) return "F-308 交易风格画像（新增模拟）";
+      if (/F-501|周报|本周报告|交易周报/.test(question)) return "F-501 周报生成（新增模拟）";
+      if (/F-502|胜率分析|最近三个月胜率|胜率是多少/.test(question)) return "F-502 胜率分析（新增模拟）";
+      if (/F-503|最差交易|亏损最大|交易复盘/.test(question)) return "F-503 最差交易复盘（新增模拟）";
+      if (/F-504|手续费统计|手续费花了多少|交易成本/.test(question)) return "F-504 手续费统计（新增模拟）";
+      if (/F-505|交易风格画像|风格分析|交易画像/.test(question)) return "F-505 交易风格画像（新增模拟）";
+      if (/资产|持仓|账户|盈亏统计|挂单/.test(question)) return "账户资产管理（F-001~F-008）";
+      if (/行情|趋势|RSI|MACD|支撑|阻力/.test(question)) return "行情分析能力";
+      if (/交易执行|下单|撤单|止盈止损|条件单/.test(question)) return "交易执行能力（F-201~F-206）";
+      if (/策略|风控|爆仓风险|仓位|盈亏比/.test(question)) return "策略与风控能力（F-301~F-305）";
+      if (/保证金|阈值|20%|预警/.test(question)) return "F-402 保证金率预警";
+      if (/推送|触发|提醒/.test(question)) return "主动推送示例";
+      if (/监控|全部|管理/.test(question)) return "预警综合管理（示例）";
+      if (/复盘|周报|月报|报告/.test(question)) return "复盘报告能力";
+      return "监控预警能力总览";
+    }
+
+    function findTargetSection(question) {
+      const targetTitle = resolveTargetTitle(question);
+      return Array.from(document.querySelectorAll("main section")).find((section) => {
+        const title = section.querySelector("h2, h3")?.textContent?.trim();
+        return title === targetTitle;
+      });
+    }
+
+    function appendUserMessage(text) {
+      const node = document.createElement("div");
+      node.className = "flex justify-end";
+      node.innerHTML = `<div class="max-w-[86%] bg-[#FFD308] text-[#3d3200] rounded-2xl rounded-br-md px-4 py-2.5 text-sm shadow-sm">${text}</div>`;
+      mainEl.appendChild(node);
+    }
+
+    function appendAiThinkingShell() {
+      const row = document.createElement("div");
+      row.className = "flex items-start gap-3";
+      row.innerHTML = `
+        <div class="w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold shrink-0">AI</div>
+        <div class="flex-1 bg-white rounded-2xl rounded-tl-md px-4 py-3 shadow-sm border border-gray-100">
+          <div id="thinkingText" class="text-sm text-gray-600"></div>
+        </div>
+      `;
+      mainEl.appendChild(row);
+      return row;
+    }
+
+    function appendReplayedAnswer(question) {
+      const target = findTargetSection(question);
+      if (!target) return;
+
+      const tip = document.createElement("div");
+      tip.className = "flex justify-start";
+      tip.innerHTML = `<div class="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-500">以下为完整答案模块</div>`;
+      mainEl.appendChild(tip);
+
+      const row = document.createElement("div");
+      row.className = "flex items-start gap-3";
+      const icon = document.createElement("div");
+      icon.className = "w-9 h-9 rounded-xl bg-[#FFD308] text-[#5a4900] flex items-center justify-center font-headline font-extrabold shrink-0";
+      icon.textContent = "AI";
+
+      const cloned = target.cloneNode(true);
+      cloned.classList.add("flex-1");
+      row.appendChild(icon);
+      row.appendChild(cloned);
+      mainEl.appendChild(row);
+      restructureAnswerLayout(row);
+      scrollToBottom();
+    }
+
+    function resolveAnswerTone(text) {
+      if (/爆仓|强平|危险|风险极高|止损触发|亏损扩大|预警触发/.test(text)) return "danger";
+      if (/预警|风险|减仓|追加保证金|阈值|波动/.test(text)) return "risk";
+      if (/盈利|已成交|止盈|净赚|胜率提升|修复/.test(text)) return "gain";
+      return "neutral";
+    }
+
+    function restructureAnswerLayout(root = document) {
+      const bodies = root.querySelectorAll("main section > .p-4.text-sm");
+      bodies.forEach((body) => {
+        if (body.dataset.structured === "1") return;
+        if (body.classList.contains("grid")) return;
+
+        const children = Array.from(body.children);
+        if (children.length < 2) return;
+
+        const flow = document.createElement("div");
+        flow.className = "answer-flow-pro";
+
+        children.forEach((child, idx) => {
+          const tone = resolveAnswerTone((child.textContent || "").replace(/\s+/g, " ").trim());
+          const shell = document.createElement("div");
+          shell.className = "answer-card-shell";
+          shell.dataset.tone = tone;
+
+          const card = document.createElement("article");
+          card.className = "answer-card";
+          card.dataset.tone = tone;
+          if (idx === 0) card.classList.add("featured");
+
+          const content = document.createElement("div");
+          content.className = "answer-content";
+          content.appendChild(child);
+
+          card.appendChild(content);
+          shell.appendChild(card);
+          flow.appendChild(shell);
+        });
+        body.appendChild(flow);
+        body.classList.add("answer-body");
+        body.classList.remove("space-y-2");
+        body.dataset.structured = "1";
+      });
+    }
+
+    function runMockFlow(question) {
+      if (isStreaming) return;
+      const text = question.trim();
+      if (!text) return;
+      isStreaming = true;
+      appendUserMessage(text);
+      inputEl.value = "";
+      scrollToBottom();
+
+      const aiRow = appendAiThinkingShell();
+      const thinkingEl = aiRow.querySelector("#thinkingText");
+      const states = [
+        "AI 思考中 · 正在理解问题…",
+        "AI 思考中 · 正在匹配监控模块…",
+        "AI 思考中 · 正在组织答案…"
+      ];
+      let idx = 0;
+      thinkingEl.textContent = states[idx];
+      const t = setInterval(() => {
+        idx = (idx + 1) % states.length;
+        thinkingEl.textContent = states[idx];
+      }, 650);
+
+      setTimeout(() => {
+        clearInterval(t);
+        aiRow.remove();
+        appendReplayedAnswer(text);
+        isStreaming = false;
+      }, 1900);
+    }
+
+    if (sendBtn) sendBtn.addEventListener("click", () => runMockFlow(inputEl.value));
+    if (inputEl) {
+      inputEl.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") runMockFlow(inputEl.value);
+      });
+    }
+
+    restructureAnswerLayout();
+  </script>
+</body>
+</html>

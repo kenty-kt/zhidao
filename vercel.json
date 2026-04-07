@@ -10,10 +10,14 @@
     { "src": "api/okx/account.py", "use": "@vercel/python" },
     { "src": "api/okx/order.py", "use": "@vercel/python" },
     { "src": "api/okx/close-position.py", "use": "@vercel/python" },
+    { "src": "ai-watch.html", "use": "@vercel/static" },
+    { "src": "code.html", "use": "@vercel/static" },
     { "src": "index.html", "use": "@vercel/static" }
   ],
   "routes": [
     { "src": "^/$", "dest": "/index.html" },
+    { "src": "^/ai-watch\\.html$", "dest": "/ai-watch.html" },
+    { "src": "^/code\\.html$", "dest": "/code.html" },
     { "src": "^/api/panews/calendar$", "dest": "/api/panews/calendar.py" },
     { "src": "^/api/feed/rss$", "dest": "/api/feed/rss.py" },
     { "src": "^/api/soso/sectors$", "dest": "/api/soso/sectors.py" },

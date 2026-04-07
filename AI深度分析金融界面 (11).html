@@ -1694,6 +1694,8 @@
       <aside class="admin-side">
         <button id="adminTabEventsBtn" class="admin-tab-btn active" onclick="adminSwitchTab('events')">Events</button>
         <button id="adminTabTradeBtn" class="admin-tab-btn" onclick="adminSwitchTab('trade')">Trade Settings</button>
+        <button id="adminTabFeedsBtn" class="admin-tab-btn" onclick="adminSwitchTab('feeds')">Feed 管理</button>
+        <button id="adminTabContentsBtn" class="admin-tab-btn" onclick="adminSwitchTab('contents')">内容管理</button>
         <button id="adminTabAnalysisBtn" class="admin-tab-btn" onclick="adminSwitchTab('analysis')">Analysis</button>
         <button id="adminTabUsersBtn" class="admin-tab-btn" onclick="adminSwitchTab('users')">账号与权限</button>
       </aside>
@@ -1815,6 +1817,117 @@
             <div class="admin-muted">在 Event 抽屉里触发分析后，会同步写入这里用于查看和重试。</div>
           </div>
           <div id="adminAnalysisList" class="admin-action-list"></div>
+        </div>
+
+        <div id="adminTabFeeds" class="admin-tab-content">
+          <div class="admin-block">
+            <div class="admin-block-title">Feed 源管理</div>
+            <div class="admin-row">
+              <div>
+                <label class="admin-label">源名称</label>
+                <input id="adminFeedName" class="admin-input" placeholder="如：行业资讯 RSS" />
+              </div>
+              <div>
+                <label class="admin-label">类型</label>
+                <select id="adminFeedType" class="admin-select">
+                  <option value="rss">rss</option>
+                  <option value="api">api</option>
+                  <option value="site">site</option>
+                </select>
+              </div>
+              <div>
+                <label class="admin-label">源地址 URL</label>
+                <input id="adminFeedUrl" class="admin-input" placeholder="https://..." />
+              </div>
+              <div>
+                <label class="admin-label">状态</label>
+                <select id="adminFeedStatus" class="admin-select">
+                  <option value="active">active</option>
+                  <option value="paused">paused</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="admin-btn" onclick="adminSaveFeed()">保存 Feed</button>
+              <button class="admin-btn admin-btn-ghost" onclick="adminResetFeedForm()">重置表单</button>
+            </div>
+          </div>
+          <div class="admin-block">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>名称</th>
+                  <th>类型</th>
+                  <th>URL</th>
+                  <th>状态</th>
+                  <th style="width:160px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminFeedsTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="adminTabContents" class="admin-tab-content">
+          <div class="admin-block">
+            <div class="admin-block-title">内容管理（正文/标题/标签/关联资产）</div>
+            <div class="admin-row">
+              <div>
+                <label class="admin-label">所属 Feed</label>
+                <select id="adminContentFeedId" class="admin-select"></select>
+              </div>
+              <div>
+                <label class="admin-label">内容状态</label>
+                <select id="adminContentStatus" class="admin-select">
+                  <option value="draft">draft</option>
+                  <option value="published">published</option>
+                  <option value="archived">archived</option>
+                </select>
+              </div>
+              <div>
+                <label class="admin-label">标题</label>
+                <input id="adminContentTitle" class="admin-input" placeholder="内容标题" />
+              </div>
+              <div>
+                <label class="admin-label">原文 URL</label>
+                <input id="adminContentUrl" class="admin-input" placeholder="https://..." />
+              </div>
+            </div>
+            <div style="margin-top:8px;">
+              <label class="admin-label">摘要</label>
+              <textarea id="adminContentSummary" class="admin-textarea" placeholder="采集摘要"></textarea>
+            </div>
+            <div style="margin-top:8px;">
+              <label class="admin-label">正文</label>
+              <textarea id="adminContentBody" class="admin-textarea" placeholder="内容正文" style="min-height:140px;"></textarea>
+            </div>
+            <div style="margin-top:8px;">
+              <label class="admin-label">标签（逗号分隔）</label>
+              <input id="adminContentTags" class="admin-input" placeholder="macro, cpi, crypto" />
+            </div>
+            <div style="margin-top:8px;">
+              <label class="admin-label">关联资产（逗号分隔）</label>
+              <input id="adminContentAssets" class="admin-input" placeholder="BTC, ETH, NVDA" />
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+              <button class="admin-btn" onclick="adminSaveFeedContent()">保存内容</button>
+              <button class="admin-btn admin-btn-ghost" onclick="adminResetContentForm()">重置表单</button>
+            </div>
+          </div>
+          <div class="admin-block">
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>标题</th>
+                  <th>Feed</th>
+                  <th>状态</th>
+                  <th>更新时间</th>
+                  <th style="width:160px;">操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminFeedContentsTableBody"></tbody>
+            </table>
+          </div>
         </div>
 
         <div id="adminTabUsers" class="admin-tab-content">
@@ -1940,16 +2053,17 @@
       <div class="w-9 h-9 rounded-xl bg-black flex items-center justify-center mb-3 font-bold text-white text-sm">A</div>
 
       <!-- 对话 -->
-      <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14">
+      <div id="leftNavChat" onclick="switchMainView('chat')" title="进入对话" class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
         <span class="text-[10px] font-medium">对话</span>
       </div>
 
-      <!-- AI诊断 -->
-      <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14">
+      <!-- AI诊断（入口暂时注释）
+      <div id="leftNavWatch" onclick="switchMainView('watch')" class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         <span class="text-[10px] font-medium">AI诊断</span>
       </div>
+      -->
 
       <!-- 交易 -->
       <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14" onclick="openTradeModal('BTC')" title="Token 交易">
@@ -1958,26 +2072,26 @@
       </div>
 
       <!-- 发现（激活） -->
-      <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer bg-white/8 text-white transition-all w-14">
+      <div id="leftNavDiscover" onclick="switchMainView('discover')" class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer bg-white/8 text-white transition-all w-14">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <span class="text-[10px] font-semibold">发现</span>
       </div>
     </div>
 
     <!-- 展开的子导航面板 -->
-    <div class="w-36 bg-[#080c17] pt-5 px-3">
+    <div id="leftSubNavPanel" class="w-36 bg-[#080c17] pt-5 px-3">
       <!-- 面板标题 -->
       <div class="text-sm font-semibold text-white mb-4 px-1">发现</div>
 
       <!-- 子导航列表 -->
       <div class="space-y-1">
         <!-- 新闻资讯：激活 -->
-        <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/8 text-white text-[13px] font-medium border border-white/8">
+        <a id="subNavNews" href="javascript:void(0)" onclick="switchMainView('news')" class="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/8 text-white text-[13px] font-medium border border-white/8">
           新闻资讯
         </a>
         <!-- 策略广场 -->
-        <a href="#" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 text-[13px] transition-all">
-          策略广场
+        <a id="subNavDiscover" href="javascript:void(0)" onclick="switchMainView('discover')" class="flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 text-[13px] transition-all">
+          发现简报
         </a>
       </div>
     </div>
@@ -1987,92 +2101,325 @@
   <!-- 中间主内容 -->
   <main id="mainContent" class="flex-1 scroll-area overflow-y-auto px-4 py-4 space-y-4 min-w-0">
 
-    <!-- AI 今日简报卡片 -->
-    <div class="card p-4 ai-thinking glow-blue" id="aiMarketBrief">
-      <div class="flex items-start justify-between mb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center flex-shrink-0">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2zm0 4v4l3 3"/></svg>
-          </div>
+    <!-- 对话页面（PC） -->
+    <div id="chatPageSection" style="display:none;">
+      <div class="max-w-[1120px] mx-auto w-full">
+      <div class="card p-5 glow-blue mb-4">
+        <div class="flex items-center justify-between mb-4">
           <div>
-            <div class="text-xs font-bold text-white">AI 今日市场简报</div>
-            <div class="text-[10px] text-slate-500" id="briefUpdatedAt">基于 247 条新闻 · 38 个宏观因子 · 实时分析</div>
+            <div class="text-3xl font-extrabold text-white leading-tight">你好！我是知道AI</div>
+            <div class="text-xl font-bold text-slate-400 mt-1">我什么都知道</div>
           </div>
+          <div class="text-xs text-slate-500">对话页</div>
         </div>
-        <div class="text-right">
-          <div class="text-[10px] text-slate-500">综合市场情绪</div>
-          <div class="text-lg font-bold text-amber-400" id="briefSentimentBadge">中性情绪</div>
-          <div class="text-[10px] text-slate-500" id="briefSentimentHint"></div>
+
+        <div class="space-y-3">
+          <div onclick="switchMainView('chat')" class="card-inner p-4 hover:border-blue-400/30 transition-all cursor-pointer">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-11 h-11 rounded-xl bg-blue-500/15 text-blue-300 flex items-center justify-center">🤖</div>
+                  <div>
+                    <div class="text-sm font-bold text-white">AI助手 <span class="text-[10px] text-slate-500 font-medium">zhidao.com</span></div>
+                    <div class="text-xs text-slate-400">问你想了解的</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          <div onclick="switchMainView('news')" class="card-inner p-4 hover:border-blue-400/30 transition-all cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-white/5 text-slate-400 flex items-center justify-center">📰</div>
+                <div>
+                  <div class="text-sm font-bold text-white">资讯助手</div>
+                  <div class="text-xs text-slate-400">不废话的情报机 · 只发重要的动态</div>
+                </div>
+              </div>
+              <div class="min-w-[28px] h-6 px-2 bg-rose-500 text-white text-[11px] font-bold rounded-full flex items-center justify-center leading-none">8</div>
+            </div>
+          </div>
+
+          <div onclick="switchMainView('watch')" class="card-inner p-4 hover:border-blue-400/30 transition-all cursor-pointer">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-white/5 text-slate-400 flex items-center justify-center">👁</div>
+                <div>
+                  <div class="text-sm font-bold text-white">AI盯盘</div>
+                  <div class="text-xs text-slate-400">实时监控异动 · 关键机会第一时间提醒</div>
+                </div>
+              </div>
+              <div class="min-w-[28px] h-6 px-2 bg-rose-500 text-white text-[11px] font-bold rounded-full flex items-center justify-center leading-none">12</div>
+            </div>
+          </div>
+
+          <div class="card-inner p-4">
+            <div class="flex items-center gap-3">
+              <div class="w-11 h-11 rounded-xl bg-white/5 text-slate-400 flex items-center justify-center">👥</div>
+              <div>
+                <div class="text-sm font-bold text-white">福利群</div>
+                <div class="text-xs text-slate-400"><span class="text-rose-400">[有人@我]</span> 比特币大手子：今天做空</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-inner p-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-white/5 text-slate-400 flex items-center justify-center">⭐</div>
+                <div>
+                  <div class="text-sm font-bold text-white">VIP专属群</div>
+                  <div class="text-xs text-slate-400">限量席位，欢迎加入</div>
+                </div>
+              </div>
+              <div class="px-3 py-1 bg-white/5 text-slate-300 text-[10px] font-bold rounded-full border border-white/10">订阅</div>
+            </div>
+          </div>
         </div>
       </div>
-      <p class="text-xs text-slate-300 leading-relaxed mb-3">
-        <span class="text-blue-300 font-medium">核心判断：</span><span id="briefSummary">正在读取新闻并生成总结...</span>
-      </p>
-      <div class="grid grid-cols-4 gap-2 mb-4">
-        <div class="card-inner p-2 text-center">
-          <div class="text-[10px] text-slate-500 mb-1" id="briefTag1Name">利率预期</div>
-          <div class="text-sm font-bold text-amber-400" id="briefTag1Trend">维持</div>
-          <div class="text-[10px] text-slate-500" id="briefTag1Sub">暂停加息</div>
+
+      <div class="card p-3 sticky bottom-0 z-20 bg-[#0b1220]/95 backdrop-blur border border-white/10">
+        <div class="flex items-center justify-between gap-3">
+          <button class="w-11 h-11 flex-shrink-0 border border-white/10 rounded-xl flex items-center justify-center bg-white/5 text-[10px] font-black text-slate-400">交易</button>
+          <div class="flex-grow h-11 bg-white/[0.03] rounded-xl border border-white/10 px-3 flex items-center gap-3">
+            <span class="text-amber-400 text-lg">🎤</span>
+            <input class="flex-grow text-sm border-none focus:ring-0 p-0 text-slate-200 bg-transparent placeholder:text-slate-500" placeholder="提问或搜索" type="text"/>
+            <span class="text-slate-500 text-lg">▦</span>
+          </div>
+          <button class="w-11 h-11 flex-shrink-0 border border-white/10 rounded-xl flex items-center justify-center bg-white/5 text-[10px] font-black text-slate-400">行情</button>
         </div>
-        <div class="card-inner p-2 text-center">
-          <div class="text-[10px] text-slate-500 mb-1" id="briefTag2Name">风险偏好</div>
-          <div class="text-sm font-bold text-emerald-400" id="briefTag2Trend">↑ 偏多</div>
-          <div class="text-[10px] text-slate-500" id="briefTag2Sub">+12% vs昨</div>
+        <p class="text-[9px] text-slate-500 mt-2 text-center">内容由AI生成，不构成投资建议</p>
+      </div>
+      </div>
+    </div>
+
+    <!-- AI 盯盘页面（PC） -->
+    <div id="watchPageSection" style="display:none;">
+      <div class="max-w-[980px] mx-auto">
+        <div class="card p-5 glow-blue mb-4">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <div class="text-2xl font-extrabold text-white leading-tight">AI盯盘</div>
+              <div class="text-xs text-slate-500 mt-1">监控预警 · 主动推送 · 全场景</div>
+            </div>
+            <button onclick="switchMainView('chat')" class="h-8 px-3 rounded-lg border border-white/10 bg-white/5 text-xs font-semibold text-slate-300 hover:bg-white/10">返回对话</button>
+          </div>
+          <div id="watchQaList" class="space-y-4"></div>
         </div>
-        <div class="card-inner p-2 text-center">
-          <div class="text-[10px] text-slate-500 mb-1" id="briefTag3Name">市场主线</div>
-          <div class="text-sm font-bold text-blue-400" id="briefTag3Trend">AI算力</div>
-          <div class="text-[10px] text-slate-500" id="briefTag3Sub">强势持续</div>
-        </div>
-        <div class="card-inner p-2 text-center">
-          <div class="text-[10px] text-slate-500 mb-1" id="briefTag4Name">尾部风险</div>
-          <div class="text-sm font-bold text-red-400" id="briefTag4Trend">油价</div>
-          <div class="text-[10px] text-slate-500" id="briefTag4Sub">欧佩克博弈</div>
+
+        <div class="card p-3 sticky bottom-0 z-20 bg-[#0b1220]/95 backdrop-blur border border-white/10">
+          <div class="flex items-center gap-3 max-w-[980px] mx-auto">
+            <input class="flex-1 h-11 rounded-full border border-white/10 bg-white/[0.03] px-4 text-sm text-slate-200 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400/35" placeholder="提问或搜索" />
+            <button class="h-11 px-4 rounded-full bg-amber-400 text-amber-950 text-sm font-bold">发送</button>
+          </div>
+          <div class="text-[10px] text-slate-500 text-center mt-2">内容由AI生成，不构成投资建议</div>
         </div>
       </div>
     </div>
 
-    <!-- AI 市场情绪雷达（基于今日资产利多/利空） -->
-    <div class="card p-4 glow-blue" id="assetSentimentBoard">
+    <!-- 全球指数 / 币种涨跌幅 -->
+    <div class="card p-4 glow-blue" id="globalMarketOverview">
       <div class="flex items-center justify-between mb-3">
-        <div class="flex items-center gap-1.5">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-          <span class="text-xs font-bold text-violet-300">AI 市场情绪雷达</span>
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          <span class="text-sm font-bold text-white">全球指数</span>
         </div>
-        <div class="text-right">
-          <div class="text-[10px] text-slate-500" id="assetSentimentLabel">中性偏多</div>
-          <div class="text-lg font-bold text-amber-400" id="assetSentimentScore">62</div>
+        <div class="text-[10px] text-slate-500">市场快照</div>
+      </div>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-2">
+        <div class="card-inner p-2.5 text-center">
+          <div class="text-[10px] text-slate-500 mb-1">道琼斯</div>
+          <div class="text-xl font-bold text-slate-100 leading-none">39,841.63</div>
+          <div class="text-lg font-bold text-emerald-400 leading-none mt-1">+2.08%</div>
+        </div>
+        <div class="card-inner p-2.5 text-center">
+          <div class="text-[10px] text-slate-500 mb-1">纳斯达克</div>
+          <div class="text-xl font-bold text-slate-100 leading-none">15,845.24</div>
+          <div class="text-lg font-bold text-emerald-400 leading-none mt-1">+4.06%</div>
+        </div>
+        <div class="card-inner p-2.5 text-center">
+          <div class="text-[10px] text-slate-500 mb-1">标普500</div>
+          <div class="text-xl font-bold text-slate-100 leading-none">5,283.42</div>
+          <div class="text-lg font-bold text-emerald-400 leading-none mt-1">+3.30%</div>
+        </div>
+        <div class="card-inner p-2.5 text-center">
+          <div class="text-[10px] text-slate-500 mb-1">恒生指数</div>
+          <div class="text-xl font-bold text-slate-100 leading-none">16,540.89</div>
+          <div class="text-lg font-bold text-emerald-400 leading-none mt-1">+1.56%</div>
         </div>
       </div>
-      <div class="flex justify-between text-[10px] text-slate-500 mb-1">
-        <span>恐惧</span>
-        <span>贪婪</span>
-      </div>
-      <div class="h-2 rounded-full bg-gradient-to-r from-red-500 via-amber-500 to-emerald-500 mb-3 relative">
-        <div id="assetSentimentPointer" class="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full border-2 border-slate-800 shadow-lg" style="left:calc(62% - 6px)"></div>
-      </div>
-      <div class="grid grid-cols-3 gap-2 mb-3">
-        <div class="card-inner p-2 text-center">
-          <div class="text-sm font-bold text-emerald-400" id="assetBullPct">67%</div>
-          <div class="text-[9px] text-slate-500">看多</div>
+      <div class="mt-3 p-3 rounded-xl border border-white/10 bg-white/[0.03]">
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-sm font-bold text-white">币种涨跌</div>
+          <div class="text-[10px] text-slate-500">近 24h 分布</div>
         </div>
-        <div class="card-inner p-2 text-center">
-          <div class="text-sm font-bold text-slate-400" id="assetNeutralPct">12%</div>
-          <div class="text-[9px] text-slate-500">中性</div>
+        <div class="grid grid-cols-11 gap-1.5 items-end h-24">
+          <div class="bg-emerald-500/90 rounded-t-sm h-[26%]"></div>
+          <div class="bg-emerald-500/90 rounded-t-sm h-[12%]"></div>
+          <div class="bg-emerald-500/90 rounded-t-sm h-[14%]"></div>
+          <div class="bg-emerald-500/90 rounded-t-sm h-[24%]"></div>
+          <div class="bg-emerald-500/90 rounded-t-sm h-[40%]"></div>
+          <div class="bg-emerald-500/90 rounded-t-sm h-[72%]"></div>
+          <div class="bg-rose-500/95 rounded-t-sm h-[56%]"></div>
+          <div class="bg-rose-500/95 rounded-t-sm h-[34%]"></div>
+          <div class="bg-rose-500/95 rounded-t-sm h-[28%]"></div>
+          <div class="bg-rose-500/95 rounded-t-sm h-[18%]"></div>
+          <div class="bg-rose-500/95 rounded-t-sm h-[10%]"></div>
         </div>
-        <div class="card-inner p-2 text-center">
-          <div class="text-sm font-bold text-red-400" id="assetBearPct">21%</div>
-          <div class="text-[9px] text-slate-500">看空</div>
+        <div class="grid grid-cols-11 gap-1.5 mt-2 text-[10px] text-slate-500 text-center">
+          <span>10%</span><span>8%</span><span>6%</span><span>4%</span><span>2%</span><span>0%</span><span>-2%</span><span>-4%</span><span>-6%</span><span>-8%</span><span>-10%</span>
+        </div>
+        <div class="mt-3">
+          <div class="h-2 rounded-full overflow-hidden bg-white/10 flex">
+            <span class="block h-full bg-emerald-500" style="width:47.3%"></span>
+            <span class="block h-full bg-rose-500" style="width:52.7%"></span>
+          </div>
+          <div class="flex items-end justify-between mt-2">
+            <div>
+              <div class="text-xs text-slate-400">上涨</div>
+              <div class="text-2xl font-bold text-emerald-400 leading-none">3,661</div>
+            </div>
+            <div class="text-right">
+              <div class="text-xs text-slate-400">下跌</div>
+              <div class="text-2xl font-bold text-rose-400 leading-none">4,076</div>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="text-[10px] text-slate-500">
-        关键事件：
-        <span id="assetSentimentEvents" class="text-slate-300">正在分析今日资产利多/利空分布...</span>
+    </div>
+
+    <!-- AI 今日简报卡片 -->
+    <div class="card p-4 ai-thinking glow-blue" id="aiMarketBrief">
+      <div class="flex items-start justify-between mb-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl border border-amber-400/30 bg-amber-400/10 flex items-center justify-center flex-shrink-0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2.2"><path d="M4 19h16M7 16V8m5 8V5m5 11v-6"/></svg>
+          </div>
+          <div>
+            <div class="text-lg font-bold text-white leading-none">实时市场简报</div>
+            <div class="text-xs font-medium text-slate-400 mt-1" id="briefUpdatedAt">😨 市场恐惧 - 11:56 今日数据</div>
+          </div>
+        </div>
+        <div class="px-3 py-1.5 rounded-xl border border-rose-400/30 bg-rose-400/10 text-sm font-bold text-rose-400 leading-none" id="briefSentimentBadge">市场恐惧</div>
+      </div>
+      <div class="card-inner p-4 mb-3">
+        <div class="text-sm font-medium text-slate-200 leading-relaxed">
+          <span class="text-rose-300 mr-1">🎯核心研判:</span>
+          <span id="briefSummary">过去 24 小时 BTC/ETH 集体回落 3-6%，Drift 2.85 亿美元盗窃引发风险警戒；全网爆仓 3.75 亿、ETF 净流出 1.74 亿，短期偏恐。以太坊链上活跃与机构买盘（15 亿+）提供底部支持，短线关注 2040 关键词。</span>
+        </div>
+        <div class="text-sm font-medium text-slate-300 leading-relaxed mt-3">
+          ⚠️风险：<span id="briefSentimentHint">合约安全、DeFi 多签与资金集中仍是隐忧，谨慎仓位控制。</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div class="card-inner p-3">
+          <div class="text-xs font-medium text-slate-400">加密货币ETF净流入</div>
+          <div class="text-2xl font-bold text-rose-400 leading-none mt-1.5">-1.74亿</div>
+        </div>
+        <div class="card-inner p-3">
+          <div class="text-xs font-medium text-slate-400">未平仓合约</div>
+          <div class="text-2xl font-bold text-slate-100 leading-none mt-1.5">2.34T</div>
+        </div>
+        <div class="card-inner p-3">
+          <div class="text-xs font-medium text-slate-400">24小时爆仓</div>
+          <div class="text-2xl font-bold text-slate-100 leading-none mt-1.5">3.75亿</div>
+        </div>
+        <div class="card-inner p-3">
+          <div class="text-xs font-medium text-slate-400">多空走势</div>
+          <div class="text-2xl font-bold text-slate-100 leading-none mt-1.5">多47.0% / 空53.0%</div>
+        </div>
+      </div>
+      <div class="mb-3">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-1.5 h-6 rounded-full bg-amber-400"></span>
+          <span class="text-base font-bold text-slate-200">24小时热点</span>
+        </div>
+        <div class="rounded-xl border border-dashed border-white/15 bg-white/[0.02] p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <span class="px-2.5 py-1 rounded-lg bg-white/5 text-xs font-semibold text-slate-400">安全</span>
+            <div class="min-w-0">
+              <div class="text-xs font-medium text-slate-400 truncate">DeFi 借贷协议遭攻击</div>
+              <div class="text-lg font-bold text-white truncate">Drift 协议被盗 2.85 亿美元</div>
+            </div>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-rose-400/10 text-lg font-bold text-rose-400 whitespace-nowrap">$2.85亿</div>
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="w-1.5 h-6 rounded-full bg-amber-400"></span>
+          <span class="text-base font-bold text-slate-200">短线精灵</span>
+        </div>
+        <div class="card-inner p-3 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-11 h-11 rounded-full border border-white/20 bg-white/5 flex items-center justify-center text-slate-400 text-base font-bold">OKX</div>
+            <div class="min-w-0">
+              <div class="text-xl font-bold text-white leading-none">ETH/USDT</div>
+              <div class="text-sm font-semibold text-emerald-400 mt-1 truncate">建议做多，短线回调支撑位 2040</div>
+            </div>
+          </div>
+          <div class="text-2xl font-bold text-emerald-400 whitespace-nowrap">2108.41 USDT</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 资金猎手（平铺） -->
+    <div class="card p-4 glow-blue" id="discoverFundHunterSection">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+          <span class="text-sm font-bold text-white">资金猎手</span>
+        </div>
+        <span class="text-[10px] text-slate-500">4/4 全部展开</span>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+        <div class="card-inner p-3">
+          <div class="text-sm font-bold text-white">ETF净流入</div>
+          <div class="text-[11px] text-slate-500 mt-1 mb-2">总净流入：$1.74亿</div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">BTC · 建仓</span><span class="text-[12px] font-bold text-emerald-400">+0.52亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">ETH · 建仓</span><span class="text-[12px] font-bold text-emerald-400">+0.42亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">BNB · 建仓</span><span class="text-[12px] font-bold text-emerald-400">+0.23亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">SOL · 建仓</span><span class="text-[12px] font-bold text-emerald-400">+0.19亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">ADA · 建仓</span><span class="text-[12px] font-bold text-emerald-400">+0.15亿</span></div>
+          </div>
+        </div>
+        <div class="card-inner p-3">
+          <div class="text-sm font-bold text-white">值得关注虚拟币</div>
+          <div class="text-[11px] text-slate-500 mt-1 mb-2">热度与资金双指标</div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">ARB · 关注</span><span class="text-[12px] font-bold text-rose-400">-0.2%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">OP · 关注</span><span class="text-[12px] font-bold text-emerald-400">+1.6%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">SUI · 关注</span><span class="text-[12px] font-bold text-emerald-400">+0.9%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">FIL · 关注</span><span class="text-[12px] font-bold text-emerald-400">+3.2%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">LINK · 关注</span><span class="text-[12px] font-bold text-emerald-400">+0.8%</span></div>
+          </div>
+        </div>
+        <div class="card-inner p-3">
+          <div class="text-sm font-bold text-white">资金买入/卖出最多</div>
+          <div class="text-[11px] text-slate-500 mt-1 mb-2">买入：网格交易热点；卖出：高位减仓</div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">买入 BTC · 买入</span><span class="text-[12px] font-bold text-emerald-400">+$0.8亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">买入 ETH · 买入</span><span class="text-[12px] font-bold text-emerald-400">+$0.6亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">卖出 SOL · 卖出</span><span class="text-[12px] font-bold text-rose-400">-$0.4亿</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">卖出 AVAX · 卖出</span><span class="text-[12px] font-bold text-rose-400">-$0.3亿</span></div>
+          </div>
+        </div>
+        <div class="card-inner p-3">
+          <div class="text-sm font-bold text-white">主力资金动向</div>
+          <div class="text-[11px] text-slate-500 mt-1 mb-2">重点资金流向</div>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">成交量 ↑ ETH · 动向</span><span class="text-[12px] font-bold text-emerald-400">+92%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">USDT 流出 · 动向</span><span class="text-[12px] font-bold text-emerald-400">+18%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">交易所余额 ↓ · 动向</span><span class="text-[12px] font-bold text-rose-400">-7%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">DeFi 资金增 · 动向</span><span class="text-[12px] font-bold text-emerald-400">+36%</span></div>
+            <div class="flex items-center justify-between rounded-lg bg-white/[0.03] px-2.5 py-2"><span class="text-[12px] font-semibold text-slate-200">ETF 资金流入 · 动向</span><span class="text-[12px] font-bold text-emerald-400">+2.4%</span></div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- AI 热力气泡分类云 -->
-    <div class="bubble-wrap">
+    <div class="bubble-wrap" id="newsBubbleSection">
       <div class="bubble-title">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         <span style="font-size:10px;font-weight:700;color:#60a5fa;letter-spacing:0.06em;text-transform:uppercase;">AI 热度分类</span>
@@ -2125,6 +2472,81 @@
 
     <script>
       let currentCategoryFilter = 'all';
+      let currentMainView = 'discover';
+      const WATCH_QA_SCENES = [
+        { q: '把账户资产管理功能都给我列出来。', t: '账户资产管理（F-001~F-008）', c: ['F-001 资产总览：现货+合约总资产 / 分账户明细', 'F-002 持仓查询：数量、成本、现价、浮盈亏', 'F-003 合约仓位：方向/杠杆/保证金/强平价', 'F-004 保证金率监控：健康/警告/危险', 'F-005 资金费率查询：费率+下次结算', 'F-006 交易历史：时间/币种/方向筛选', 'F-007 盈亏统计：日/周/月 + 导出', 'F-008 挂单管理：查询未成交 + 自然语言撤单'] },
+        { q: '我账户现在有多少钱？（F-001）', t: 'F-001 资产总览（模拟）', c: ['现货 2,350.45U（82.4%）', '合约 500.00U（17.6%）', '合计 2,850.45U，24h +88.32U（+3.2%）'] },
+        { q: '我现在持仓情况怎么样？（F-002）', t: 'F-002 持仓查询（模拟）', c: ['BTC/USDT：0.0182，成本 63,200，现价 65,800，+47.32U（+3.95%）', 'ETH/USDT：0.25，成本 3,500，现价 3,400，-25.00U（-2.86%）', '整体浮盈亏：+22.32U（+0.94%）'] },
+        { q: '我合约有哪些仓位？（F-003）', t: 'F-003 合约仓位详情（模拟）', c: ['BTC 永续多单：10x 逐仓，开仓 64,500，浮盈 +65U', 'ETH 永续空单：5x 全仓，开仓 3,450，浮盈 +25U'] },
+        { q: '我的合约账户安全吗？（F-004）', t: 'F-004 保证金率监控（模拟）', c: ['保证金率：43.2%（健康）', '安全阈值：≥30% / 警告 15~30% / 危险 <15%', '账户权益与保证金已同步校验'] },
+        { q: 'ETH 资金费率多少？（F-005）', t: 'F-005 资金费率查询（模拟）', c: ['当前费率：+0.0135%', '下次结算：1小时42分钟后', '结算周期：8小时 / 次，年化约 14.8%'] },
+        { q: '我最近交易记录呢？（F-006）', t: 'F-006 交易历史（模拟）', c: ['03-18 BTC 买入 @64,500', '03-17 ETH 卖出 @3,520', '03-16 SOL 买入 @142.5'] },
+        { q: '给我日/周/月盈亏统计。（F-007）', t: 'F-007 盈亏统计（模拟）', c: ['日统计：+42.50U（手续费 3.20U）', '周统计：+188.90U（手续费 18.60U）', '月统计：-56.30U（手续费 72.40U）'] },
+        { q: '我现在有哪些未成交挂单？（F-008）', t: 'F-008 挂单管理（模拟）', c: ['#001 ETH 限价卖单：未成交', '#002 SOL 止损单：未触发', '支持：撤销单笔 / 全部撤单'] },
+
+        { q: 'BTC 现在多少钱？（F-101）', t: 'F-101 实时价格（模拟）', c: ['当前：65,820 USDT', '24h：+2,150（+3.38%）', '高低：66,200 / 63,500，成交量 32,450 BTC'] },
+        { q: 'SOL、ETH、BNB 今天谁涨得最多？（F-102）', t: 'F-102 多币种比价（模拟）', c: ['🥇 SOL +5.62%', '🥈 ETH +4.21%', '🥉 BNB +1.85%'] },
+        { q: 'BTC 现在 RSI 多少？（F-103）', t: 'F-103 技术指标（模拟）', c: ['RSI(14)=68.3（接近超买）', 'RSI(6)=74.1（超买）', 'MACD 红柱 +16.5，布林位于中轨与上轨之间'] },
+        { q: 'BTC 关键支撑和压力在哪？（F-104）', t: 'F-104 支撑压力位（模拟）', c: ['压力：66,200 / 68,500 / 73,000', '支撑：65,000 / 63,200'] },
+        { q: '看看 BTC 4 小时线趋势。（F-105）', t: 'F-105 K线趋势（模拟）', c: ['结构：震荡上行，高低点抬升', '均线：MA7>MA25>MA99 多头排列', '量价：上涨放量、回调缩量，偏上涨中继'] },
+        { q: 'BTC 最近波动大吗？（F-106）', t: 'F-106 波动率分析（模拟）', c: ['7天 52.3%（中高）', '30天 44.8%（中）', '90天 38.5%（正常）'] },
+        { q: '当前市场情绪怎么样？（F-107）', t: 'F-107 市场情绪（模拟）', c: ['多空比 49:51', '大单净流入 +1280万U', '综合：中性偏谨慎，空头略占优'] },
+
+        { q: '市价买入 500U 的 BTC。（F-201）', t: 'F-201 现货市价单（模拟）', c: ['成交价 65,820，数量 0.007596 BTC', '手续费 0.50U，状态 ✅ 已成交'] },
+        { q: '挂一个 BTC 限价买单 64,800，数量 0.01。（F-202）', t: 'F-202 现货限价单（模拟）', c: ['订单 #LMT-1028，类型 限价买入', '占用 648U，状态 ⏳ 挂单中'] },
+        { q: 'ETH 10x 做多，保证金 200U，逐仓。（F-203）', t: 'F-203 合约开仓（模拟）', c: ['标的 ETH 永续，多单 10x 逐仓', '名义价值 2,000U，状态 ✅ 已开仓'] },
+        { q: '把我的 ETH 空单平仓 50%。（F-204）', t: 'F-204 合约平仓（模拟）', c: ['已平 0.25 ETH @3,395', '已实现盈亏 +13.75U，剩余 0.25 ETH'] },
+        { q: '给 ETH 多单设置止盈 3800，止损 3200。（F-205）', t: 'F-205 止盈止损（模拟）', c: ['止盈 3,800（+11.1%）', '止损 3,200（-6.5%）', '双向保护 ✅ 生效'] },
+        { q: 'BTC 突破 68,000 就市价买入 0.01。（F-206）', t: 'F-206 条件触发单（模拟）', c: ['触发条件：BTC ≥ 68,000', '动作：市价买 0.01 BTC', '状态：⏳ 待触发（当前 65,820）'] },
+        { q: '把我所有挂单都撤掉。（F-207）', t: 'F-207 批量撤单（模拟）', c: ['已撤销 3 笔挂单', '释放冻结资金 1,210U'] },
+        { q: '用余额的 30% 买 ETH。（F-208）', t: 'F-208 按比例下单（模拟）', c: ['可用 1,000U，按 30% 下单=300U', '按现价约买 0.0877 ETH，✅ 已成交'] },
+        { q: 'BTC 多单加仓 20%。（F-209）', t: 'F-209 加减仓（模拟）', c: ['原仓 0.05 BTC，新增 0.01 BTC', '加仓后 0.06 BTC，新均价 64,980'] },
+        { q: '把 ETH 合约杠杆调到 3x。（F-210）', t: 'F-210 调整杠杆（模拟）', c: ['ETH 杠杆 5x→3x', '强平价 3,789 上移至 3,945（风险下降）'] },
+
+        { q: 'BTC 涨到 68,000 或跌到 63,200 立刻提醒我。（F-401）', t: 'F-401 到价提醒（新增模拟）', c: ['上穿 68,000 / 下破 63,200 双阈值监控', '触发推送含方向、最新价、动作按钮'] },
+        { q: '保证金率低于 20% 提醒我，并展示处理建议。（F-402）', t: 'F-402 保证金率预警（新增模拟）', c: ['阈值：20% 警告 / 15% 危险 / 10% 强平风险', '支持：仅提醒 / 自动减仓 / 自动追保'] },
+        { q: '我的限价单成交后第一时间通知我。（F-403）', t: 'F-403 成交通知（新增模拟）', c: ['限价成交即时推送', '止盈/止损触发会附带已实现盈亏与剩余仓位'] },
+        { q: 'ETH 持仓亏损超过 5% 就提醒我。（F-404）', t: 'F-404 持仓浮亏预警（新增模拟）', c: ['ETH 浮亏超过 -5% 触发', '扩大到 -7%/-9% 分级推送，防刷屏重置'] },
+        { q: '资金费率超过 0.05% 就提醒我。（F-405）', t: 'F-405 资金费率异常预警（新增模拟）', c: ['费率绝对值 ≥0.05% 且持续两个周期触发', '可建议降杠杆或对冲部分仓位'] },
+        { q: '市场波动突然变大时提醒我。（F-406）', t: 'F-406 波动率突增预警（新增模拟）', c: ['1h波动率>3.5% 或 15分钟振幅>1.8% 触发', '触发后建议先减仓并观察 15 分钟'] },
+
+        { q: '我账户有 2,000U，每笔最多亏 2%，该开多大仓位？（F-301）', t: 'F-301 仓位管理建议（新增模拟）', c: ['单笔风险上限 40U', '止损 4% 时建议仓位约 1,000U'] },
+        { q: '我用 500U 买 ETH，最多亏 50U，止损放哪里？（F-302）', t: 'F-302 止损位建议（新增模拟）', c: ['500U 最大亏损 50U → 止损约 -10%', '结合结构位优先放置在 3,200 附近'] },
+        { q: 'ETH 开仓 3420，止盈 3600，止损 3300，合理吗？（F-303）', t: 'F-303 盈亏比评估（新增模拟）', c: ['当前盈亏比约 1.5:1，低于 2:1', '建议上调止盈到 3,660 或收紧止损'] },
+        { q: '我的 ETH 空单快接近强平了吗？（F-304）', t: 'F-304 爆仓风险预警（新增模拟）', c: ['当前距强平 11.4%，风险中高', '追加保证金后风险可从高降至中'] },
+        { q: '帮我看下整体持仓风险，有没有集中暴露？（F-305）', t: 'F-305 组合风险评估（新增模拟）', c: ['方向暴露：多 68% / 空 32%', 'BTC+ETH 集中度 79%，建议降到 58%'] },
+        { q: '我想做 ETH 网格，区间 3000-3800，投入 2000U，给参数。（F-306）', t: 'F-306 网格策略参数（新增模拟）', c: ['区间 3000~3800，建议 12 格，单格约 166U', '跌破 2,940 停网格，上破 3,860 分批止盈'] },
+        { q: '每周定投 100U 买 BTC，帮我做计划。（F-307）', t: 'F-307 定投计划（新增模拟）', c: ['每周一 10:00 定投 100U，周期 24 周', '单周跌幅>8% 时自动追加 50U'] },
+        { q: '给我做个交易风格画像，看看我哪里容易亏。（F-308）', t: 'F-308 交易风格画像（新增模拟）', c: ['标签：短线偏激进、止损执行中等', '高风险时段 22:00~00:00，建议减少夜间交易'] },
+
+        { q: '给我生成本周交易周报。（F-501）', t: 'F-501 周报生成（新增模拟）', c: ['03/25-03/31：12笔，胜率58.3%，净盈亏 +96.40U', '支持自动周一推送摘要'] },
+        { q: '我最近三个月的胜率是多少？（F-502）', t: 'F-502 胜率分析（新增模拟）', c: ['近三个月 99 笔，胜率 53.5%', '高胜率时段 06:00~10:00（73.3%）'] },
+        { q: '帮我复盘亏损最大的交易。（F-503）', t: 'F-503 最差交易复盘（新增模拟）', c: ['最大亏损：DOGE 多单 -88U', '主要问题：逆势开仓 + 止损延迟'] },
+        { q: '我这个月手续费花了多少？（F-504）', t: 'F-504 手续费统计（新增模拟）', c: ['03月累计手续费 24.60U', '手续费占净利润约 12.8%'] },
+        { q: '分析一下我的交易风格画像。（F-505）', t: 'F-505 交易风格画像（新增模拟）', c: ['趋势跟随偏短线，入场积极离场偏慢', '建议统一止损模板，控制情绪化加仓'] }
+      ];
+      function renderWatchQaScenes() {
+        const wrap = document.getElementById('watchQaList');
+        if (!wrap) return;
+        wrap.innerHTML = WATCH_QA_SCENES.map((x) => `
+          <div class="space-y-2">
+            <div class="flex justify-end">
+              <div class="max-w-[76%] rounded-2xl rounded-br-md px-4 py-2.5 text-sm font-medium bg-amber-400 text-amber-950">${x.q}</div>
+            </div>
+            <div class="flex items-start gap-3">
+              <div class="w-9 h-9 rounded-xl bg-amber-400 text-amber-950 flex items-center justify-center font-headline font-extrabold shrink-0">AI</div>
+              <section class="flex-1 card-inner overflow-hidden">
+                <div class="px-4 py-3 border-b border-white/10 bg-white/[0.03]">
+                  <h3 class="font-headline font-extrabold text-base text-white">${x.t}</h3>
+                </div>
+                <div class="p-4 grid sm:grid-cols-2 gap-2 text-sm">
+                  ${(x.c || []).map((item) => `<div class="card-inner p-3">${item}</div>`).join('')}
+                </div>
+              </section>
+            </div>
+          </div>
+        `).join('');
+      }
       let bubbleDisplayLabels = {
         all: '全部事件',
         tech: '主题1',
@@ -2134,6 +2556,68 @@
         geo: '主题5',
         fx: '主题6'
       };
+      function switchMainView(mode) {
+        currentMainView = mode === 'news' ? 'news' : (mode === 'chat' ? 'chat' : (mode === 'watch' ? 'watch' : 'discover'));
+        const chatIds = ['chatPageSection'];
+        const watchIds = ['watchPageSection'];
+        const discoverIds = ['globalMarketOverview', 'aiMarketBrief', 'discoverFundHunterSection'];
+        const newsIds = ['newsBubbleSection', 'rssTimeline'];
+        chatIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.display = currentMainView === 'chat' ? '' : 'none';
+        });
+        watchIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.display = currentMainView === 'watch' ? '' : 'none';
+        });
+        discoverIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.display = currentMainView === 'discover' ? '' : 'none';
+        });
+        newsIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.display = currentMainView === 'news' ? '' : 'none';
+        });
+
+        const subNavNews = document.getElementById('subNavNews');
+        const subNavDiscover = document.getElementById('subNavDiscover');
+        if (subNavNews) {
+          subNavNews.className = currentMainView === 'news'
+            ? 'flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/8 text-white text-[13px] font-medium border border-white/8'
+            : 'flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 text-[13px] transition-all';
+        }
+        if (subNavDiscover) {
+          subNavDiscover.className = currentMainView === 'discover'
+            ? 'flex items-center gap-2 px-3 py-2.5 rounded-xl bg-white/8 text-white text-[13px] font-medium border border-white/8'
+            : 'flex items-center gap-2 px-3 py-2.5 rounded-xl text-slate-400 hover:text-slate-200 hover:bg-white/5 text-[13px] transition-all';
+        }
+        const leftNavDiscover = document.getElementById('leftNavDiscover');
+        const leftNavChat = document.getElementById('leftNavChat');
+        const leftNavWatch = document.getElementById('leftNavWatch');
+        const leftSubNavPanel = document.getElementById('leftSubNavPanel');
+        if (leftNavDiscover) {
+          leftNavDiscover.className = currentMainView === 'discover' || currentMainView === 'news'
+            ? 'flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer bg-white/8 text-white transition-all w-14'
+            : 'flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14';
+        }
+        if (leftNavChat) {
+          leftNavChat.className = currentMainView === 'chat'
+            ? 'flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer bg-white/8 text-white transition-all w-14'
+            : 'flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14';
+        }
+        if (leftNavWatch) {
+          leftNavWatch.className = currentMainView === 'watch'
+            ? 'flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer bg-white/8 text-white transition-all w-14'
+            : 'flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14';
+        }
+        if (leftSubNavPanel) leftSubNavPanel.style.display = currentMainView === 'chat' ? 'none' : '';
+        const rightPanel = document.getElementById('rightAnalysisPanel');
+        if (rightPanel) rightPanel.style.display = (currentMainView === 'chat' || currentMainView === 'watch') ? 'none' : 'flex';
+      }
       function limitCategoryLabel(label, maxLen = 4) {
         const cleaned = String(label || '').replace(/[·\s/_-]/g, '');
         const chars = Array.from(cleaned);
@@ -2298,7 +2782,7 @@
       </div>
     </div>
 
-    <div class="tl-container" id="staticTimeline" style="display:none;">
+    <div class="tl-container" id="staticTimeline" style="display:none !important;">
 
       <!-- ── 3月15日 ── -->
       <div class="tl-group" data-date-group>
@@ -2747,7 +3231,7 @@
     </div><!-- end tl-container -->
 
     <!-- 分页控件 -->
-    <div class="pagination" id="paginationBar">
+    <div class="pagination" id="paginationBar" style="display:none !important;">
       <button class="page-btn" id="prevBtn" onclick="changePage(currentPage - 1)" disabled>
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
         上一页
@@ -3367,9 +3851,15 @@
             if (!row?.symbol) return;
             const last = Number(row.lastPrice);
             const chg = Number(row.priceChangePercent);
+            const high = Number(row.highPrice);
+            const low = Number(row.lowPrice);
+            const quoteVol = Number(row.quoteVolume);
             map[row.symbol] = {
               price: Number.isFinite(last) ? last : null,
-              changePct: Number.isFinite(chg) ? chg : null
+              changePct: Number.isFinite(chg) ? chg : null,
+              highPrice: Number.isFinite(high) ? high : null,
+              lowPrice: Number.isFinite(low) ? low : null,
+              quoteVolume: Number.isFinite(quoteVol) ? quoteVol : null
             };
           });
           return map;
@@ -3397,6 +3887,26 @@
       if (Number.isFinite(yes)) return { yes, no: 1 - yes };
       if (Number.isFinite(no)) return { yes: 1 - no, no };
       return { yes: 0.5, no: 0.5 };
+    }
+
+    const NEWS_CUTOFF_TS = new Date('2026-03-15T00:00:00+08:00').getTime();
+    function keepAfterNewsCutoff(dateText) {
+      const ts = new Date(dateText || '').getTime();
+      if (!Number.isFinite(ts)) return true;
+      return ts >= NEWS_CUTOFF_TS;
+    }
+
+    function pruneStaticTimelineBeforeCutoff() {
+      const groups = document.querySelectorAll('#staticTimeline .tl-group[data-date-group]');
+      groups.forEach((group) => {
+        const dayText = group.querySelector('.tl-date-header .day')?.textContent?.trim() || '';
+        const monthText = group.querySelector('.tl-date-header .month')?.textContent?.trim() || '';
+        const day = Number((dayText.match(/\d+/) || [])[0]);
+        const month = Number((monthText.match(/\d+/) || [])[0]);
+        if (!Number.isFinite(day) || !Number.isFinite(month)) return;
+        const ts = new Date(2026, month - 1, day, 0, 0, 0).getTime();
+        if (ts < NEWS_CUTOFF_TS) group.remove();
+      });
     }
 
     async function fetchPolymarketMarkets() {
@@ -3900,12 +4410,12 @@
       const totalScore = sample.reduce((acc, item) => acc + scoreText(`${item.title} ${item.description}`), 0);
       const avgScore = sample.length ? totalScore / sample.length : 0;
       const sentiment = getSentimentByScore(avgScore);
-      const topTags = analyzeTopTags(sample);
       const topHeadlines = sample.slice(0, 2).map((item) => item.title).join('；');
-
+      const timeLabel = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
       const summaryText =
-        `过去24小时共追踪 ${sample.length} 条资讯，情绪判定为「${sentiment.label}」。` +
-        `${topHeadlines ? `重点事件包括：${topHeadlines}。` : ''}`;
+        `过去 24 小时 BTC/ETH 集体回落 3-6%，Drift 2.85 亿美元盗窃引发风险警戒；全网爆仓 3.75 亿、ETF 净流出 1.74 亿，短期偏恐。` +
+        `${topHeadlines ? `重点事件：${topHeadlines}。` : ''}` +
+        `短线关注 2040 关键位。`;
 
       const updatedEl = document.getElementById('briefUpdatedAt');
       const sentimentBadgeEl = document.getElementById('briefSentimentBadge');
@@ -3913,15 +4423,14 @@
       const summaryEl = document.getElementById('briefSummary');
 
       if (updatedEl) {
-        updatedEl.textContent = `基于 ${sample.length} 条新闻 · 24小时窗口 · 更新 ${new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })}`;
+        updatedEl.textContent = `😨 市场恐惧 - ${timeLabel} 今日数据`;
       }
       if (sentimentBadgeEl) {
-        sentimentBadgeEl.className = `text-lg font-bold ${sentiment.colorClass}`;
-        sentimentBadgeEl.textContent = sentiment.label;
+        sentimentBadgeEl.className = 'px-3 py-1.5 rounded-xl border border-rose-400/30 bg-rose-400/10 text-sm font-bold text-rose-400 leading-none';
+        sentimentBadgeEl.textContent = '市场恐惧';
       }
-      if (sentimentHintEl) sentimentHintEl.textContent = sentiment.hint;
+      if (sentimentHintEl) sentimentHintEl.textContent = `合约安全、DeFi 多签与资金集中仍是隐忧，谨慎仓位控制。${sentiment.hint ? ` ${sentiment.hint}` : ''}`;
       if (summaryEl) summaryEl.textContent = summaryText;
-      topTags.slice(0, 4).forEach((tag, idx) => setBriefTagCard(idx + 1, tag));
     }
 
     function renderAIBriefFallback() {
@@ -3930,21 +4439,18 @@
       const sentimentHintEl = document.getElementById('briefSentimentHint');
       const summaryEl = document.getElementById('briefSummary');
 
-      if (updatedEl) updatedEl.textContent = '基于 247 条新闻 · 38 个宏观因子 · 实时分析';
+      if (updatedEl) updatedEl.textContent = '😨 市场恐惧 - 11:56 今日数据';
       if (sentimentBadgeEl) {
-        sentimentBadgeEl.className = 'text-lg font-bold text-amber-400';
-        sentimentBadgeEl.textContent = '中性情绪';
+        sentimentBadgeEl.className = 'px-3 py-1.5 rounded-xl border border-rose-400/30 bg-rose-400/10 text-sm font-bold text-rose-400 leading-none';
+        sentimentBadgeEl.textContent = '市场恐惧';
       }
-      if (sentimentHintEl) sentimentHintEl.textContent = '当前无法获取最新资讯数据。';
-      if (summaryEl) summaryEl.textContent = '未能拉取过去24小时新闻，暂时无法生成有效简报。';
-      setBriefTagCard(1, { name: '市场流动性', trend: '中性', trendColor: 'text-amber-400', hits: 0 });
-      setBriefTagCard(2, { name: '风险偏好', trend: '中性', trendColor: 'text-amber-400', hits: 0 });
-      setBriefTagCard(3, { name: '政策预期', trend: '中性', trendColor: 'text-amber-400', hits: 0 });
-      setBriefTagCard(4, { name: '波动率', trend: '中性', trendColor: 'text-amber-400', hits: 0 });
+      if (sentimentHintEl) sentimentHintEl.textContent = '合约安全、DeFi 多签与资金集中仍是隐忧，谨慎仓位控制。';
+      if (summaryEl) summaryEl.textContent = '过去 24 小时 BTC/ETH 集体回落 3-6%，Drift 2.85 亿美元盗窃引发风险警戒；全网爆仓 3.75 亿、ETF 净流出 1.74 亿，短期偏恐。以太坊链上活跃与机构买盘提供底部支持，短线关注 2040 关键位。';
     }
 
     function renderRssTimeline(items, marketMap = {}, pmMarkets = []) {
-      if (!items.length) {
+      const filteredItems = (items || []).filter((it) => keepAfterNewsCutoff(it.pubDate));
+      if (!filteredItems.length) {
         updateBubbleCounts({ all: 0, tech: 0, macro: 0, crypto: 0, commodity: 0, geo: 0, fx: 0 });
         return `
           <div class="tl-group">
@@ -3960,10 +4466,10 @@
         `;
       }
 
-      const first = formatDayInfo(items[0].pubDate);
+      const first = formatDayInfo(filteredItems[0].pubDate);
       const bubbleCounts = { all: 0, tech: 0, macro: 0, crypto: 0, commodity: 0, geo: 0, fx: 0 };
       const bubbleLabelStats = { tech: {}, macro: {}, crypto: {}, commodity: {}, geo: {}, fx: {} };
-      const rows = items.slice(0, 120).map((item) => {
+      const rows = filteredItems.slice(0, 120).map((item) => {
         const dayInfo = formatDayInfo(item.pubDate);
         const safeTitle = escapeHtml(item.title);
         const safeDesc = escapeHtml(item.description);
@@ -3987,10 +4493,42 @@
 	            ...asset,
 	            ...viewInfo,
 	            price: mk.price ?? null,
-	            changePct: mk.changePct ?? null
+	            changePct: mk.changePct ?? null,
+              highPrice: mk.highPrice ?? null,
+              lowPrice: mk.lowPrice ?? null,
+              quoteVolume: mk.quoteVolume ?? null
 	          };
 	        });
-        const aiInterpretation = buildAiInterpretation(item, tags, assets, itemScore);
+        const recAsset = assets[0] || { symbol: 'BTC', pair: 'BTCUSDT', view: '看多', viewClass: 'text-emerald-400', price: null, changePct: null, highPrice: null, lowPrice: null, quoteVolume: null };
+        const recIsBear = recAsset.view === '看空';
+        const recSignal = recIsBear ? '利空' : '利多';
+        const recAction = recIsBear ? '卖出' : '买入';
+        const recSignalClass = recIsBear ? 'bg-rose-500/20 text-rose-300' : 'bg-emerald-500/20 text-emerald-300';
+        const recActionClass = recIsBear
+          ? 'bg-rose-500/90 hover:bg-rose-500 text-white'
+          : 'bg-emerald-500/90 hover:bg-emerald-500 text-white';
+        const recPriceText = Number.isFinite(recAsset.price)
+          ? `$${Number(recAsset.price).toLocaleString('en-US', { maximumFractionDigits: recAsset.price >= 100 ? 2 : 4 })}`
+          : '--';
+        const recHasChange = Number.isFinite(recAsset.changePct);
+        const recChangeClass = recHasChange ? (recAsset.changePct >= 0 ? 'text-emerald-400' : 'text-rose-400') : 'text-slate-400';
+        const recChangeText = recHasChange
+          ? `${recAsset.changePct >= 0 ? '+' : ''}${recAsset.changePct.toFixed(2)}%`
+          : '--';
+        const recHighText = Number.isFinite(recAsset.highPrice)
+          ? `$${Number(recAsset.highPrice).toLocaleString('en-US', { maximumFractionDigits: recAsset.highPrice >= 100 ? 2 : 4 })}`
+          : '--';
+        const recLowText = Number.isFinite(recAsset.lowPrice)
+          ? `$${Number(recAsset.lowPrice).toLocaleString('en-US', { maximumFractionDigits: recAsset.lowPrice >= 100 ? 2 : 4 })}`
+          : '--';
+        const recVolText = Number.isFinite(recAsset.quoteVolume)
+          ? (recAsset.quoteVolume >= 1_000_000_000
+            ? `$${(recAsset.quoteVolume / 1_000_000_000).toFixed(2)}B`
+            : recAsset.quoteVolume >= 1_000_000
+              ? `$${(recAsset.quoteVolume / 1_000_000).toFixed(2)}M`
+              : `$${(recAsset.quoteVolume / 1_000).toFixed(1)}K`)
+          : '--';
+        const recIcon = recAsset.symbol === 'BTC' ? '₿' : (recAsset.symbol === 'ETH' ? 'Ξ' : escapeHtml(String(recAsset.symbol || 'C').slice(0, 1)));
         const polyBlock = renderPolymarketBlock(rawText, assets, itemScore, pmMarkets);
         return `
           <div class="tl-row" data-category="${escapeHtml(primaryCategory.key)}">
@@ -4010,29 +4548,41 @@
                     style="width:150px;height:90px;object-fit:cover;border-radius:8px;border:1px solid rgba(255,255,255,0.08);background:#0b1220;" />
                 </a>
               ` : ''}
-              <div class="bg-blue-950/20 border border-blue-900/30 rounded-lg p-3 mb-3">
-                <div class="flex items-center gap-1.5 mb-1.5">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-                  <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wide">AI 解读</span>
+              <div class="card-inner p-3 mb-3">
+                <div class="flex items-center justify-between gap-3 mb-2">
+                  <div class="flex items-center gap-2 min-w-0">
+                    <span class="px-2 py-0.5 rounded-md text-[10px] font-bold ${recSignalClass}">${recSignal}</span>
+                    <div class="w-8 h-8 rounded-full border border-white/15 bg-white/5 flex items-center justify-center text-sm font-bold text-amber-300">${recIcon}</div>
+                    <div class="text-sm font-bold text-white">${escapeHtml(recAsset.symbol)}</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-2xl font-bold text-white leading-none">${recPriceText}</div>
+                    <div class="text-[11px] font-semibold ${recChangeClass}">${recChangeText}</div>
+                  </div>
                 </div>
-                <p class="text-[11px] text-slate-300 leading-relaxed">${escapeHtml(aiInterpretation)}</p>
-              </div>
-              <div class="card-inner p-2.5 mb-3">
-                <div class="text-[10px] text-slate-500 mb-1.5">推荐</div>
-                <div class="grid grid-cols-2 gap-2">
-                  ${assets.map((asset) => `
-                    <div class="card-inner p-2 flex items-center justify-between" style="cursor:pointer;transition:border-color 0.15s;" onmouseenter="this.style.borderColor='rgba(96,165,250,0.35)'" onmouseleave="this.style.borderColor=''" onclick='openTradeModal(${JSON.stringify(asset.symbol)}, ${JSON.stringify(inferSwapInstId(asset.symbol, asset.pair))}, ${Number.isFinite(asset.price) ? asset.price : 0}, 0, ${JSON.stringify(asset.view === "看空" ? "SHORT" : "LONG")})'>
-                      <div>
-                        <div class="text-[11px] font-bold text-white">${escapeHtml(asset.symbol)}</div>
-                        <div class="text-[10px] text-slate-500">
-                          ${asset.price === null ? '--' : `$${Number(asset.price).toLocaleString('en-US', { maximumFractionDigits: asset.price >= 100 ? 2 : 4 })}`}
-                          ${asset.changePct === null ? '' : `<span class="${asset.changePct >= 0 ? 'text-emerald-400' : 'text-red-400'}">${asset.changePct >= 0 ? '+' : ''}${asset.changePct.toFixed(2)}%</span>`}
-                        </div>
-                      </div>
-	                      <span class="text-[10px] font-bold ${asset.viewClass}">${escapeHtml(asset.view)}</span>
-	                    </div>
-	                  `).join('')}
-	                </div>
+                <div class="rounded-lg border border-amber-400/20 bg-amber-400/5 p-2 mb-2">
+                  <div class="text-[10px] font-bold text-amber-300 uppercase tracking-[0.08em] mb-1">AINSIGHT</div>
+                  <div class="text-[11px] text-slate-300 leading-relaxed">${escapeHtml(recAsset.symbol)} 当前结合新闻与盘口偏 ${recIsBear ? '弱' : '强'}，建议关注 ${recIsBear ? '反弹压力位' : '回调支撑位'} 确认。</div>
+                </div>
+                <div class="grid grid-cols-4 gap-2 mb-2">
+                  <div class="card-inner p-2 text-center">
+                    <div class="text-[10px] text-slate-500 mb-1">24h涨跌</div>
+                    <div class="text-sm font-bold ${recChangeClass}">${recChangeText}</div>
+                  </div>
+                  <div class="card-inner p-2 text-center">
+                    <div class="text-[10px] text-slate-500 mb-1">24h最高</div>
+                    <div class="text-sm font-bold text-slate-100">${recHighText}</div>
+                  </div>
+                  <div class="card-inner p-2 text-center">
+                    <div class="text-[10px] text-slate-500 mb-1">24h最低</div>
+                    <div class="text-sm font-bold text-slate-100">${recLowText}</div>
+                  </div>
+                  <div class="card-inner p-2 text-center">
+                    <div class="text-[10px] text-slate-500 mb-1">24h成交额</div>
+                    <div class="text-sm font-bold text-slate-100">${recVolText}</div>
+                  </div>
+                </div>
+                <button class="w-full h-9 rounded-xl text-sm font-bold transition-all ${recActionClass}" onclick='openTradeModal(${JSON.stringify(recAsset.symbol)}, ${JSON.stringify(inferSwapInstId(recAsset.symbol, recAsset.pair))}, ${Number.isFinite(recAsset.price) ? recAsset.price : 0}, 0, ${JSON.stringify(recIsBear ? "SHORT" : "LONG")})'>${recAction}</button>
               </div>
               ${polyBlock}
             </div>
@@ -4068,7 +4618,8 @@
       const staticTimeline = document.getElementById('staticTimeline');
       const pagination = document.getElementById('paginationBar');
 
-      if (!rssTimeline || !staticTimeline) return false;
+      if (!rssTimeline) return false;
+      pruneStaticTimelineBeforeCutoff();
 
       try {
         const feedResults = await Promise.all(RSS_FEED_URLS.map((url) => fetchFeedItems(url)));
@@ -4077,21 +4628,22 @@
         const mergedItems = mergeRssItems(freshItems, archiveItems);
         writeRssArchive(mergedItems);
         const items = await translateItemsToZh(mergedItems, 120);
+        const filteredItems = items.filter((it) => keepAfterNewsCutoff(it.pubDate));
         const recommendPairs = Array.from(new Set(
-          items
+          filteredItems
             .slice(0, 120)
             .flatMap((item) => recommendAssetsForNews(`${item.title} ${item.description}`, scoreText(`${item.title} ${item.description}`)).map((x) => x.pair))
         ));
         const marketMap = await fetchBinanceMarketSnapshot(recommendPairs);
         const pmMarkets = PM_DISABLED ? [] : await fetchPolymarketMarkets();
-        renderAIMarketBrief(items);
-        renderAssetSentimentBoard(items, marketMap);
-        renderAITradeOpportunities(items, marketMap);
+        renderAIMarketBrief(filteredItems);
+        renderAssetSentimentBoard(filteredItems, marketMap);
+        renderAITradeOpportunities(filteredItems, marketMap);
         const okxPositions = await fetchOkxPositions();
-        renderPortfolioHealth(items, okxPositions);
-        rssTimeline.innerHTML = renderRssTimeline(items, marketMap, pmMarkets);
+        renderPortfolioHealth(filteredItems, okxPositions);
+        rssTimeline.innerHTML = renderRssTimeline(filteredItems, marketMap, pmMarkets);
         applyNewsCategoryFilter(currentCategoryFilter);
-        staticTimeline.style.display = 'none';
+        if (staticTimeline) staticTimeline.style.display = 'none';
         if (pagination) pagination.style.display = 'none';
         return true;
       } catch (err) {
@@ -4100,9 +4652,10 @@
         renderAssetSentimentFallback();
         renderAITradeOpportunities([], {});
         renderPortfolioHealth([], { positions: [] });
-        rssTimeline.style.display = 'none';
-        staticTimeline.style.display = '';
-        if (pagination) pagination.style.display = '';
+        rssTimeline.style.display = '';
+        rssTimeline.innerHTML = renderRssTimeline([], {}, []);
+        if (staticTimeline) staticTimeline.style.display = 'none';
+        if (pagination) pagination.style.display = 'none';
         return false;
       }
     }
@@ -4147,8 +4700,10 @@
     // 滚动监听：回到顶部 + 日期块 stuck 效果
     document.addEventListener('DOMContentLoaded', async () => {
       const mainEl = document.getElementById('mainContent');
+      renderWatchQaScenes();
       await loadBlockcastRss();
       await loadSosoHotspotsToTreemap();
+      switchMainView('discover');
 
       // IntersectionObserver 检测 sticky 吸附状态
       const stickyWraps = document.querySelectorAll('.tl-date-sticky-wrap');
@@ -4182,7 +4737,7 @@
   </script>
 
   <!-- 右侧 AI 分析面板 -->
-  <aside class="border-l border-white/5 flex flex-col bg-[#080c17] flex-shrink-0 scroll-area overflow-y-auto" style="width:388px;">
+  <aside id="rightAnalysisPanel" class="border-l border-white/5 flex flex-col bg-[#080c17] flex-shrink-0 scroll-area overflow-y-auto" style="width:538px;">
 
     <!-- 我的持仓 AI 健康度 -->
     <div class="p-4 border-b border-white/5" id="portfolioHealthSection">
@@ -4898,7 +5453,28 @@
         overrides: { riskLevel: 7, positionSize: 30, takeProfit: 7.2, stopLoss: 3.2 }
       }
     },
-      analysisTasks: []
+      analysisTasks: [],
+      feeds: [
+        { id: 'feed-001', name: 'PA News 日历', type: 'api', url: '/api/panews/calendar?period=week', status: 'active', createdAt: '2026-04-02 09:00' },
+        { id: 'feed-002', name: 'SoSo 板块', type: 'api', url: '/api/soso/sectors', status: 'active', createdAt: '2026-04-02 09:00' }
+      ],
+      feedContents: [
+        {
+          id: 'fc-001',
+          feedId: 'feed-001',
+          title: '美国 CPI 公布前市场波动放大',
+          url: 'https://example.com/news/cpi-vol',
+          summary: '市场提前交易通胀路径，风险资产短线波动增加。',
+          body: '美国 CPI 数据公布窗口临近，资金提前定价通胀路径，短周期波动明显放大。交易层面建议控制杠杆，关注数据落地后的方向确认。',
+          status: 'published',
+          tags: ['macro', 'cpi'],
+          assets: ['BTC', 'SPX', 'GOLD'],
+          createdAt: '2026-04-02 09:30',
+          updatedAt: '2026-04-02 09:30'
+        }
+      ],
+      editingFeedId: null,
+      editingContentId: null
     };
   }
 
@@ -5033,10 +5609,12 @@
   async function adminBootstrapFromApi(force) {
     if (adminApiBootstrapped && !force) return;
     try {
-      const [eventsRes, globalTradeRes, tasksRes] = await Promise.all([
+      const [eventsRes, globalTradeRes, tasksRes, feedsRes, contentsRes] = await Promise.all([
         adminApiRequest('GET', '/events'),
         adminApiRequest('GET', '/trade-settings/global'),
-        adminApiRequest('GET', '/analysis/tasks')
+        adminApiRequest('GET', '/analysis/tasks'),
+        adminApiRequest('GET', '/feeds'),
+        adminApiRequest('GET', '/feed-contents')
       ]);
       if (Array.isArray(eventsRes.items)) adminState.events = eventsRes.items;
       adminState.globalTradeSettings = {
@@ -5051,6 +5629,8 @@
         }
       };
       adminState.analysisTasks = Array.isArray(tasksRes.items) ? tasksRes.items : [];
+      adminState.feeds = Array.isArray(feedsRes.items) ? feedsRes.items : [];
+      adminState.feedContents = Array.isArray(contentsRes.items) ? contentsRes.items : [];
       if (!adminState.selectedEventId || !adminState.events.some(e => e.id === adminState.selectedEventId)) {
         adminState.selectedEventId = adminState.events[0] ? adminState.events[0].id : null;
       }
@@ -5148,7 +5728,7 @@
   function adminSwitchTab(tab) {
     adminState.activeTab = tab;
     adminPersistState();
-    const tabs = ['events', 'trade', 'analysis', 'users'];
+    const tabs = ['events', 'trade', 'feeds', 'contents', 'analysis', 'users'];
     tabs.forEach((id) => {
       const btn = document.getElementById('adminTab' + id.charAt(0).toUpperCase() + id.slice(1) + 'Btn');
       const content = document.getElementById('adminTab' + id.charAt(0).toUpperCase() + id.slice(1));
@@ -5160,6 +5740,14 @@
       adminLoadGlobalTradeSettings();
       adminLoadEventTradeSettings();
     }
+    if (tab === 'feeds') {
+      adminRenderFeedsTable();
+      adminRenderFeedFormSelect();
+    }
+    if (tab === 'contents') {
+      adminRenderFeedFormSelect();
+      adminRenderFeedContentsTable();
+    }
     if (tab === 'analysis') adminRenderAnalysisTasks();
   }
 
@@ -5169,6 +5757,9 @@
     adminLoadGlobalTradeSettings();
     adminLoadEventTradeSettings();
     adminRenderAnalysisTasks();
+    adminRenderFeedsTable();
+    adminRenderFeedFormSelect();
+    adminRenderFeedContentsTable();
     adminSwitchTab(adminState.activeTab || 'events');
   }
 
@@ -5626,6 +6217,269 @@
         </div>
       </div>
     `).join('');
+  }
+
+  function adminResetFeedForm() {
+    adminState.editingFeedId = null;
+    document.getElementById('adminFeedName').value = '';
+    document.getElementById('adminFeedType').value = 'rss';
+    document.getElementById('adminFeedUrl').value = '';
+    document.getElementById('adminFeedStatus').value = 'active';
+  }
+
+  function adminRenderFeedsTable() {
+    const body = document.getElementById('adminFeedsTableBody');
+    if (!body) return;
+    const list = adminState.feeds || [];
+    if (!list.length) {
+      body.innerHTML = '<tr><td colspan="5" class="admin-muted">暂无 Feed</td></tr>';
+      return;
+    }
+    body.innerHTML = list.map(feed => `
+      <tr>
+        <td>${feed.name || '-'}</td>
+        <td>${feed.type || '-'}</td>
+        <td><span class="small">${feed.url || '-'}</span></td>
+        <td><span class="admin-pill ${feed.status === 'active' ? 'active' : 'draft'}">${feed.status || '-'}</span></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="admin-btn admin-btn-ghost" onclick="adminSyncFeed('${feed.id}')">采集</button>
+            <button class="admin-btn admin-btn-ghost" onclick="adminEditFeed('${feed.id}')">编辑</button>
+            <button class="admin-btn admin-btn-red" onclick="adminDeleteFeed('${feed.id}')">删除</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function adminRenderFeedFormSelect() {
+    const select = document.getElementById('adminContentFeedId');
+    if (!select) return;
+    select.innerHTML = (adminState.feeds || []).map(feed => `<option value="${feed.id}">${feed.name}</option>`).join('');
+  }
+
+  function adminEditFeed(feedId) {
+    const feed = (adminState.feeds || []).find(x => x.id === feedId);
+    if (!feed) return;
+    adminState.editingFeedId = feed.id;
+    document.getElementById('adminFeedName').value = feed.name || '';
+    document.getElementById('adminFeedType').value = feed.type || 'rss';
+    document.getElementById('adminFeedUrl').value = feed.url || '';
+    document.getElementById('adminFeedStatus').value = feed.status || 'active';
+  }
+
+  async function adminSaveFeed() {
+    const payload = {
+      name: document.getElementById('adminFeedName').value.trim(),
+      type: document.getElementById('adminFeedType').value,
+      url: document.getElementById('adminFeedUrl').value.trim(),
+      status: document.getElementById('adminFeedStatus').value
+    };
+    if (!payload.name || !payload.url) {
+      window.alert('请填写 Feed 名称和 URL');
+      return;
+    }
+    let usedApi = false;
+    if (adminApiAvailable) {
+      try {
+        if (adminState.editingFeedId) {
+          const res = await adminApiRequest('PUT', `/feeds/${encodeURIComponent(adminState.editingFeedId)}`, payload);
+          const idx = (adminState.feeds || []).findIndex(x => x.id === adminState.editingFeedId);
+          if (idx >= 0 && res.item) adminState.feeds[idx] = res.item;
+        } else {
+          const res = await adminApiRequest('POST', '/feeds', payload);
+          if (res.item) (adminState.feeds || (adminState.feeds = [])).unshift(res.item);
+        }
+        usedApi = true;
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSaveFeed api failed, fallback local:', err);
+      }
+    }
+    if (!usedApi) {
+      if (adminState.editingFeedId) {
+        const idx = (adminState.feeds || []).findIndex(x => x.id === adminState.editingFeedId);
+        if (idx >= 0) adminState.feeds[idx] = { ...adminState.feeds[idx], ...payload };
+      } else {
+        (adminState.feeds || (adminState.feeds = [])).unshift({ id: 'feed-' + String(Date.now()).slice(-6), ...payload, createdAt: adminNow() });
+      }
+    }
+    const targetFeedId = adminState.editingFeedId || ((adminState.feeds || [])[0] && adminState.feeds[0].id);
+    adminPersistState();
+    adminResetFeedForm();
+    adminRenderFeedsTable();
+    adminRenderFeedFormSelect();
+    if (payload.type === 'rss' && payload.status === 'active' && targetFeedId) {
+      await adminSyncFeed(targetFeedId, true);
+    }
+    window.alert('Feed 已保存');
+  }
+
+  async function adminSyncFeed(feedId, silent) {
+    const feed = (adminState.feeds || []).find(x => x.id === feedId);
+    if (!feed) return;
+    if (adminApiAvailable) {
+      try {
+        const res = await adminApiRequest('POST', `/feeds/${encodeURIComponent(feedId)}/sync`, {});
+        await adminBootstrapFromApi(true);
+        adminRenderFeedContentsTable();
+        if (!silent) {
+          window.alert(`采集完成：新增 ${res.added || 0} 条（抓取 ${res.totalFetched || 0} 条）`);
+        }
+        return;
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSyncFeed api failed:', err);
+        if (!silent) window.alert(`采集失败：${err.message || err}`);
+        return;
+      }
+    }
+    if (!silent) window.alert('当前 API 不可用，无法执行采集');
+  }
+
+  async function adminDeleteFeed(feedId) {
+    const yes = window.confirm('确认删除该 Feed？关联采集内容也会删除。');
+    if (!yes) return;
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('DELETE', `/feeds/${encodeURIComponent(feedId)}`);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminDeleteFeed api failed, fallback local:', err);
+      }
+    }
+    adminState.feeds = (adminState.feeds || []).filter(x => x.id !== feedId);
+    adminState.feedContents = (adminState.feedContents || []).filter(x => x.feedId !== feedId);
+    if (adminState.editingFeedId === feedId) adminResetFeedForm();
+    adminPersistState();
+    adminRenderFeedsTable();
+    adminRenderFeedFormSelect();
+    adminRenderFeedContentsTable();
+  }
+
+  function adminResetContentForm() {
+    adminState.editingContentId = null;
+    document.getElementById('adminContentTitle').value = '';
+    document.getElementById('adminContentUrl').value = '';
+    document.getElementById('adminContentSummary').value = '';
+    document.getElementById('adminContentBody').value = '';
+    document.getElementById('adminContentTags').value = '';
+    document.getElementById('adminContentAssets').value = '';
+    document.getElementById('adminContentStatus').value = 'draft';
+  }
+
+  function adminFeedNameById(feedId) {
+    const feed = (adminState.feeds || []).find(x => x.id === feedId);
+    return feed ? feed.name : feedId;
+  }
+
+  function adminRenderFeedContentsTable() {
+    const body = document.getElementById('adminFeedContentsTableBody');
+    if (!body) return;
+    const list = adminState.feedContents || [];
+    if (!list.length) {
+      body.innerHTML = '<tr><td colspan="5" class="admin-muted">暂无采集内容</td></tr>';
+      return;
+    }
+    body.innerHTML = list.map(item => `
+      <tr>
+        <td>
+          <div style="font-weight:700;color:#e2e8f0;">${item.title || '-'}</div>
+          <span class="small">${item.url || ''}</span>
+          <span class="small">资产：${Array.isArray(item.assets) ? item.assets.join(', ') : '-'}</span>
+        </td>
+        <td>${adminFeedNameById(item.feedId)}</td>
+        <td><span class="admin-pill ${item.status === 'published' ? 'active' : 'draft'}">${item.status || '-'}</span></td>
+        <td>${item.updatedAt || item.createdAt || '-'}</td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <button class="admin-btn admin-btn-ghost" onclick="adminEditFeedContent('${item.id}')">编辑</button>
+            <button class="admin-btn admin-btn-red" onclick="adminDeleteFeedContent('${item.id}')">删除</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function adminEditFeedContent(contentId) {
+    const item = (adminState.feedContents || []).find(x => x.id === contentId);
+    if (!item) return;
+    adminState.editingContentId = item.id;
+    document.getElementById('adminContentFeedId').value = item.feedId || '';
+    document.getElementById('adminContentStatus').value = item.status || 'draft';
+    document.getElementById('adminContentTitle').value = item.title || '';
+    document.getElementById('adminContentUrl').value = item.url || '';
+    document.getElementById('adminContentSummary').value = item.summary || '';
+    document.getElementById('adminContentBody').value = item.body || '';
+    document.getElementById('adminContentTags').value = Array.isArray(item.tags) ? item.tags.join(', ') : '';
+    document.getElementById('adminContentAssets').value = Array.isArray(item.assets) ? item.assets.join(', ') : '';
+  }
+
+  async function adminSaveFeedContent() {
+    const payload = {
+      feedId: document.getElementById('adminContentFeedId').value,
+      status: document.getElementById('adminContentStatus').value,
+      title: document.getElementById('adminContentTitle').value.trim(),
+      url: document.getElementById('adminContentUrl').value.trim(),
+      summary: document.getElementById('adminContentSummary').value.trim(),
+      body: document.getElementById('adminContentBody').value.trim(),
+      tags: document.getElementById('adminContentTags').value.split(',').map(x => x.trim()).filter(Boolean),
+      assets: document.getElementById('adminContentAssets').value.split(',').map(x => x.trim().toUpperCase()).filter(Boolean)
+    };
+    if (!payload.feedId || !payload.title) {
+      window.alert('请填写内容标题并选择 Feed');
+      return;
+    }
+    let usedApi = false;
+    if (adminApiAvailable) {
+      try {
+        if (adminState.editingContentId) {
+          const res = await adminApiRequest('PUT', `/feed-contents/${encodeURIComponent(adminState.editingContentId)}`, payload);
+          const idx = (adminState.feedContents || []).findIndex(x => x.id === adminState.editingContentId);
+          if (idx >= 0 && res.item) adminState.feedContents[idx] = res.item;
+        } else {
+          const res = await adminApiRequest('POST', '/feed-contents', payload);
+          if (res.item) (adminState.feedContents || (adminState.feedContents = [])).unshift(res.item);
+        }
+        usedApi = true;
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminSaveFeedContent api failed, fallback local:', err);
+      }
+    }
+    if (!usedApi) {
+      if (adminState.editingContentId) {
+        const idx = (adminState.feedContents || []).findIndex(x => x.id === adminState.editingContentId);
+        if (idx >= 0) adminState.feedContents[idx] = { ...adminState.feedContents[idx], ...payload, updatedAt: adminNow() };
+      } else {
+        (adminState.feedContents || (adminState.feedContents = [])).unshift({
+          id: 'fc-' + String(Date.now()).slice(-6),
+          ...payload,
+          createdAt: adminNow(),
+          updatedAt: adminNow()
+        });
+      }
+    }
+    adminPersistState();
+    adminResetContentForm();
+    adminRenderFeedContentsTable();
+    window.alert('采集内容已保存');
+  }
+
+  async function adminDeleteFeedContent(contentId) {
+    const yes = window.confirm('确认删除该采集内容？');
+    if (!yes) return;
+    if (adminApiAvailable) {
+      try {
+        await adminApiRequest('DELETE', `/feed-contents/${encodeURIComponent(contentId)}`);
+      } catch (err) {
+        adminApiAvailable = false;
+        console.warn('adminDeleteFeedContent api failed, fallback local:', err);
+      }
+    }
+    adminState.feedContents = (adminState.feedContents || []).filter(x => x.id !== contentId);
+    adminPersistState();
+    adminRenderFeedContentsTable();
   }
 
   document.addEventListener('keydown', function (e) {

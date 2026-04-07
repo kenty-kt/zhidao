@@ -7,6 +7,7 @@ from api._lib.http_utils import json_resp, query_of
 ALLOWED_FEEDS = {
     'https://blockcast.it/feed',
     'https://rsshub.app/coindesk/news',
+    'https://www.chaincatcher.com/rss/clist',
 }
 
 

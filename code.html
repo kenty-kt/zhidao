@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error-dim": "#b92902",
+              "on-surface": "#2c2f30",
+              "surface-dim": "#d1d5d7",
+              "on-error-container": "#520c00",
+              "surface-container": "#e6e8ea",
+              "primary": "#6e5a00",
+              "outline": "#757778",
+              "background": "#f5f6f7",
+              "on-surface-variant": "#595c5d",
+              "tertiary-fixed-dim": "#c0dfee",
+              "on-primary-fixed-variant": "#655300",
+              "tertiary": "#435f6d",
+              "on-tertiary-container": "#3c5966",
+              "on-background": "#2c2f30",
+              "on-tertiary-fixed": "#2a4753",
+              "tertiary-fixed": "#ceedfd",
+              "surface-bright": "#f5f6f7",
+              "secondary": "#5a5c5e",
+              "secondary-dim": "#4e5052",
+              "surface-container-low": "#eff1f2",
+              "on-secondary-container": "#505254",
+              "inverse-surface": "#0c0f10",
+              "surface-container-high": "#e0e3e4",
+              "on-tertiary": "#e4f5ff",
+              "on-primary-container": "#5a4900",
+              "error": "#b02500",
+              "surface-container-lowest": "#ffffff",
+              "on-primary": "#fff2d0",
+              "on-primary-fixed": "#443700",
+              "on-tertiary-fixed-variant": "#466370",
+              "primary-dim": "#604e00",
+              "secondary-fixed-dim": "#d4d4d7",
+              "surface-tint": "#6e5a00",
+              "on-secondary": "#f2f2f5",
+              "secondary-fixed": "#e2e2e5",
+              "primary-container": "#FFD308",
+              "surface": "#f5f6f7",
+              "inverse-primary": "#ffd308",
+              "on-error": "#ffefec",
+              "primary-fixed": "#ffd308",
+              "primary-fixed-dim": "#efc500",
+              "secondary-container": "#e2e2e5",
+              "on-secondary-fixed-variant": "#5a5c5e",
+              "error-container": "#f95630",
+              "tertiary-dim": "#375361",
+              "on-secondary-fixed": "#3e3f42",
+              "surface-variant": "#dadddf",
+              "surface-container-highest": "#dadddf",
+              "outline-variant": "#abadae",
+              "inverse-on-surface": "#9b9d9e",
+              "tertiary-container": "#ceedfd"
+            },
+            fontFamily: {
+              "headline": ["Manrope"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Inter', sans-serif; }
+      .font-headline { font-family: 'Manrope', sans-serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      .custom-blur { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+      .status-bar-safe { padding-top: env(safe-area-inset-top); }
+      .bottom-nav-safe { padding-bottom: env(safe-area-inset-bottom); }
+    </style>
+</head>
+<body class="bg-surface text-on-surface min-h-screen pb-44">
+<!-- BEGIN: Header from SCREEN_24 -->
+<header class="status-bar-safe bg-white/80 backdrop-blur-lg px-4 py-2 flex items-center justify-between sticky top-0 z-50 border-b border-gray-100">
+<div class="flex items-center gap-4">
+<button class="text-gray-400">
+<svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><line x1="7" x2="17" y1="12" y2="12"></line></svg>
+</button>
+</div>
+<div class="w-8 h-8"></div>
+</header>
+<!-- END: Header from SCREEN_24 -->
+<main class="max-w-7xl mx-auto px-6 pt-8 space-y-10">
+<!-- Hero Section -->
+<section class="space-y-2">
+<h1 class="text-4xl font-headline font-extrabold tracking-tight text-on-surface">你好！我是知道AI</h1>
+<p class="text-2xl font-headline font-bold text-on-surface-variant">我什么都知道</p>
+</section>
+<!-- Progress/Check-in Module (temporarily disabled)
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-sm">
+<div class="flex justify-between items-center mb-4">
+<span class="text-sm font-semibold text-on-surface">连登3天获取对话次数</span>
+<span class="text-xs text-on-surface-variant font-medium">当前已签到 2 天</span>
+</div>
+<div class="relative h-2 w-full bg-surface-container rounded-full mb-4">
+<div class="absolute left-0 top-0 h-full w-2/3 bg-primary-container rounded-full"></div>
+<div class="absolute -top-1 left-0 flex justify-between w-full px-1">
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-sm"></div>
+<span class="mt-2 text-[10px] font-bold text-on-surface">1天</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-primary rounded-full border-2 border-white shadow-sm"></div>
+<span class="mt-2 text-[10px] font-bold text-on-surface">2天</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-4 h-4 bg-surface-container-high rounded-full border-2 border-white"></div>
+<span class="mt-2 text-[10px] font-medium text-on-surface-variant">3天</span>
+</div>
+</div>
+</div>
+</div>
+-->
+<!-- Assistant Grid/List -->
+<div class="space-y-4">
+<!-- AI助手 -->
+<a href="ai-chat.html" class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex items-center justify-center bg-primary-container text-primary rounded-xl">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-headline font-bold">AI助手</span>
+<span class="text-[10px] text-on-surface-variant">zhidao.com</span>
+</div>
+<p class="text-sm text-on-surface-variant">问你想了解的</p>
+</div>
+</div>
+</a>
+<!-- 资讯助手 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container text-on-surface-variant rounded-xl">
+<span class="material-symbols-outlined">newspaper</span>
+</div>
+<div>
+<span class="font-headline font-bold">资讯助手</span>
+<p class="text-sm text-on-surface-variant">不废话的情报机 · 只发重要的动态</p>
+</div>
+</div>
+<div class="min-w-[28px] h-6 px-2 bg-[#ff3b30] text-white text-[11px] font-bold rounded-full flex items-center justify-center leading-none shadow-sm">8</div>
+</div>
+<!-- AI盯盘 -->
+<a href="ai-watch.html" class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container text-on-surface-variant rounded-xl">
+<span class="material-symbols-outlined">visibility</span>
+</div>
+<div>
+<span class="font-headline font-bold">AI盯盘</span>
+<p class="text-sm text-on-surface-variant">实时监控异动 · 关键机会第一时间提醒</p>
+</div>
+</div>
+<div class="min-w-[28px] h-6 px-2 bg-[#ff3b30] text-white text-[11px] font-bold rounded-full flex items-center justify-center leading-none shadow-sm">12</div>
+</a>
+<!-- 福利群 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container text-on-surface-variant rounded-xl">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div>
+<span class="font-headline font-bold">福利群</span>
+<p class="text-sm text-on-surface-variant"><span class="text-error">[有人@我]</span> 比特币大手子：今天做空</p>
+</div>
+</div>
+</div>
+<!-- VIP专属群 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container-lowest rounded-xl hover:bg-surface-container-low transition-all duration-300">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 flex items-center justify-center bg-surface-container text-on-surface-variant rounded-xl">
+<span class="material-symbols-outlined">workspace_premium</span>
+</div>
+<div>
+<span class="font-headline font-bold">VIP专属群</span>
+<p class="text-sm text-on-surface-variant">限量席位，欢迎加入</p>
+</div>
+</div>
+<div class="px-3 py-1 bg-surface-container-high text-on-surface-variant text-[10px] font-bold rounded-full">订阅</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation -->
+<div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 bottom-nav-safe z-50">
+<nav class="w-full max-w-md mx-auto px-5 py-3 flex items-center justify-between">
+<a href="code.html" class="relative flex flex-col items-center justify-center min-w-[72px] text-gray-900">
+<span class="material-symbols-outlined text-[26px]" style="font-variation-settings:'FILL' 1">smart_toy</span>
+<span class="text-[15px] font-black leading-none mt-1">Agent</span>
+<span class="absolute -bottom-2 w-8 h-1.5 bg-primary-container rounded-full"></span>
+</a>
+<a href="Image 2.html" class="flex flex-col items-center justify-center min-w-[72px] text-gray-400 hover:text-gray-700 transition-colors">
+<span class="material-symbols-outlined text-[26px]">expand_circle_down</span>
+<span class="text-[15px] font-bold leading-none mt-1">发现</span>
+</a>
+<a href="news.html" class="flex flex-col items-center justify-center min-w-[72px] text-gray-400 hover:text-gray-700 transition-colors">
+<span class="material-symbols-outlined text-[26px]">newspaper</span>
+<span class="text-[15px] font-bold leading-none mt-1">资讯助手</span>
+</a>
+<a href="#" class="flex flex-col items-center justify-center min-w-[72px] text-gray-400 hover:text-gray-700 transition-colors">
+<span class="material-symbols-outlined text-[26px]">account_balance_wallet</span>
+<span class="text-[15px] font-bold leading-none mt-1">钱包</span>
+</a>
+</nav>
+<div class="w-full max-w-md mx-auto px-4 pb-4">
+<div class="flex items-center justify-between gap-3">
+<button class="w-12 h-12 flex-shrink-0 border border-gray-200 rounded-2xl flex items-center justify-center bg-white shadow-sm">
+<span class="text-[10px] font-black text-gray-500">交易</span>
+</button>
+<div class="flex-grow h-12 bg-gray-50 rounded-2xl border border-gray-200 px-4 flex items-center gap-3">
+<span class="material-symbols-outlined text-[#8a6d00] text-xl">mic</span>
+<input class="flex-grow text-sm border-none focus:ring-0 p-0 text-gray-700 bg-transparent placeholder:text-gray-400" placeholder="提问或搜索" type="text"/>
+<span class="material-symbols-outlined text-gray-400 text-xl">grid_view</span>
+</div>
+<button class="w-12 h-12 flex-shrink-0 border border-gray-200 rounded-2xl flex items-center justify-center bg-white shadow-sm">
+<span class="text-[10px] font-black text-gray-500">行情</span>
+</button>
+</div>
+<p class="text-[9px] text-gray-400 mt-2 text-center">内容由AI生成，不构成投资建议</p>
+</div>
+</div></body></html>
