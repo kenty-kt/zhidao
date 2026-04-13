@@ -2066,7 +2066,7 @@
       -->
 
       <!-- 交易 -->
-      <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14" onclick="openTradeModal('BTC')" title="Token 交易">
+      <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14" onclick="window.location.href='trade.html'" title="打开交易页面">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         <span class="text-[10px] font-medium">交易</span>
       </div>
@@ -2075,6 +2075,12 @@
       <div id="leftNavDiscover" onclick="switchMainView('discover')" class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer bg-white/8 text-white transition-all w-14">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
         <span class="text-[10px] font-semibold">发现</span>
+      </div>
+
+      <!-- 授权 -->
+      <div class="flex flex-col items-center gap-1 py-3 px-2 rounded-xl cursor-pointer text-slate-500 hover:text-slate-300 hover:bg-white/5 transition-all w-14" onclick="window.location.href='authorize.html'" title="打开授权页面">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l7 3v5c0 5.2-3.4 8.9-7 10-3.6-1.1-7-4.8-7-10V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg>
+        <span class="text-[10px] font-medium">授权</span>
       </div>
     </div>
 
@@ -4703,7 +4709,16 @@
       renderWatchQaScenes();
       await loadBlockcastRss();
       await loadSosoHotspotsToTreemap();
-      switchMainView('discover');
+      const launchView = (() => {
+        const byQuery = new URLSearchParams(window.location.search).get('view');
+        const byHash = String(window.location.hash || '').replace('#', '');
+        let byStorage = '';
+        try { byStorage = localStorage.getItem('zhidaoLaunchView') || ''; } catch (e) {}
+        const raw = (byQuery || byHash || byStorage || 'discover').toLowerCase();
+        return ['chat', 'watch', 'news', 'discover'].includes(raw) ? raw : 'discover';
+      })();
+      switchMainView(launchView);
+      try { localStorage.removeItem('zhidaoLaunchView'); } catch (e) {}
 
       // IntersectionObserver 检测 sticky 吸附状态
       const stickyWraps = document.querySelectorAll('.tl-date-sticky-wrap');

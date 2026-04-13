@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>授权管理 · 知道AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #050910;
+      --bg-soft: #0b111b;
+      --panel: #0a1019;
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --brand: #0ea5ff;
+      --ok: #14b8a6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1200px 600px at 45% -180px, rgba(14, 165, 233, 0.12), transparent 70%),
+        linear-gradient(180deg, #060b14, #050910);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .menu-item { color: #8da0bf; transition: 0.2s; }
+    .menu-item:hover { color: #cdd8e8; background: rgba(255, 255, 255, 0.05); }
+    .menu-item.active {
+      color: #fff;
+      background: rgba(14, 165, 255, 0.16);
+      border-color: rgba(14, 165, 255, 0.35);
+      box-shadow: 0 0 12px rgba(14, 165, 255, 0.2);
+    }
+    .auth-table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(3, 8, 16, 0.88);
+    }
+    .auth-head {
+      background: rgba(255, 255, 255, 0.04);
+      color: #aab5c7;
+      font-weight: 700;
+    }
+    .auth-row {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      transition: background 0.2s ease;
+    }
+    .auth-row:hover { background: rgba(255, 255, 255, 0.03); }
+    .check {
+      color: var(--ok);
+      font-size: 16px;
+      line-height: 1;
+      font-weight: 700;
+      display: inline-block;
+      transform: translateY(1px);
+    }
+    .rank-pill {
+      min-width: 34px;
+      height: 24px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 12px;
+      line-height: 1;
+      font-style: italic;
+      color: #dbeafe;
+      background: linear-gradient(135deg, rgba(30, 64, 175, 0.72), rgba(15, 23, 42, 0.92));
+      border: 1px solid rgba(147, 197, 253, 0.34);
+    }
+    .btn-light {
+      height: 36px;
+      min-width: 92px;
+      border-radius: 7px;
+      border: 1px solid rgba(255, 255, 255, 0.72);
+      background: #f8fafc;
+      color: #111827;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      padding: 0 12px;
+      cursor: pointer;
+    }
+    .tag-new {
+      position: absolute;
+      right: -8px;
+      top: -9px;
+      height: 18px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fb923c, #f97316);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff7ed;
+      font-size: 10px;
+      line-height: 16px;
+      font-weight: 700;
+      padding: 0 6px;
+    }
+    .logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.06);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .create-link {
+      color: var(--brand);
+      font-size: 16px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .q {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      font-size: 11px;
+      margin-left: 5px;
+      color: #9ca3af;
+    }
+    .auth-grid {
+      display: grid;
+      grid-template-columns: 220px 260px 220px 220px 120px;
+      column-gap: 10px;
+      align-items: center;
+    }
+    .auth-grid > div { min-width: 0; }
+    .auth-grid .ell {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .auth-grid .cell-center { text-align: center; }
+    .auth-grid .cell-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .auth-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(2px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 80;
+      padding: 18px;
+    }
+    .auth-modal.show { display: flex; }
+    .auth-modal-panel {
+      width: min(1080px, 100%);
+      height: min(780px, calc(100vh - 32px));
+      max-height: calc(100vh - 32px);
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      background: #080f1b;
+      box-shadow: 0 18px 48px rgba(2, 8, 23, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    .auth-modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      background: rgba(15, 23, 42, 0.9);
+      gap: 8px;
+    }
+    .auth-modal-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #e2e8f0;
+    }
+    .auth-modal-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .auth-modal-btn {
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.85);
+      color: #dbe4f0;
+      padding: 0 11px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+    .auth-modal-btn:hover { border-color: rgba(56, 189, 248, 0.55); }
+    .auth-modal-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+    }
+    .auth-modal-note {
+      margin: 0;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #94a3b8;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(10, 16, 28, 0.95);
+    }
+    .api-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 6, 23, 0.78);
+      padding: 18px;
+    }
+    .api-modal.show { display: flex; }
+    .api-modal-panel {
+      width: min(1360px, 100%);
+      height: min(880px, calc(100vh - 32px));
+      max-height: calc(100vh - 32px);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: #212226;
+      box-shadow: 0 20px 56px rgba(2, 8, 23, 0.66);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .api-topbar {
+      height: 54px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      color: #e5e7eb;
+    }
+    .api-topbar .title {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+    .api-topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #d1d5db;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .api-close {
+      border: none;
+      background: transparent;
+      color: #9ca3af;
+      font-size: 24px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+    .api-ex-tabs {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.11);
+      background: #232428;
+    }
+    .api-ex-tab {
+      height: 42px;
+      min-width: 132px;
+      border-radius: 9px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: #c8cdd5;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 0 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .api-ex-tab.active {
+      background: linear-gradient(135deg, rgba(255,255,255,0.14), rgba(255,255,255,0.02));
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+    .api-content {
+      flex: 1;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 58% 42%;
+      background: #222327;
+      overflow: hidden;
+    }
+    .api-content.quick-mode {
+      grid-template-columns: 1fr;
+    }
+    .api-content.hyper-mode {
+      grid-template-columns: 58% 42%;
+    }
+    .api-left {
+      border-right: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 16px 20px;
+      overflow: auto;
+    }
+    .api-content.quick-mode .api-left {
+      border-right: none;
+    }
+    .api-mini-tabs {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 12px;
+      margin-bottom: 18px;
+    }
+    .api-content.hyper-mode .api-mini-tabs {
+      display: none;
+    }
+    .api-mini-tab {
+      font-size: 18px;
+      color: #676f7d;
+      font-weight: 700;
+      line-height: 1;
+      border: none;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+    }
+    .api-mini-tab.active {
+      color: #f3f4f6;
+      position: relative;
+    }
+    .api-mini-tab.active::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -12px;
+      height: 3px;
+      border-radius: 999px;
+      background: #f8fafc;
+    }
+    .api-form-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 16px 12px;
+      align-items: center;
+    }
+    .api-left-title {
+      display: none;
+      font-size: 18px;
+      color: #d1d5db;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    .api-content.hyper-mode .api-left-title {
+      display: block;
+    }
+    .api-input-wrap {
+      position: relative;
+    }
+    .api-input-suffix {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #d1d5db;
+      font-size: 14px;
+      pointer-events: none;
+    }
+    .api-api-view { display: block; }
+    .api-quick-view { display: none; }
+    .api-content.quick-mode .api-api-view { display: none; }
+    .api-content.quick-mode .api-quick-view { display: block; }
+    .api-label {
+      color: #d5d9df;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 600;
+    }
+    .api-label .req { color: #f43f5e; }
+    .api-input {
+      height: 44px;
+      border-radius: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #1f2024;
+      color: #e5e7eb;
+      padding: 0 16px;
+      font-size: 14px;
+      outline: none;
+      width: 100%;
+    }
+    .api-options {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 14px;
+      color: #d2d8e0;
+    }
+    .api-add-btn {
+      margin-top: 26px;
+      width: 100%;
+      height: 48px;
+      border-radius: 10px;
+      border: none;
+      background: #f2f4f8;
+      color: #151a20;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .api-right {
+      padding: 14px 14px 14px 12px;
+      overflow: auto;
+    }
+    .api-content.quick-mode .api-right { display: none; }
+    .api-tutorial {
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: #d7dce4;
+    }
+    .api-tutorial-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .api-tutorial h4 {
+      margin: 0;
+      font-size: 16px;
+      color: #f3f4f6;
+      font-weight: 800;
+    }
+    .api-tutorial-btn {
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      background: rgba(255, 255, 255, 0.06);
+      color: #dbe4f0;
+      height: 34px;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .api-tutorial ol {
+      margin: 0;
+      padding-left: 22px;
+      list-style: decimal;
+      display: grid;
+      gap: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .api-shot {
+      margin-top: 12px;
+      height: 220px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 189, 248, 0.34);
+      background:
+        linear-gradient(140deg, rgba(56, 189, 248, 0.2), rgba(96, 165, 250, 0.08)),
+        linear-gradient(180deg, #8d8f95 0%, #9fa1a8 22%, #7a7d84 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(15, 23, 42, 0.85);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .api-signup {
+      margin-top: 14px;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+    .api-signup a {
+      color: #0ea5ff;
+      text-decoration: none;
+    }
+    .api-warning {
+      display: none;
+      border: 1px solid rgba(248, 113, 113, 0.22);
+      background: rgba(127, 29, 29, 0.28);
+      color: #fda4af;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 14px;
+      margin-bottom: 12px;
+      line-height: 1.6;
+    }
+    .api-warning.show { display: block; }
+    .api-warning a { color: #0ea5ff; text-decoration: none; }
+    .api-global-notice {
+      display: none;
+      height: 48px;
+      margin: 10px 16px 0;
+      border: 1px solid rgba(148, 163, 184, 0.28);
+      border-radius: 6px;
+      background: rgba(255,255,255,0.08);
+      color: #d1d5db;
+      font-size: 14px;
+      font-weight: 600;
+      padding: 0 16px;
+      align-items: center;
+    }
+    .api-global-notice.show {
+      display: flex;
+    }
+    .quick-banner {
+      height: 42px;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      background: linear-gradient(90deg, rgba(120, 53, 15, 0.28), rgba(120, 53, 15, 0.16));
+      color: #fbbf24;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .quick-banner-close {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #9ca3af;
+      background: transparent;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .quick-card {
+      width: min(760px, 100%);
+      margin: 0 auto;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 10px;
+      padding: 18px 18px 16px;
+    }
+    .quick-brand {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      margin: 10px 0 12px;
+    }
+    .quick-brand-logo {
+      width: 96px;
+      height: 96px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: #0b0f18;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+    }
+    .quick-brand-logo.binance {
+      color: #facc15;
+      font-size: 42px;
+      font-weight: 800;
+    }
+    .quick-link-mark {
+      color: #3b82f6;
+      font-size: 24px;
+      font-weight: 800;
+    }
+    .quick-divider {
+      border-top: 1px solid rgba(255, 255, 255, 0.16);
+      margin: 14px 0 12px;
+    }
+    .quick-title {
+      font-size: 16px;
+      color: #f3f4f6;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .quick-list {
+      margin: 0;
+      padding-left: 22px;
+      color: #d1d5db;
+      font-size: 14px;
+      line-height: 1.7;
+      list-style: decimal;
+      display: grid;
+      gap: 4px;
+    }
+    .quick-options {
+      width: min(760px, 100%);
+      margin: 16px auto 0;
+      display: flex;
+      gap: 26px;
+      align-items: center;
+      color: #d1d5db;
+      font-size: 14px;
+    }
+    .quick-go-btn {
+      width: min(760px, 100%);
+      margin: 14px auto 0;
+      height: 52px;
+      border-radius: 10px;
+      border: none;
+      background: #f3f4f6;
+      color: #111827;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      display: block;
+    }
+    .quick-foot {
+      width: min(760px, 100%);
+      margin: 12px auto 0;
+      text-align: center;
+      color: #cbd5e1;
+      font-size: 14px;
+    }
+    .quick-foot a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+    @media (max-height: 860px) {
+      .api-modal { padding: 10px; }
+      .auth-modal { padding: 10px; }
+      .api-modal-panel {
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+      }
+      .auth-modal-panel {
+        height: calc(100vh - 20px);
+        max-height: calc(100vh - 20px);
+      }
+      .api-topbar { height: 48px; }
+      .api-ex-tabs { padding-top: 8px; padding-bottom: 8px; }
+      .api-left, .api-right { padding-top: 10px; }
+      .api-input { height: 40px; }
+      .api-add-btn { height: 44px; margin-top: 18px; }
+      .api-shot { height: 170px; }
+      .quick-banner { height: 36px; font-size: 14px; margin-bottom: 12px; }
+      .quick-card { padding: 14px; }
+      .quick-brand-logo { width: 78px; height: 78px; font-size: 30px; }
+      .quick-go-btn { height: 46px; font-size: 16px; }
+    }
+    @media (max-width: 1600px) {
+      .auth-grid {
+        grid-template-columns: 220px 240px 200px 200px 110px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
+      <div class="font-bold tracking-wide text-sm">授权管理</div>
+      <span class="px-2 py-1 rounded-full border border-sky-300/35 bg-sky-500/15 text-[11px] text-sky-200">Exchange Access</span>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-[70px_1fr] h-[calc(100vh-56px)]">
+    <aside class="border-r border-white/10 bg-[#060b12] flex flex-col items-center py-3 gap-2">
+      <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10"></div>
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
+      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
+      <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="AI深度分析金融界面 (11).html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">授权</div>
+    </aside>
+
+    <main class="min-w-0 overflow-auto p-5 md:p-8">
+      <div class="mx-auto w-full max-w-[1100px]">
+        <div class="text-4xl md:text-5xl leading-none font-extrabold text-white">授权你的交易所账号</div>
+
+        <div class="auth-table-wrap mt-6 min-w-[980px]">
+          <div class="auth-head auth-grid px-6 py-4 text-[15px]">
+            <div class="ell">交易所</div>
+            <div class="ell">支持交易类型</div>
+            <div class="ell">授权</div>
+            <div class="ell">创建新账户</div>
+          </div>
+
+          <div class="auth-row auth-grid px-6 py-5 text-[16px]">
+            <div class="flex items-center gap-3 ell"><span class="logo">✣</span><span class="font-semibold">欧易OKX</span></div>
+            <div class="text-slate-200 ell">现货、合约和杠杆</div>
+            <div class="cell-actions">
+              <div class="relative"><button class="btn-light" data-quick-auth data-exchange="欧易OKX" data-url="https://www.okx.com/zh-hans/account/authlogin?access_type=offline&client_id=3fe1ee51d88a4c1cab8694faf7752e95Q2XtBWdH&redirect_uri=https%3A%2F%2Fwww.aicoin.com%2Flink%2Fmain%2Foauth%2Fokex&response_type=code&scope=fast_api">快捷授权</button><span class="tag-new">推荐</span></div>
+              <button class="btn-light" data-api-auth data-api-open-tab="okx">API 授权</button>
+            </div>
+            <a class="create-link" href="https://www.okx.com/" target="_blank" rel="noopener noreferrer">+ 创建</a>
+          </div>
+
+          <div class="auth-row auth-grid px-6 py-5 text-[16px]">
+            <div class="flex items-center gap-3 ell"><span class="logo">◈</span><span class="font-semibold">币安</span></div>
+            <div class="text-slate-200 ell">现货、合约和杠杆</div>
+            <div class="cell-actions">
+              <div class="relative"><button class="btn-light" data-quick-auth data-exchange="币安" data-url="https://accounts.binance.com/zh-CN/login">快捷授权</button><span class="tag-new">推荐</span></div>
+              <button class="btn-light" data-api-auth data-api-open-tab="binance">API 授权</button>
+            </div>
+            <a class="create-link" href="https://www.binance.com/" target="_blank" rel="noopener noreferrer">+ 创建</a>
+          </div>
+
+          <div class="auth-row auth-grid px-6 py-5 text-[16px]">
+            <div class="flex items-center gap-3 ell"><span class="logo">◉</span><span class="font-semibold">Hyperliquid</span></div>
+            <div class="text-slate-200 ell">现货和合约</div>
+            <div class="cell-actions">
+              <button class="btn-light" data-api-auth data-api-open-tab="hyper">API 授权</button>
+            </div>
+            <a class="create-link" href="https://hyperliquid.xyz/" target="_blank" rel="noopener noreferrer">+ 创建</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="authEmbedModal" class="auth-modal" aria-hidden="true">
+    <div class="auth-modal-panel" role="dialog" aria-modal="true" aria-label="快捷授权弹窗">
+      <div class="auth-modal-head">
+        <div id="authEmbedTitle" class="auth-modal-title">快捷授权</div>
+        <div class="auth-modal-actions">
+          <a id="authEmbedOpenNew" class="auth-modal-btn" href="#" target="_blank" rel="noopener noreferrer">新窗口打开</a>
+          <button id="authEmbedClose" class="auth-modal-btn" type="button">关闭</button>
+        </div>
+      </div>
+      <iframe id="authEmbedFrame" class="auth-modal-iframe" src="about:blank" referrerpolicy="no-referrer"></iframe>
+      <p class="auth-modal-note">若页面因交易所安全策略无法嵌入，请使用“新窗口打开”。</p>
+    </div>
+  </div>
+
+  <div id="apiAuthModal" class="api-modal" aria-hidden="true">
+    <div class="api-modal-panel" role="dialog" aria-modal="true" aria-label="API 授权弹窗">
+      <div class="api-topbar">
+        <div class="title">添加授权</div>
+        <div class="api-topbar-right">
+          <span>API管理</span>
+          <button id="apiAuthClose" class="api-close" type="button">×</button>
+        </div>
+      </div>
+      <div class="api-ex-tabs">
+        <button class="api-ex-tab active" type="button" data-api-tab="okx"><span>✣</span><span>欧易OKX</span></button>
+        <button class="api-ex-tab" type="button" data-api-tab="binance"><span>◈</span><span>币安</span></button>
+        <button class="api-ex-tab" type="button" data-api-tab="hyper"><span>◉</span><span>Hyperliquid</span></button>
+      </div>
+      <div id="apiGlobalNotice" class="api-global-notice"></div>
+      <div class="api-content">
+        <section class="api-left">
+          <div id="apiLeftTitle" class="api-left-title">添加API账户</div>
+          <div class="api-mini-tabs">
+            <button class="api-mini-tab" type="button" data-api-mode="quick">快速授权</button>
+            <button class="api-mini-tab active" type="button" data-api-mode="api">API 授权</button>
+          </div>
+          <div class="api-api-view">
+            <div class="api-form-grid">
+              <label class="api-label">账户备注名<br>(选填)</label>
+              <div class="api-input-wrap">
+                <input class="api-input" placeholder="可不填，输入任意名称" />
+                <span class="api-input-suffix">0/15</span>
+              </div>
+
+              <label class="api-label" id="apiKeyLabel">API Key <span class="req">*</span></label>
+              <input class="api-input" id="apiAuthKeyInput" placeholder="前往欧易OKX创建API，获取后填写" />
+
+              <label class="api-label" id="apiSecretLabel">密钥 <span class="req">*</span></label>
+              <input class="api-input" id="apiAuthSecretInput" placeholder="前往欧易OKX创建API，获取后填写" />
+
+              <label class="api-label" id="apiPassphraseLabel">密码<br>(Passphrase) <span class="req">*</span></label>
+              <input class="api-input" id="apiAuthPassphraseInput" placeholder="创建API时设置，获取后填写" />
+            </div>
+            <div class="api-options">
+              <label><input type="checkbox" checked /> 开启资产统计</label>
+              <label><input type="checkbox" /> 设为默认账户</label>
+              <label id="apiBindAccountOption"><input type="checkbox" /> API 绑定账号</label>
+            </div>
+            <button class="api-add-btn" type="button">添加</button>
+            <div class="api-signup">还没有账户？ <a id="apiSignupLink" href="https://www.okx.com/" target="_blank" rel="noopener noreferrer">欧易OKX 注册</a></div>
+          </div>
+
+          <div class="api-quick-view">
+            <div class="quick-banner">
+              一键连接你的<span id="quickExchangeName">欧易OKX</span>账户，无需申请 API Key，更快更安全
+              <button class="quick-banner-close" type="button">×</button>
+            </div>
+            <div class="quick-card">
+              <div class="quick-brand">
+                <div class="quick-brand-logo">✣</div>
+                <div class="quick-link-mark">⛓</div>
+                <div class="quick-brand-logo" id="quickTargetLogo">A</div>
+              </div>
+              <div class="quick-divider"></div>
+              <div class="quick-title">安全连接交易所 <span style="color:#3b82f6;">图文教程↗</span></div>
+              <ol class="quick-list" id="quickStepList">
+                <li>点击下面连接账户按钮，前往欧易官网</li>
+                <li>登录你的欧易账户</li>
+                <li>同意快捷API授权</li>
+              </ol>
+            </div>
+            <div class="quick-options">
+              <label><input type="checkbox" checked /> 开启资产统计</label>
+              <label><input type="checkbox" /> 设为默认账户</label>
+            </div>
+            <button class="quick-go-btn" id="quickAuthGoBtn" type="button">前往连接我的欧易OKX账户</button>
+            <div class="quick-foot">还没有账户？<a href="#">欧易OKX 注册</a></div>
+          </div>
+        </section>
+        <aside class="api-right">
+          <div id="apiWarningBox" class="api-warning"></div>
+          <div class="api-tutorial">
+            <div class="api-tutorial-head">
+              <h4>操作教程：</h4>
+              <button id="apiTutorialBtn" class="api-tutorial-btn" type="button">欧易OKX授权教程</button>
+            </div>
+            <ol id="apiTutorialList">
+              <li>访问 <span id="apiTutorialLink" style="color:#60a5fa;">OKX官网</span> 并完成登录。</li>
+            </ol>
+            <div class="api-shot">教程示意图（按截图风格占位）</div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const modal = document.getElementById("authEmbedModal");
+      const frame = document.getElementById("authEmbedFrame");
+      const title = document.getElementById("authEmbedTitle");
+      const openNew = document.getElementById("authEmbedOpenNew");
+      const closeBtn = document.getElementById("authEmbedClose");
+      const quickButtons = Array.from(document.querySelectorAll("[data-quick-auth]"));
+      const apiAuthModal = document.getElementById("apiAuthModal");
+      const apiAuthClose = document.getElementById("apiAuthClose");
+      const apiButtons = Array.from(document.querySelectorAll("[data-api-auth]"));
+      const apiTabs = Array.from(document.querySelectorAll("[data-api-tab]"));
+      const apiModeTabs = Array.from(document.querySelectorAll("[data-api-mode]"));
+      const apiContent = document.querySelector(".api-content");
+      const apiTutorialList = document.getElementById("apiTutorialList");
+      const apiTutorialBtn = document.getElementById("apiTutorialBtn");
+      const apiWarningBox = document.getElementById("apiWarningBox");
+      const apiGlobalNotice = document.getElementById("apiGlobalNotice");
+      const apiLeftTitle = document.getElementById("apiLeftTitle");
+      const apiKeyLabel = document.getElementById("apiKeyLabel");
+      const apiSecretLabel = document.getElementById("apiSecretLabel");
+      const apiPassphraseLabel = document.getElementById("apiPassphraseLabel");
+      const apiBindAccountOption = document.getElementById("apiBindAccountOption");
+      const apiAuthKeyInput = document.getElementById("apiAuthKeyInput");
+      const apiAuthSecretInput = document.getElementById("apiAuthSecretInput");
+      const apiAuthPassphraseInput = document.getElementById("apiAuthPassphraseInput");
+      const apiSignupLink = document.getElementById("apiSignupLink");
+      const quickExchangeName = document.getElementById("quickExchangeName");
+      const quickAuthGoBtn = document.getElementById("quickAuthGoBtn");
+      const quickTargetLogo = document.getElementById("quickTargetLogo");
+      const quickStepList = document.getElementById("quickStepList");
+      const quickBannerClose = document.querySelector(".quick-banner-close");
+      const quickBanner = document.querySelector(".quick-banner");
+      let activeApiTab = "okx";
+      const apiTabMeta = {
+        okx: {
+          title: "欧易OKX",
+          linkText: "OKX官网",
+          tutorialBtn: "欧易OKX授权教程",
+          tutorialSteps: [
+            "访问 OKX官网 并完成登录；",
+            "点击“个人头像”→“API”→“申请V5 API”；",
+            "输入“备注名”和“密码”，若选择【API交易】无需绑定IP地址；",
+            "权限勾选“交易”，输入验证码后点击“确认”；",
+            "获得 API Key 和密钥后复制到左侧输入框。"
+          ],
+          keyPlaceholder: "前往欧易OKX创建API，获取后填写",
+          secretPlaceholder: "前往欧易OKX创建API，获取后填写",
+          passPlaceholder: "创建API时设置，获取后填写",
+          keyLabel: "API Key",
+          showPassphrase: true,
+          showBindAccount: true,
+          hideModeSwitch: false,
+          globalNotice: "",
+          leftTitle: "",
+          warningHtml: "",
+          signupText: "欧易OKX 注册",
+          signupHref: "https://www.okx.com/",
+          quickSteps: [
+            "点击下面连接账户按钮，前往欧易官网",
+            "登录你的欧易账户",
+            "同意快捷API授权"
+          ],
+          quickLogoHtml: "✣",
+          quickLogoClass: "",
+          quickUrl: "https://www.okx.com/zh-hans/account/authlogin?access_type=offline&client_id=3fe1ee51d88a4c1cab8694faf7752e95Q2XtBWdH&redirect_uri=https%3A%2F%2Fwww.aicoin.com%2Flink%2Fmain%2Foauth%2Fokex&response_type=code&scope=fast_api",
+          logo: "✣"
+        },
+        binance: {
+          title: "币安",
+          linkText: "Binance官网",
+          tutorialBtn: "币安授权教程",
+          tutorialSteps: [
+            "访问 币安官网 并完成登录；",
+            "创建API之前先划转一些资产到合约账户，全仓逐仓杠杆，首次使用合约和杠杆可能需要答题；",
+            "点击头像→点击“账户”，进入“API管理”；取消【默认安全控制措施】的勾选；",
+            "点击“创建API”→ 选择API密钥类型【系统生成】→ 输入密钥标签→ 完成安全验证→ 提交获得 API；",
+            "点击“编辑权限”→ 勾选“允许现货及杠杆交易、允许杠杆借贷和划转、允许合约、允许方向划转”；",
+            "获得API 密钥和密钥，复制到左侧输入框。"
+          ],
+          keyPlaceholder: "前往币安创建API，获取后填写",
+          secretPlaceholder: "前往币安创建API，获取后填写",
+          passPlaceholder: "创建API时设置，获取后填写",
+          keyLabel: "API密钥",
+          showPassphrase: false,
+          showBindAccount: false,
+          hideModeSwitch: false,
+          globalNotice: "",
+          leftTitle: "",
+          warningHtml: "",
+          signupText: "币安注册",
+          signupHref: "https://www.binance.com/",
+          quickSteps: [
+            "点击下面连接账户按钮，前往币安官网",
+            "登录你的币安账户",
+            "同意快捷API授权"
+          ],
+          quickLogoHtml: "◆",
+          quickLogoClass: "binance",
+          quickUrl: "https://accounts.binance.com/zh-CN/login",
+          logo: "◈"
+        },
+        hyper: {
+          title: "Hyperliquid",
+          linkText: "Hyperliquid官网",
+          tutorialBtn: "Hyperliquid授权教程",
+          tutorialSteps: [
+            "访问 Hyperliquid 官网并完成登录；",
+            "创建 API 前，先往 Hyperliquid 转入资金；",
+            "点击【更多】打开【API】界面 → 点击生成 API 钱包地址 → 点击【授权 API 钱包】生成【私钥】并保存；",
+            "授权 API 密钥后，点击右上角【存款】按钮获取【主钱包地址】；",
+            "获得“主钱包地址、API钱包地址、API钱包私钥”，复制填写至左侧输入框，点击添加授权；",
+            "首次需要通过钱包执行一次签名授权激活交易服务。"
+          ],
+          keyPlaceholder: "填写主钱包地址",
+          secretPlaceholder: "前往 Hyperliquid 创建API钱包地址后填写",
+          passPlaceholder: "创建API时设置，获取后填写",
+          keyLabel: "主钱包地址",
+          secretLabel: "API钱包地址",
+          passphraseLabel: "API钱包私钥",
+          showPassphrase: false,
+          showBindAccount: false,
+          hideModeSwitch: true,
+          globalNotice: "Hyperliquid 为链上 DEX，需使用钱包地址授权，流程与中心化交易所的 API Key 不同。",
+          leftTitle: "添加API账户",
+          warningHtml: "",
+          signupText: "Hyperliquid注册",
+          signupHref: "https://hyperliquid.xyz/",
+          quickSteps: [
+            "点击下面连接账户按钮，前往 Hyperliquid 官网",
+            "登录你的 Hyperliquid 账户",
+            "同意快捷API授权"
+          ],
+          quickLogoHtml: "◉",
+          quickLogoClass: "",
+          quickUrl: "",
+          logo: "◉"
+        }
+      };
+
+      function openAuthModal(exchange, url) {
+        title.textContent = `${exchange} · 快捷授权`;
+        frame.src = url;
+        openNew.href = url;
+        modal.classList.add("show");
+        modal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeAuthModal() {
+        modal.classList.remove("show");
+        modal.setAttribute("aria-hidden", "true");
+        frame.src = "about:blank";
+      }
+
+      function openApiModal() {
+        apiAuthModal.classList.add("show");
+        apiAuthModal.setAttribute("aria-hidden", "false");
+      }
+
+      function closeApiModal() {
+        apiAuthModal.classList.remove("show");
+        apiAuthModal.setAttribute("aria-hidden", "true");
+      }
+
+      function setApiMode(mode) {
+        const activeMeta = apiTabMeta[activeApiTab] || apiTabMeta.okx;
+        if (activeMeta.hideModeSwitch) {
+          apiModeTabs.forEach((tab) => {
+            tab.classList.toggle("active", tab.getAttribute("data-api-mode") === "api");
+          });
+          apiContent.classList.remove("quick-mode");
+          apiContent.classList.add("hyper-mode");
+          return;
+        }
+        apiModeTabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.getAttribute("data-api-mode") === mode);
+        });
+        apiContent.classList.toggle("quick-mode", mode === "quick");
+        apiContent.classList.remove("hyper-mode");
+        if (mode === "quick" && quickBanner) quickBanner.style.display = "flex";
+      }
+
+      function setApiTab(nextTab) {
+        const meta = apiTabMeta[nextTab] || apiTabMeta.okx;
+        activeApiTab = nextTab;
+        apiTabs.forEach((tab) => {
+          tab.classList.toggle("active", tab.getAttribute("data-api-tab") === nextTab);
+        });
+        if (apiTutorialBtn) apiTutorialBtn.textContent = meta.tutorialBtn || `${meta.title}授权教程`;
+        if (apiTutorialList) {
+          apiTutorialList.innerHTML = (meta.tutorialSteps || []).map((step) => `<li>${step}</li>`).join("");
+        }
+        if (apiWarningBox) {
+          if (meta.warningHtml) {
+            apiWarningBox.classList.add("show");
+            apiWarningBox.innerHTML = meta.warningHtml;
+          } else {
+            apiWarningBox.classList.remove("show");
+            apiWarningBox.innerHTML = "";
+          }
+        }
+        if (apiKeyLabel) {
+          apiKeyLabel.innerHTML = `${meta.keyLabel || "API Key"} <span class="req">*</span>`;
+        }
+        if (apiSecretLabel) {
+          apiSecretLabel.innerHTML = `${meta.secretLabel || "密钥"} <span class="req">*</span>`;
+        }
+        if (apiPassphraseLabel && apiAuthPassphraseInput) {
+          if (meta.passphraseLabel) {
+            apiPassphraseLabel.innerHTML = `${meta.passphraseLabel} <span class="req">*</span>`;
+            apiPassphraseLabel.style.display = "";
+            apiAuthPassphraseInput.style.display = "";
+          } else {
+            const passDisplay = meta.showPassphrase ? "" : "none";
+            apiPassphraseLabel.style.display = passDisplay;
+            apiAuthPassphraseInput.style.display = passDisplay;
+            apiPassphraseLabel.innerHTML = `密码<br>(Passphrase) <span class="req">*</span>`;
+          }
+        }
+        if (apiBindAccountOption) {
+          apiBindAccountOption.style.display = meta.showBindAccount ? "" : "none";
+        }
+        if (apiGlobalNotice) {
+          if (meta.globalNotice) {
+            apiGlobalNotice.classList.add("show");
+            apiGlobalNotice.textContent = meta.globalNotice;
+          } else {
+            apiGlobalNotice.classList.remove("show");
+            apiGlobalNotice.textContent = "";
+          }
+        }
+        if (apiLeftTitle) {
+          apiLeftTitle.textContent = meta.leftTitle || "";
+        }
+        apiAuthKeyInput.placeholder = meta.keyPlaceholder;
+        apiAuthSecretInput.placeholder = meta.secretPlaceholder;
+        apiAuthPassphraseInput.placeholder = meta.passPlaceholder;
+        if (apiSignupLink) {
+          apiSignupLink.textContent = meta.signupText || `${meta.title} 注册`;
+          apiSignupLink.href = meta.signupHref || "#";
+        }
+        quickExchangeName.textContent = meta.title;
+        quickAuthGoBtn.textContent = `前往连接我的${meta.title}账户`;
+        if (quickStepList) {
+          quickStepList.innerHTML = (meta.quickSteps || []).map((step) => `<li>${step}</li>`).join("");
+        }
+        quickTargetLogo.classList.remove("binance");
+        if (meta.quickLogoClass) quickTargetLogo.classList.add(meta.quickLogoClass);
+        quickTargetLogo.innerHTML = meta.quickLogoHtml || meta.logo || "A";
+        quickAuthGoBtn.disabled = !meta.quickUrl;
+        quickAuthGoBtn.style.opacity = meta.quickUrl ? "1" : "0.5";
+        quickAuthGoBtn.style.cursor = meta.quickUrl ? "pointer" : "not-allowed";
+        if (meta.hideModeSwitch) {
+          apiContent.classList.remove("quick-mode");
+          apiContent.classList.add("hyper-mode");
+        } else {
+          apiContent.classList.remove("hyper-mode");
+        }
+      }
+
+      quickButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const exchange = btn.getAttribute("data-exchange") || "交易所";
+          const url = btn.getAttribute("data-url");
+          if (!url) return;
+          openAuthModal(exchange, url);
+        });
+      });
+      apiButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+          openApiModal();
+          setApiTab(btn.getAttribute("data-api-open-tab") || "okx");
+          setApiMode("api");
+        });
+      });
+      apiTabs.forEach((tab) => {
+        tab.addEventListener("click", () => setApiTab(tab.getAttribute("data-api-tab")));
+      });
+      apiModeTabs.forEach((tab) => {
+        tab.addEventListener("click", () => setApiMode(tab.getAttribute("data-api-mode")));
+      });
+      quickAuthGoBtn.addEventListener("click", () => {
+        const meta = apiTabMeta[activeApiTab] || apiTabMeta.okx;
+        if (!meta.quickUrl) return;
+        openAuthModal(meta.title, meta.quickUrl);
+      });
+      if (quickBannerClose) {
+        quickBannerClose.addEventListener("click", () => {
+          quickBannerClose.parentElement.style.display = "none";
+        });
+      }
+
+      closeBtn.addEventListener("click", closeAuthModal);
+      apiAuthClose.addEventListener("click", closeApiModal);
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeAuthModal();
+      });
+      apiAuthModal.addEventListener("click", (e) => {
+        if (e.target === apiAuthModal) closeApiModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal.classList.contains("show")) closeAuthModal();
+        if (e.key === "Escape" && apiAuthModal.classList.contains("show")) closeApiModal();
+      });
+    })();
+  </script>
+</body>
+</html>

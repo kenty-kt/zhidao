@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>专属策略已生成 · 知道AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at 50% -22%, rgba(245, 158, 11, 0.1), transparent 38%), #070b12;
+      color: #e5e7eb;
+    }
+    .menu-item { color: #8da0bf; transition: 0.2s; }
+    .menu-item:hover { color: #d3dff1; background: rgba(255,255,255,0.05); }
+    .menu-item.active {
+      color: #fff;
+      border-color: rgba(16, 185, 129, 0.36);
+      background: rgba(16, 185, 129, 0.15);
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.18);
+    }
+    .flow-steps {
+      display: grid; grid-template-columns: auto 1fr auto 1fr auto 1fr auto; align-items: center;
+      gap: 10px; color: #6b7280; font-weight: 700; margin-bottom: 16px;
+    }
+    .flow-step { display: flex; align-items: center; gap: 10px; }
+    .flow-no {
+      width: 32px; height: 32px; border-radius: 999px; border: 1px solid #374151; display: inline-flex;
+      align-items: center; justify-content: center; font-size: 16px; color: #d1d5db; background: #111827;
+    }
+    .flow-label { font-size: 14px; white-space: nowrap; color: #94a3b8; }
+    .flow-line { height: 1px; background: rgba(148, 163, 184, 0.28); min-width: 30px; }
+    .flow-step.active .flow-no { border-color: rgba(245,158,11,.7); background: rgba(245,158,11,.22); color: #fff; }
+    .flow-step.active .flow-label { color: #e5e7eb; }
+    .strategy-shell {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.86), rgba(10, 16, 28, 0.92));
+      color: #e5e7eb;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      padding: 18px;
+    }
+    .logo {
+      width: 56px; height: 42px; margin: 0 auto; border-radius: 10px;
+      background: linear-gradient(120deg, #0ea5e9, #a855f7, #f97316);
+      transform: skewX(-14deg) rotate(-12deg);
+    }
+    .title {
+      margin: 18px 0 4px; text-align: center; font-size: 40px; font-weight: 800;
+      background: linear-gradient(90deg, #f59e0b, #ef4444, #ec4899, #8b5cf6, #38bdf8);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .subtitle { margin: 0 0 16px; text-align: center; color: #94a3b8; font-size: 16px; font-weight: 700; }
+    .tag { display:inline-flex; align-items:center; height:28px; padding:0 12px; border-radius:999px; border:1px solid #fdba74; color:#f97316; font-size:12px; font-weight:700; margin-bottom:10px; }
+    .strategy-name { margin: 0; color:#f97316; font-size:34px; font-weight:800; }
+    .strategy-desc { margin: 6px 0 12px; color:#9fb0c8; font-size:14px; }
+    .kpis { display:grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 10px; }
+    .kpi { border:1px solid rgba(148,163,184,0.25); border-radius:10px; background:rgba(15,23,42,0.75); padding:10px 12px; }
+    .kpi .label { color:#94a3b8; font-size:12px; } .kpi .val { margin-top:4px; font-size:34px; font-weight:800; line-height:1; color:#f8fafc; }
+    .green { color:#10b981; } .red { color:#ef4444; }
+    .block { border:1px solid rgba(148,163,184,0.24); border-radius:12px; background:rgba(15,23,42,0.68); padding:12px 14px; margin-top:10px; }
+    .block h3 { margin:0 0 8px; font-size:22px; font-weight:800; }
+    .params { width:100%; border-collapse: collapse; font-size:14px; }
+    .params td { padding:10px 8px; border-bottom:1px solid rgba(148,163,184,0.2); color:#94a3b8; }
+    .params td:nth-child(2), .params td:nth-child(4) { color:#f1f5f9; font-weight:700; text-align:right; }
+    .bars { margin-top: 8px; display: grid; gap: 12px; }
+    .bar-row { display:grid; grid-template-columns:1fr 260px; gap:14px; align-items:center; }
+    .bar { height:10px; background:rgba(148,163,184,0.3); border-radius:999px; overflow:hidden; }
+    .bar i { display:block; height:100%; border-radius:999px; }
+    .bar-meta { display:flex; justify-content:space-between; color:#94a3b8; font-size:13px; gap:8px; }
+    .saved { margin-top: 10px; border:1px solid rgba(251,191,36,0.35); border-radius:12px; background:rgba(120,53,15,0.22); color:#fdba74; padding:12px 14px; }
+    .saved h4 { margin:0; font-size:22px; color:#f59e0b; } .saved p { margin:8px 0 0; font-size:13px; line-height:1.55; color:#cbd5e1; }
+    .actions { margin-top:14px; display:flex; justify-content:flex-end; gap:10px; }
+    .btn { border:1px solid #fdba74; border-radius:10px; height:42px; padding:0 16px; font-size:14px; font-weight:700; cursor:pointer; }
+    .btn.primary { border-color:transparent; color:#fff; background: linear-gradient(180deg,#f59e0b,#f97316); }
+    .btn.ghost { color:#f97316; background:#fff; }
+    @media (max-width: 900px) {
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .flow-label { font-size: 12px; }
+      .strategy-name { font-size: 26px; }
+      .bar-row { grid-template-columns: 1fr; }
+      .actions { justify-content: stretch; }
+      .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
+      <div class="font-bold tracking-wide text-sm">AI交易诊断</div>
+      <span class="px-2 py-1 rounded-full border border-emerald-300/35 bg-emerald-500/15 text-[11px] text-emerald-200">Diagnostic</span>
+    </div>
+  </header>
+  <div class="grid grid-cols-[70px_1fr] h-[calc(100vh-56px)]">
+    <aside class="border-r border-white/10 bg-[#060b12] flex flex-col items-center py-3 gap-2">
+      <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10"></div>
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
+      <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">AI诊断</div>
+      <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="AI深度分析金融界面 (11).html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
+    </aside>
+    <main class="overflow-auto">
+      <div class="mx-auto max-w-[1240px] px-6 md:px-8 py-9 md:py-10">
+        <div class="flow-steps" aria-label="诊断流程进度">
+          <div class="flow-step"><span class="flow-no">1</span><span class="flow-label">选择数据源</span></div>
+          <div class="flow-line"></div>
+          <div class="flow-step"><span class="flow-no">2</span><span class="flow-label">AI分析</span></div>
+          <div class="flow-line"></div>
+          <div class="flow-step"><span class="flow-no">3</span><span class="flow-label">诊断报告</span></div>
+          <div class="flow-line"></div>
+          <div class="flow-step active"><span class="flow-no">4</span><span class="flow-label">生成专属策略</span></div>
+        </div>
+        <section class="strategy-shell">
+          <div class="logo"></div>
+          <h1 class="title">您的专属策略已生成！</h1>
+          <p class="subtitle">基于您的127笔交易数据，AI为您量身定制了优化策略</p>
+          <span class="tag">◈ 专属策略</span>
+          <h2 class="strategy-name">纪律性趋势跟踪策略</h2>
+          <p class="strategy-desc">针对您的交易习惯优化，解决止损不合理和追高杀跌问题</p>
+          <div class="kpis">
+            <div class="kpi"><div class="label">预期年化收益</div><div class="val green">+156.8%</div></div>
+            <div class="kpi"><div class="label">优化后胜率</div><div class="val">58.3%</div></div>
+            <div class="kpi"><div class="label">最大回撤</div><div class="val red">-8.3%</div></div>
+            <div class="kpi"><div class="label">夏普比率</div><div class="val">0.87</div></div>
+          </div>
+          <section class="block">
+            <h3>✣ 核心策略参数</h3>
+            <table class="params">
+              <tr><td>自动止损设置</td><td>固定 2.5%</td><td>止盈策略</td><td>移动止盈</td></tr>
+              <tr><td>入场信号</td><td>突破确认 + 成交量</td><td>持仓时间</td><td>6-12小时</td></tr>
+              <tr><td>杠杆倍数</td><td>10x (固定)</td><td>交易对</td><td>BTC, ETH</td></tr>
+            </table>
+          </section>
+          <section class="block">
+            <h3>⎔ 与您当前交易习惯对比</h3>
+            <div class="bars">
+              <div class="bar-row"><div class="bar"><i style="width:40%;background:#facc15;"></i></div><div class="bar-meta"><span>无止损交易</span><span><b style="color:#f59e0b;">42%</b> → <b class="green">0%</b></span></div></div>
+              <div class="bar-row"><div class="bar"><i style="width:68%;background:#8b5cf6;"></i></div><div class="bar-meta"><span>预期胜率</span><span><b style="color:#8b5cf6;">58.3%</b> → <b class="green">72.5%</b></span></div></div>
+              <div class="bar-row"><div class="bar"><i style="width:88%;background:#38bdf8;"></i></div><div class="bar-meta"><span>平均持仓时间</span><span><b style="color:#38bdf8;">2.3h</b> → <b class="green">8.5h</b></span></div></div>
+            </div>
+          </section>
+          <section class="saved"><h4>✓ 策略已保存至您的账户</h4><p>您可以在【交易】→【AI策略】→【策略设置】中找到【纪律性趋势跟踪策略】，位于【我的策略】选项卡下。在策略设置中选择该策略并启动，AI将自动按照优化参数执行交易，帮助您建立纪律性的交易习惯。</p></section>
+          <div class="actions">
+            <button class="btn primary" onclick="window.location.href='trade.html'">前往交易页面启用策略</button>
+            <button class="btn ghost" onclick="window.location.href='ai-watch.html'">重新诊断</button>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
