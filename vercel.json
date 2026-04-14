@@ -11,6 +11,7 @@
     { "src": "api/okx/order.py", "use": "@vercel/python" },
     { "src": "api/okx/close-position.py", "use": "@vercel/python" },
     { "src": "authorize.html", "use": "@vercel/static" },
+    { "src": "chat.html", "use": "@vercel/static" },
     { "src": "trade.html", "use": "@vercel/static" },
     { "src": "AI深度分析金融界面 (11).html", "use": "@vercel/static" },
     { "src": "ai-watch.html", "use": "@vercel/static" },
@@ -23,6 +24,7 @@
   "routes": [
     { "src": "^/$", "dest": "/index.html" },
     { "src": "^/authorize\\.html$", "dest": "/authorize.html" },
+    { "src": "^/chat\\.html$", "dest": "/chat.html" },
     { "src": "^/trade\\.html$", "dest": "/trade.html" },
     { "src": "^/AI深度分析金融界面\\s\\(11\\)\\.html$", "dest": "/AI深度分析金融界面 (11).html" },
     { "src": "^/ai-watch\\.html$", "dest": "/ai-watch.html" },

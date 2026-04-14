@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900">
+  <rect width="1280" height="900" fill="#f7f7f7"/>
+  <rect x="40" y="30" width="1200" height="60" rx="10" fill="#ffffff" stroke="#cfcfcf"/>
+  <text x="70" y="68" font-size="24" fill="#333">V1 首页</text>
+  <rect x="40" y="110" width="320" height="180" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="60" y="150" font-size="22" fill="#333">账户摘要卡</text>
+  <text x="60" y="190" font-size="16" fill="#666">连接状态 / 总权益 / 可用余额</text>
+  <rect x="380" y="110" width="860" height="90" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="410" y="160" font-size="22" fill="#333">Ticker 条</text>
+  <text x="540" y="160" font-size="16" fill="#666">BTC / ETH / BNB / 涨跌 / 状态</text>
+  <rect x="380" y="220" width="860" height="160" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="410" y="260" font-size="22" fill="#333">AI 观点摘要卡</text>
+  <text x="410" y="300" font-size="16" fill="#666">结论 / 逻辑 / 风险 / 机会 / 动作</text>
+  <rect x="40" y="310" width="580" height="520" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="60" y="350" font-size="22" fill="#333">发现流 / 快讯流</text>
+  <text x="60" y="390" font-size="16" fill="#666">快讯标题 + 关联币种 + 情绪标签</text>
+  <rect x="640" y="400" width="600" height="430" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="660" y="440" font-size="22" fill="#333">AI 对话入口 / 快捷操作</text>
+  <text x="660" y="480" font-size="16" fill="#666">去授权 / 去账户 / 问 AI</text>
+</svg>
+

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="900" viewBox="0 0 1280 900">
+  <rect width="1280" height="900" fill="#f7f7f7"/>
+  <rect x="40" y="30" width="1200" height="60" rx="10" fill="#ffffff" stroke="#cfcfcf"/>
+  <text x="70" y="68" font-size="24" fill="#333">V1 发现页</text>
+  <rect x="40" y="110" width="620" height="720" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="60" y="150" font-size="22" fill="#333">快讯列表</text>
+  <text x="60" y="190" font-size="16" fill="#666">标题 / 来源 / 时间 / 关联币种 / 情绪</text>
+  <rect x="690" y="110" width="550" height="360" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="710" y="150" font-size="22" fill="#333">AI 观点摘要</text>
+  <text x="710" y="190" font-size="16" fill="#666">结论 / 逻辑 / 风险 / 机会 / 动作</text>
+  <rect x="690" y="490" width="550" height="340" rx="10" fill="#fff" stroke="#cfcfcf"/>
+  <text x="710" y="530" font-size="22" fill="#333">Ticker 侧栏</text>
+  <text x="710" y="570" font-size="16" fill="#666">价格 / 涨跌 / 状态</text>
+</svg>
+

@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>快讯中心 · 知道AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #070b12;
+      --panel: #0d1424;
+      --panel-2: #111827;
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #dbe4f0;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 520px at 70% -180px, rgba(56, 189, 248, 0.12), transparent 70%),
+        linear-gradient(180deg, #060b14, #070b12);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .menu-item { color: #8da0bf; transition: 0.2s; }
+    .menu-item:hover { color: #cdd8e8; background: rgba(255,255,255,0.05); }
+    .menu-item.active {
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      border-color: rgba(255,255,255,0.18);
+    }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: 0 20px 48px rgba(2,8,23,0.26);
+    }
+    .card-inner {
+      background: var(--panel-2);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+    }
+    .news-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      transition: 0.2s ease;
+    }
+    .news-card:hover { border-color: rgba(96,165,250,0.22); transform: translateY(-1px); }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      height: 26px;
+      border-radius: 999px;
+      padding: 0 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      font-size: 11px;
+      font-weight: 700;
+      color: #cbd5e1;
+    }
+    .ai-box {
+      border: 1px solid rgba(59,130,246,0.18);
+      background: rgba(37,99,235,0.08);
+      border-radius: 12px;
+      padding: 12px;
+    }
+    .action-btn {
+      height: 36px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .action-btn.primary {
+      background: rgba(16,185,129,0.14);
+      border-color: rgba(16,185,129,0.28);
+      color: #d1fae5;
+    }
+    .timeline-line {
+      position: absolute;
+      left: 73px;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.02));
+    }
+    .scroll-area {
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.1) transparent;
+    }
+    .ai-badge {
+      background: linear-gradient(135deg, #1e3a5f, #0f2847);
+      border: 1px solid rgba(96,165,250,0.3);
+      border-radius: 6px;
+      padding: 2px 8px;
+      font-size: 10px;
+      color: #60a5fa;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+    .ai-badge-green {
+      background: linear-gradient(135deg, #052e16, #064e3b);
+      border-color: rgba(52,211,153,0.3);
+      color: #34d399;
+    }
+    .signal-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      animation: pulse-dot 2s infinite;
+    }
+    .tm-cell {
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 5px 7px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid transparent;
+    }
+    .tm-cell .tm-dom { font-size: 8px; color: rgba(255,255,255,0.4); font-weight: 500; }
+    .tm-cell .tm-name { font-size: 12px; font-weight: 800; color: #fff; line-height: 1.2; }
+    .tm-cell .tm-chg { font-size: 11px; font-weight: 700; line-height: 1.3; }
+    .tm-cell::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 28% 28%, rgba(255,255,255,0.08), transparent 55%);
+      pointer-events: none;
+    }
+    .cal-event-item {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .cal-event-item:last-child { border-bottom: none; }
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.8); }
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+    .page-shell {
+      display: grid;
+      grid-template-columns: 70px minmax(0, 1fr);
+      height: calc(100vh - 56px);
+    }
+    .content-shell {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 500px;
+      min-width: 0;
+    }
+    @media (max-width: 1180px) {
+      .content-shell { grid-template-columns: minmax(0, 1fr); }
+      .right-panel { border-left: none; border-top: 1px solid rgba(255,255,255,0.05); max-height: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
+      <div class="font-bold tracking-wide text-sm">快讯中心</div>
+      <span class="px-2 py-1 rounded-full border border-sky-300/35 bg-sky-500/15 text-[11px] text-sky-200">Fast News</span>
+    </div>
+  </header>
+
+  <div class="page-shell">
+    <aside class="border-r border-white/10 bg-[#060b12] flex flex-col items-center py-3 gap-2">
+      <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10"></div>
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <a href="chat.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
+      <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">快讯</div>
+      <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
+      <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
+      <a href="account.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">账户</a>
+    </aside>
+
+    <div class="content-shell min-h-0">
+      <main class="overflow-auto p-5 md:p-8 min-w-0">
+        <div class="mx-auto max-w-[1180px] space-y-5">
+          <section class="card p-5 relative overflow-hidden">
+            <div class="timeline-line hidden md:block"></div>
+            <div class="space-y-4">
+              <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
+                <div class="text-xs text-slate-500 pt-3">16:42</div>
+                <div class="news-card p-4">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-[10px] text-slate-500 font-medium">REUTERS</span>
+                    <span class="chip" style="color:#34d399;border-color:rgba(52,211,153,.24);background:rgba(16,185,129,.12)">利多信号</span>
+                    <span class="chip">加密市场</span>
+                  </div>
+                  <h3 class="text-base font-bold text-white mb-2">比特币算力创历史新高，机构累积热潮持续升温</h3>
+                  <div class="ai-box mb-3">
+                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 深度解读</div>
+                    <div class="text-sm text-slate-300 leading-relaxed">链上数据显示大量资金从交易所转移至冷钱包，72 小时内网络哈希率显著抬升。历史上类似阶段通常伴随 BTC 风险偏好回暖。</div>
+                  </div>
+                  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
+                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">推荐资产</div><div class="text-sm font-bold text-white mt-1">BTC</div></div>
+                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">AI 评分</div><div class="text-sm font-bold text-emerald-400 mt-1">91</div></div>
+                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">情绪</div><div class="text-sm font-bold text-emerald-400 mt-1">偏多</div></div>
+                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">跟踪</div><div class="text-sm font-bold text-white mt-1">ETF 流入</div></div>
+                  </div>
+                  <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div class="text-xs text-slate-500">AI 建议：优先观察 BTC 回调后的确认机会。</div>
+                    <a class="action-btn primary" href="trade.html">去交易</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
+                <div class="text-xs text-slate-500 pt-3">15:18</div>
+                <div class="news-card p-4">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-[10px] text-slate-500 font-medium">BLOOMBERG</span>
+                    <span class="chip" style="color:#fbbf24;border-color:rgba(251,191,36,.24);background:rgba(245,158,11,.12)">中性偏强</span>
+                    <span class="chip">宏观</span>
+                  </div>
+                  <h3 class="text-base font-bold text-white mb-2">美债收益率回落，风险资产短线获得喘息窗口</h3>
+                  <div class="ai-box mb-3">
+                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 摘要</div>
+                    <div class="text-sm text-slate-300 leading-relaxed">收益率回落缓和了高估值资产压力，短线有利于科技和加密风险偏好修复，但持续性仍需看后续通胀数据。</div>
+                  </div>
+                  <div class="flex items-center justify-between gap-3 flex-wrap">
+                    <div class="text-xs text-slate-500">关联资产：ETH / SOL / NVDA</div>
+                    <a class="action-btn" href="index.html">返回对话</a>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
+                <div class="text-xs text-slate-500 pt-3">13:56</div>
+                <div class="news-card p-4">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-[10px] text-slate-500 font-medium">THE BLOCK</span>
+                    <span class="chip" style="color:#fb7185;border-color:rgba(248,113,113,.24);background:rgba(248,113,113,.12)">风险预警</span>
+                    <span class="chip">DeFi</span>
+                  </div>
+                  <h3 class="text-base font-bold text-white mb-2">某链上协议出现异常大额转出，社区关注资金安全</h3>
+                  <div class="ai-box mb-3">
+                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 风险分析</div>
+                    <div class="text-sm text-slate-300 leading-relaxed">该事件更偏向情绪扰动，短线可能压制 DeFi 板块估值。若扩散到主流协议，需关注市场避险情绪上升。</div>
+                  </div>
+                  <div class="text-xs text-slate-500">建议：避免追高小市值 DeFi 代币，优先观察市场是否出现二次发酵。</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
+                <div class="text-xs text-slate-500 pt-3">11:07</div>
+                <div class="news-card p-4">
+                  <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <span class="text-[10px] text-slate-500 font-medium">CNBC</span>
+                    <span class="chip" style="color:#34d399;border-color:rgba(52,211,153,.24);background:rgba(16,185,129,.12)">主线逻辑</span>
+                    <span class="chip">AI 科技</span>
+                  </div>
+                  <h3 class="text-base font-bold text-white mb-2">AI 基础设施资本开支继续上修，算力链景气延续</h3>
+                  <div class="ai-box mb-3">
+                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 观点</div>
+                    <div class="text-sm text-slate-300 leading-relaxed">上游 GPU、HBM 与先进封装仍是最强主线，市场短线波动不改中期产业资本支出方向。</div>
+                  </div>
+                  <div class="grid grid-cols-3 gap-2">
+                    <div class="news-card p-2.5 text-center"><div class="text-[10px] text-slate-500">MSFT</div><div class="text-sm font-bold text-white mt-1">78</div></div>
+                    <div class="news-card p-2.5 text-center"><div class="text-[10px] text-slate-500">GOOGL</div><div class="text-sm font-bold text-white mt-1">85</div></div>
+                    <div class="news-card p-2.5 text-center"><div class="text-[10px] text-slate-500">NVDA</div><div class="text-sm font-bold text-emerald-400 mt-1">94</div></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+
+      <aside class="right-panel border-l border-white/5 flex flex-col bg-[#080c17] flex-shrink-0 scroll-area" style="width:100%;">
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-xs font-bold text-white">AI 账户评分</div>
+            <span class="ai-badge">实时更新</span>
+          </div>
+          <div class="card-inner p-3 mb-3 flex items-center gap-3">
+            <div class="relative w-14 h-14 flex-shrink-0">
+              <svg viewBox="0 0 56 56" class="w-14 h-14 -rotate-90">
+                <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"></circle>
+                <circle cx="28" cy="28" r="22" fill="none" stroke="url(#scoreGrad)" stroke-width="5" stroke-dasharray="138" stroke-dashoffset="35" stroke-linecap="round"></circle>
+                <defs>
+                  <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#3b82f6"></stop>
+                    <stop offset="100%" stop-color="#06b6d4"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center">
+                <span class="text-sm font-bold text-white">75</span>
+              </div>
+            </div>
+            <div>
+              <div class="text-xs font-bold text-white mb-0.5">账户健康度</div>
+              <div class="text-[10px] text-slate-400">持仓与新闻综合评估</div>
+              <div class="text-[10px] text-slate-300 leading-relaxed mt-1">账户已连接，当前展示的是综合账户评分说明。</div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-950/20 border border-emerald-900/20">
+              <div class="w-6 h-6 rounded bg-emerald-500/20 flex items-center justify-center text-[9px] font-bold text-emerald-400">N</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between">
+                  <span class="text-[11px] font-medium text-white">NVDA</span>
+                  <span class="text-[11px] text-emerald-400">+3.46%</span>
+                </div>
+                <div class="text-[9px] text-emerald-400">↑ AI 主线持续强化</div>
+              </div>
+              <div class="text-[10px] text-emerald-400 font-bold">↑↑</div>
+            </div>
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-950/20 border border-emerald-900/20">
+              <div class="w-6 h-6 rounded bg-orange-500/20 flex items-center justify-center text-[9px] font-bold text-orange-400">B</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between">
+                  <span class="text-[11px] font-medium text-white">BTC</span>
+                  <span class="text-[11px] text-emerald-400">+4.82%</span>
+                </div>
+                <div class="text-[9px] text-emerald-400">↑ 减半+降息双催化</div>
+              </div>
+              <div class="text-[10px] text-emerald-400 font-bold">↑↑</div>
+            </div>
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-amber-950/20 border border-amber-900/20">
+              <div class="w-6 h-6 rounded bg-amber-500/20 flex items-center justify-center text-[9px] font-bold text-amber-400">G</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between">
+                  <span class="text-[11px] font-medium text-white">GOLD</span>
+                  <span class="text-[11px] text-emerald-400">+1.15%</span>
+                </div>
+                <div class="text-[9px] text-amber-400">→ 美元走弱支撑</div>
+              </div>
+              <div class="text-[10px] text-amber-400 font-bold">→</div>
+            </div>
+            <div class="flex items-center gap-2 p-2 rounded-lg bg-red-950/20 border border-red-900/20">
+              <div class="w-6 h-6 rounded bg-red-500/20 flex items-center justify-center text-[9px] font-bold text-red-400">E</div>
+              <div class="flex-1 min-w-0">
+                <div class="flex justify-between">
+                  <span class="text-[11px] font-medium text-white">XLE</span>
+                  <span class="text-[11px] text-red-400">-0.82%</span>
+                </div>
+                <div class="text-[9px] text-red-400">↓ 欧佩克不确定性</div>
+              </div>
+              <div class="text-[10px] text-red-400 font-bold">↓</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-1.5">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
+              <span class="text-xs font-bold text-white">AI 热点方块图</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span class="signal-dot" style="background:#60a5fa"></span>
+              <span class="text-[9px] text-blue-400">实时热度</span>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;">
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.22);"><span class="tm-dom">57.64%</span><span class="tm-name">BTC</span><span class="tm-chg" style="color:#34d399">+0.34%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.15);"><span class="tm-dom">10.70%</span><span class="tm-name">Stable</span><span class="tm-chg" style="color:#f87171">-0.01%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.15);"><span class="tm-dom">10.61%</span><span class="tm-name">ETH</span><span class="tm-chg" style="color:#34d399">+0.88%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e40af);border-color:rgba(96,165,250,0.15);"><span class="tm-dom">8.47%</span><span class="tm-name">Layer1</span><span class="tm-chg" style="color:#60a5fa">+1.17%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">4.28%</span><span class="tm-name">CeFi</span><span class="tm-chg" style="color:#34d399">+1.42%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">4.06%</span><span class="tm-name">PayFi</span><span class="tm-chg" style="color:#34d399">+0.39%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">1.38%</span><span class="tm-name">DeFi</span><span class="tm-chg" style="color:#34d399">+2.07%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">1.07%</span><span class="tm-name">Meme</span><span class="tm-chg" style="color:#34d399">+3.75%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e293b);border-color:rgba(148,163,184,0.08);"><span class="tm-dom">0.58%</span><span class="tm-name">Others</span><span class="tm-chg" style="color:#94a3b8">+1.67%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#312e81,#4c1d95);border-color:rgba(167,139,250,0.4);box-shadow:0 0 12px rgba(139,92,246,0.3);"><span class="tm-dom" style="color:rgba(196,181,253,0.65);">0.40%</span><span class="tm-name">AI</span><span class="tm-chg" style="color:#c4b5fd">+9.89%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e40af);border-color:rgba(96,165,250,0.1);"><span class="tm-dom">0.23%</span><span class="tm-name">Layer2</span><span class="tm-chg" style="color:#60a5fa">+1.31%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.1);"><span class="tm-dom">0.15%</span><span class="tm-name">DePIN</span><span class="tm-chg" style="color:#f87171">-0.05%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.08);"><span class="tm-dom">0.14%</span><span class="tm-name">SocFi</span><span class="tm-chg" style="color:#34d399">+0.85%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e293b);border-color:rgba(148,163,184,0.07);"><span class="tm-dom">0.13%</span><span class="tm-name">RWA</span><span class="tm-chg" style="color:#94a3b8">+0.14%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.12);"><span class="tm-dom">0.09%</span><span class="tm-name">GameFi</span><span class="tm-chg" style="color:#f87171">-0.10%</span></div>
+            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.08);"><span class="tm-dom">0.06%</span><span class="tm-name">NFT</span><span class="tm-chg" style="color:#34d399">+0.45%</span></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;padding:4px 2px 0;">
+            <div style="width:7px;height:7px;border-radius:2px;background:#166534;"></div><span style="font-size:9px;color:#475569;">涨</span>
+            <div style="width:7px;height:7px;border-radius:2px;background:#7f1d1d;"></div><span style="font-size:9px;color:#475569;">跌</span>
+          </div>
+        </div>
+
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-1.5">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>
+              <span class="text-xs font-bold text-white">AI 交易机会</span>
+            </div>
+            <span class="ai-badge ai-badge-green">动态信号</span>
+          </div>
+          <div class="space-y-2">
+            <a href="trade.html" class="card-inner p-3 block border border-emerald-500/35 hover:border-emerald-400/60 transition">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-[11px] font-bold text-emerald-400">BTC · 趋势做多</div>
+                  <div class="text-[10px] text-slate-300 mt-1">算力、ETF 流入与风险偏好共振，主升趋势仍在。</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[11px] font-bold text-white">$67,420</div>
+                  <div class="text-[10px] text-emerald-400">+2.84%</div>
+                </div>
+              </div>
+            </a>
+            <a href="trade.html" class="card-inner p-3 block border border-emerald-500/25 hover:border-emerald-400/60 transition">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-[11px] font-bold text-emerald-400">NVDA · 事件顺势</div>
+                  <div class="text-[10px] text-slate-300 mt-1">AI 基建叙事继续强化，相关产业链保持高景气。</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[11px] font-bold text-white">$912.40</div>
+                  <div class="text-[10px] text-emerald-400">+3.46%</div>
+                </div>
+              </div>
+            </a>
+            <a href="trade.html" class="card-inner p-3 block border border-red-500/30 hover:border-red-400/60 transition">
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <div class="text-[11px] font-bold text-red-400">XLE · 反弹做空</div>
+                  <div class="text-[10px] text-slate-300 mt-1">供给扰动不确定性抬升，短线预期仍偏谨慎。</div>
+                </div>
+                <div class="text-right">
+                  <div class="text-[11px] font-bold text-white">$88.70</div>
+                  <div class="text-[10px] text-red-400">-0.82%</div>
+                </div>
+              </div>
+            </a>
+          </div>
+          <div class="mt-2 text-center">
+            <span class="text-[9px] text-slate-600">信号更新中 · 点击卡片直接下单</span>
+          </div>
+        </div>
+
+        <div class="p-4 border-b border-white/5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-1.5">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+              <span class="text-xs font-bold text-white">关键事件日历</span>
+            </div>
+            <span style="font-size:10px;color:#64748b;">实时抓取</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px;">
+            <span style="font-size:10px;color:#334155;font-weight:600;">日</span>
+            <span style="font-size:10px;color:#334155;font-weight:600;">一</span>
+            <span style="font-size:10px;color:#334155;font-weight:600;">二</span>
+            <span style="font-size:10px;color:#334155;font-weight:600;">三</span>
+            <span style="font-size:10px;color:#334155;font-weight:600;">四</span>
+            <span style="font-size:10px;color:#334155;font-weight:600;">五</span>
+            <span style="font-size:10px;color:#334155;font-weight:600;">六</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);text-align:center;align-items:center;margin-bottom:10px;">
+            <span class="text-[11px] text-slate-500">13</span>
+            <span class="text-[11px] text-slate-500">14</span>
+            <span class="text-[11px] text-slate-500">15</span>
+            <span class="text-[11px] text-slate-500">16</span>
+            <span class="text-[11px] text-slate-500">17</span>
+            <span class="text-[11px] text-slate-500">18</span>
+            <span class="mx-auto flex h-[26px] w-[26px] items-center justify-center rounded-full bg-white text-[11px] font-semibold text-slate-900">19</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:4px;margin-bottom:10px;">
+            <div class="rounded-[7px] border border-white/10 px-[10px] py-[4px] text-[10px] font-semibold text-slate-500">今天</div>
+            <div class="rounded-[7px] border border-white/15 bg-slate-800 px-[10px] py-[4px] text-[10px] font-semibold text-white">近7天</div>
+          </div>
+          <div style="font-size:10px;color:#334155;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;">本周事件 2026-04-13 ~ 2026-04-19</div>
+          <div>
+            <div class="cal-event-item">
+              <div style="display:flex;align-items:flex-start;gap:7px;">
+                <span class="cal-dot" style="background:#34d399;"></span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:11px;font-weight:700;color:#e2e8f0;line-height:1.5;">美国零售销售数据公布</div>
+                  <div style="font-size:10px;color:#94a3b8;margin-top:2px;">2026-04-15 20:30</div>
+                  <div style="font-size:10px;color:#64748b;line-height:1.6;margin-top:4px;"><span style="color:#34d399;font-weight:600;">正向信号：</span>关注风险资产量能能否同步放大。</div>
+                </div>
+              </div>
+            </div>
+            <div class="cal-event-item">
+              <div style="display:flex;align-items:flex-start;gap:7px;">
+                <span class="cal-dot" style="background:#a78bfa;"></span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:11px;font-weight:700;color:#e2e8f0;line-height:1.5;">多家 AI 龙头发布季度指引</div>
+                  <div style="font-size:10px;color:#94a3b8;margin-top:2px;">2026-04-17 08:00</div>
+                  <div style="font-size:10px;color:#64748b;line-height:1.6;margin-top:4px;"><span style="color:#a78bfa;font-weight:600;">AI判断：</span>若资本开支继续上修，科技主线仍有扩散空间。</div>
+                </div>
+              </div>
+            </div>
+            <div class="cal-event-item">
+              <div style="display:flex;align-items:flex-start;gap:7px;">
+                <span class="cal-dot" style="background:#f87171;"></span>
+                <div style="flex:1;min-width:0;">
+                  <div style="font-size:11px;font-weight:700;color:#e2e8f0;line-height:1.5;">中东局势进展与原油周度库存</div>
+                  <div style="font-size:10px;color:#94a3b8;margin-top:2px;">2026-04-18 22:30</div>
+                  <div style="font-size:10px;color:#64748b;line-height:1.6;margin-top:4px;"><span style="color:#f87171;font-weight:600;">风险提示：</span>大宗商品与能源板块波动可能再次放大。</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

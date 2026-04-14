@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 对话 · 知道AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { font-family: 'Inter', sans-serif; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: #070b14;
+    color: #e2e8f0;
+    overflow: hidden;
+  }
+  .menu-item { color: #8da0bf; transition: 0.2s; }
+  .menu-item:hover { color: #cdd8e8; background: rgba(255, 255, 255, 0.05); }
+  .menu-item.active {
+    color: #fff;
+    background: rgba(14, 165, 255, 0.16);
+    border-color: rgba(14, 165, 255, 0.35);
+    box-shadow: 0 0 12px rgba(14, 165, 255, 0.2);
+  }
+  .glow-blue { box-shadow: 0 0 20px rgba(96,165,250,0.12); }
+  .card { background: #0d1424; border: 1px solid rgba(255,255,255,0.06); border-radius: 14px; }
+  .card-inner { background: #111827; border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; }
+  .scroll-area {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+  }
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+  .chat-shell {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-main {
+    flex: 1;
+    min-height: 0;
+    padding: 16px 18px;
+    display: flex;
+    justify-content: center;
+  }
+  .chat-wrap {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .chat-panel {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .chat-list {
+    min-height: 0;
+    flex: 1;
+  }
+  .chat-item {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .chat-item:hover {
+    border-color: rgba(96,165,250,0.2);
+    transform: translateY(-1px);
+  }
+  .icon-box {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 17px;
+  }
+  .bottom-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    background: rgba(11,18,32,0.95);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .input-reset {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+  .input-reset:focus {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+  @media (max-width: 768px) {
+    .chat-main { padding: 12px; }
+  }
+</style>
+</head>
+<body>
+  <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
+      <div class="font-bold tracking-wide text-sm">AI 对话</div>
+      <span class="px-2 py-1 rounded-full border border-sky-300/35 bg-sky-500/15 text-[11px] text-sky-200">Chat Workspace</span>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-[70px_1fr] h-[calc(100vh-56px)]">
+    <aside class="border-r border-white/10 bg-[#060b12] flex flex-col items-center py-3 gap-2">
+      <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10"></div>
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">对话</div>
+      <a href="fast.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">快讯</a>
+      <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
+      <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
+      <a href="account.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">账户</a>
+    </aside>
+
+    <main class="chat-main scroll-area">
+      <div class="chat-wrap">
+        <div class="card p-4 md:p-5 glow-blue chat-panel">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <div class="text-3xl md:text-[40px] font-extrabold text-white leading-tight">你好！我是知道AI</div>
+              <div class="text-xl md:text-[28px] font-bold text-slate-400 mt-1.5">我什么都知道</div>
+            </div>
+            <div class="text-xs text-slate-500 self-start mt-2">对话页</div>
+          </div>
+
+          <div class="space-y-3 chat-list">
+            <div class="card-inner p-4 md:p-5 chat-item">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="icon-box bg-blue-500/15 text-blue-300">🤖</div>
+                  <div>
+                    <div class="text-sm md:text-lg font-bold text-white">AI助手 <span class="text-[10px] md:text-xs text-slate-500 font-medium">zhidao.com</span></div>
+                    <div class="text-xs md:text-base text-slate-400">问你想了解的</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-inner p-4 md:p-5 chat-item">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="icon-box bg-white/5 text-slate-400">📰</div>
+                  <div class="min-w-0">
+                    <div class="text-sm md:text-lg font-bold text-white">资讯助手</div>
+                    <div class="text-xs md:text-base text-slate-400 truncate">不废话的情报机 · 只发重要的动态</div>
+                  </div>
+                </div>
+                <div class="min-w-[28px] h-6 md:h-9 md:min-w-[40px] px-2 md:px-3 bg-rose-500 text-white text-[11px] md:text-base font-bold rounded-full flex items-center justify-center leading-none">8</div>
+              </div>
+            </div>
+
+            <div class="card-inner p-4 md:p-5 chat-item">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  <div class="icon-box bg-white/5 text-slate-400">👁</div>
+                  <div class="min-w-0">
+                    <div class="text-sm md:text-lg font-bold text-white">AI盯盘</div>
+                    <div class="text-xs md:text-base text-slate-400 truncate">实时监控异动 · 关键机会第一时间提醒</div>
+                  </div>
+                </div>
+                <div class="min-w-[28px] h-6 md:h-9 md:min-w-[40px] px-2 md:px-3 bg-rose-500 text-white text-[11px] md:text-base font-bold rounded-full flex items-center justify-center leading-none">12</div>
+              </div>
+            </div>
+
+            <div class="card-inner p-4 md:p-5">
+              <div class="flex items-center gap-3">
+                <div class="icon-box bg-white/5 text-slate-400">👥</div>
+                <div>
+                  <div class="text-sm md:text-lg font-bold text-white">福利群</div>
+                  <div class="text-xs md:text-base text-slate-400"><span class="text-rose-400">[有人@我]</span> 比特币大手子：今天做空</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card-inner p-4 md:p-5">
+              <div class="flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="icon-box bg-white/5 text-slate-400">⭐</div>
+                  <div>
+                    <div class="text-sm md:text-lg font-bold text-white">VIP专属群</div>
+                    <div class="text-xs md:text-base text-slate-400">限量席位，欢迎加入</div>
+                  </div>
+                </div>
+                <div class="px-3 py-1 md:px-4 md:py-2 bg-white/5 text-slate-300 text-[10px] md:text-sm font-bold rounded-full border border-white/10">订阅</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card p-3 bottom-bar">
+          <div class="flex items-center justify-between gap-3">
+            <button class="w-11 h-11 md:w-16 md:h-16 flex-shrink-0 border border-white/10 rounded-xl flex items-center justify-center bg-white/5 text-[10px] md:text-lg font-black text-slate-400">交易</button>
+            <div class="flex-grow h-11 md:h-16 bg-white/[0.03] rounded-xl border border-white/10 px-3 md:px-5 flex items-center gap-3">
+              <span class="text-amber-400 text-lg md:text-3xl">🎤</span>
+              <input class="input-reset flex-grow text-sm md:text-xl p-0 text-slate-200 bg-transparent placeholder:text-slate-500" placeholder="提问或搜索" type="text" />
+              <span class="text-slate-500 text-lg md:text-2xl">▦</span>
+            </div>
+            <button class="w-11 h-11 md:w-16 md:h-16 flex-shrink-0 border border-white/10 rounded-xl flex items-center justify-center bg-white/5 text-[10px] md:text-lg font-black text-slate-400">行情</button>
+          </div>
+          <p class="text-[9px] md:text-sm text-slate-500 mt-2 text-center">内容由AI生成，不构成投资建议</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

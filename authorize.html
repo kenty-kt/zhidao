@@ -680,11 +680,13 @@
   <div class="grid grid-cols-[70px_1fr] h-[calc(100vh-56px)]">
     <aside class="border-r border-white/10 bg-[#060b12] flex flex-col items-center py-3 gap-2">
       <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10"></div>
-      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
-      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <a href="chat.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
+      <a href="fast.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">快讯</a>
       <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
-      <a href="AI深度分析金融界面 (11).html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
       <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">授权</div>
+      <a href="account.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">账户</a>
     </aside>
 
     <main class="min-w-0 overflow-auto p-5 md:p-8">
@@ -703,8 +705,8 @@
             <div class="flex items-center gap-3 ell"><span class="logo">✣</span><span class="font-semibold">欧易OKX</span></div>
             <div class="text-slate-200 ell">现货、合约和杠杆</div>
             <div class="cell-actions">
-              <div class="relative"><button class="btn-light" data-quick-auth data-exchange="欧易OKX" data-url="https://www.okx.com/zh-hans/account/authlogin?access_type=offline&client_id=3fe1ee51d88a4c1cab8694faf7752e95Q2XtBWdH&redirect_uri=https%3A%2F%2Fwww.aicoin.com%2Flink%2Fmain%2Foauth%2Fokex&response_type=code&scope=fast_api">快捷授权</button><span class="tag-new">推荐</span></div>
-              <button class="btn-light" data-api-auth data-api-open-tab="okx">API 授权</button>
+              <div class="relative"><button class="btn-light" type="button" data-quick-auth data-exchange="欧易OKX" data-url="https://www.okx.com/zh-hans/account/authlogin?access_type=offline&client_id=3fe1ee51d88a4c1cab8694faf7752e95Q2XtBWdH&redirect_uri=https%3A%2F%2Fwww.aicoin.com%2Flink%2Fmain%2Foauth%2Fokex&response_type=code&scope=fast_api">快捷授权</button><span class="tag-new">推荐</span></div>
+              <button class="btn-light" type="button" data-api-auth data-api-open-tab="okx">API 授权</button>
             </div>
             <a class="create-link" href="https://www.okx.com/" target="_blank" rel="noopener noreferrer">+ 创建</a>
           </div>
@@ -713,8 +715,8 @@
             <div class="flex items-center gap-3 ell"><span class="logo">◈</span><span class="font-semibold">币安</span></div>
             <div class="text-slate-200 ell">现货、合约和杠杆</div>
             <div class="cell-actions">
-              <div class="relative"><button class="btn-light" data-quick-auth data-exchange="币安" data-url="https://accounts.binance.com/zh-CN/login">快捷授权</button><span class="tag-new">推荐</span></div>
-              <button class="btn-light" data-api-auth data-api-open-tab="binance">API 授权</button>
+              <div class="relative"><button class="btn-light" type="button" data-quick-auth data-exchange="币安" data-url="https://accounts.binance.com/zh-CN/login">快捷授权</button><span class="tag-new">推荐</span></div>
+              <button class="btn-light" type="button" data-api-auth data-api-open-tab="binance">API 授权</button>
             </div>
             <a class="create-link" href="https://www.binance.com/" target="_blank" rel="noopener noreferrer">+ 创建</a>
           </div>
@@ -723,7 +725,7 @@
             <div class="flex items-center gap-3 ell"><span class="logo">◉</span><span class="font-semibold">Hyperliquid</span></div>
             <div class="text-slate-200 ell">现货和合约</div>
             <div class="cell-actions">
-              <button class="btn-light" data-api-auth data-api-open-tab="hyper">API 授权</button>
+              <button class="btn-light" type="button" data-api-auth data-api-open-tab="hyper">API 授权</button>
             </div>
             <a class="create-link" href="https://hyperliquid.xyz/" target="_blank" rel="noopener noreferrer">+ 创建</a>
           </div>
@@ -772,7 +774,7 @@
             <div class="api-form-grid">
               <label class="api-label">账户备注名<br>(选填)</label>
               <div class="api-input-wrap">
-                <input class="api-input" placeholder="可不填，输入任意名称" />
+                <input class="api-input" id="apiRemarkInput" placeholder="可不填，输入任意名称" maxlength="15" />
                 <span class="api-input-suffix">0/15</span>
               </div>
 
@@ -786,11 +788,11 @@
               <input class="api-input" id="apiAuthPassphraseInput" placeholder="创建API时设置，获取后填写" />
             </div>
             <div class="api-options">
-              <label><input type="checkbox" checked /> 开启资产统计</label>
-              <label><input type="checkbox" /> 设为默认账户</label>
-              <label id="apiBindAccountOption"><input type="checkbox" /> API 绑定账号</label>
+              <label><input id="apiEnableStatsInput" type="checkbox" checked /> 开启资产统计</label>
+              <label><input id="apiDefaultInput" type="checkbox" /> 设为默认账户</label>
+              <label id="apiBindAccountOption"><input id="apiBindAccountInput" type="checkbox" /> API 绑定账号</label>
             </div>
-            <button class="api-add-btn" type="button">添加</button>
+            <button id="apiAddBtn" class="api-add-btn" type="button">添加</button>
             <div class="api-signup">还没有账户？ <a id="apiSignupLink" href="https://www.okx.com/" target="_blank" rel="noopener noreferrer">欧易OKX 注册</a></div>
           </div>
 
@@ -814,8 +816,8 @@
               </ol>
             </div>
             <div class="quick-options">
-              <label><input type="checkbox" checked /> 开启资产统计</label>
-              <label><input type="checkbox" /> 设为默认账户</label>
+              <label><input id="quickEnableStatsInput" type="checkbox" checked /> 开启资产统计</label>
+              <label><input id="quickDefaultInput" type="checkbox" /> 设为默认账户</label>
             </div>
             <button class="quick-go-btn" id="quickAuthGoBtn" type="button">前往连接我的欧易OKX账户</button>
             <div class="quick-foot">还没有账户？<a href="#">欧易OKX 注册</a></div>
@@ -838,311 +840,6 @@
     </div>
   </div>
 
-  <script>
-    (function () {
-      const modal = document.getElementById("authEmbedModal");
-      const frame = document.getElementById("authEmbedFrame");
-      const title = document.getElementById("authEmbedTitle");
-      const openNew = document.getElementById("authEmbedOpenNew");
-      const closeBtn = document.getElementById("authEmbedClose");
-      const quickButtons = Array.from(document.querySelectorAll("[data-quick-auth]"));
-      const apiAuthModal = document.getElementById("apiAuthModal");
-      const apiAuthClose = document.getElementById("apiAuthClose");
-      const apiButtons = Array.from(document.querySelectorAll("[data-api-auth]"));
-      const apiTabs = Array.from(document.querySelectorAll("[data-api-tab]"));
-      const apiModeTabs = Array.from(document.querySelectorAll("[data-api-mode]"));
-      const apiContent = document.querySelector(".api-content");
-      const apiTutorialList = document.getElementById("apiTutorialList");
-      const apiTutorialBtn = document.getElementById("apiTutorialBtn");
-      const apiWarningBox = document.getElementById("apiWarningBox");
-      const apiGlobalNotice = document.getElementById("apiGlobalNotice");
-      const apiLeftTitle = document.getElementById("apiLeftTitle");
-      const apiKeyLabel = document.getElementById("apiKeyLabel");
-      const apiSecretLabel = document.getElementById("apiSecretLabel");
-      const apiPassphraseLabel = document.getElementById("apiPassphraseLabel");
-      const apiBindAccountOption = document.getElementById("apiBindAccountOption");
-      const apiAuthKeyInput = document.getElementById("apiAuthKeyInput");
-      const apiAuthSecretInput = document.getElementById("apiAuthSecretInput");
-      const apiAuthPassphraseInput = document.getElementById("apiAuthPassphraseInput");
-      const apiSignupLink = document.getElementById("apiSignupLink");
-      const quickExchangeName = document.getElementById("quickExchangeName");
-      const quickAuthGoBtn = document.getElementById("quickAuthGoBtn");
-      const quickTargetLogo = document.getElementById("quickTargetLogo");
-      const quickStepList = document.getElementById("quickStepList");
-      const quickBannerClose = document.querySelector(".quick-banner-close");
-      const quickBanner = document.querySelector(".quick-banner");
-      let activeApiTab = "okx";
-      const apiTabMeta = {
-        okx: {
-          title: "欧易OKX",
-          linkText: "OKX官网",
-          tutorialBtn: "欧易OKX授权教程",
-          tutorialSteps: [
-            "访问 OKX官网 并完成登录；",
-            "点击“个人头像”→“API”→“申请V5 API”；",
-            "输入“备注名”和“密码”，若选择【API交易】无需绑定IP地址；",
-            "权限勾选“交易”，输入验证码后点击“确认”；",
-            "获得 API Key 和密钥后复制到左侧输入框。"
-          ],
-          keyPlaceholder: "前往欧易OKX创建API，获取后填写",
-          secretPlaceholder: "前往欧易OKX创建API，获取后填写",
-          passPlaceholder: "创建API时设置，获取后填写",
-          keyLabel: "API Key",
-          showPassphrase: true,
-          showBindAccount: true,
-          hideModeSwitch: false,
-          globalNotice: "",
-          leftTitle: "",
-          warningHtml: "",
-          signupText: "欧易OKX 注册",
-          signupHref: "https://www.okx.com/",
-          quickSteps: [
-            "点击下面连接账户按钮，前往欧易官网",
-            "登录你的欧易账户",
-            "同意快捷API授权"
-          ],
-          quickLogoHtml: "✣",
-          quickLogoClass: "",
-          quickUrl: "https://www.okx.com/zh-hans/account/authlogin?access_type=offline&client_id=3fe1ee51d88a4c1cab8694faf7752e95Q2XtBWdH&redirect_uri=https%3A%2F%2Fwww.aicoin.com%2Flink%2Fmain%2Foauth%2Fokex&response_type=code&scope=fast_api",
-          logo: "✣"
-        },
-        binance: {
-          title: "币安",
-          linkText: "Binance官网",
-          tutorialBtn: "币安授权教程",
-          tutorialSteps: [
-            "访问 币安官网 并完成登录；",
-            "创建API之前先划转一些资产到合约账户，全仓逐仓杠杆，首次使用合约和杠杆可能需要答题；",
-            "点击头像→点击“账户”，进入“API管理”；取消【默认安全控制措施】的勾选；",
-            "点击“创建API”→ 选择API密钥类型【系统生成】→ 输入密钥标签→ 完成安全验证→ 提交获得 API；",
-            "点击“编辑权限”→ 勾选“允许现货及杠杆交易、允许杠杆借贷和划转、允许合约、允许方向划转”；",
-            "获得API 密钥和密钥，复制到左侧输入框。"
-          ],
-          keyPlaceholder: "前往币安创建API，获取后填写",
-          secretPlaceholder: "前往币安创建API，获取后填写",
-          passPlaceholder: "创建API时设置，获取后填写",
-          keyLabel: "API密钥",
-          showPassphrase: false,
-          showBindAccount: false,
-          hideModeSwitch: false,
-          globalNotice: "",
-          leftTitle: "",
-          warningHtml: "",
-          signupText: "币安注册",
-          signupHref: "https://www.binance.com/",
-          quickSteps: [
-            "点击下面连接账户按钮，前往币安官网",
-            "登录你的币安账户",
-            "同意快捷API授权"
-          ],
-          quickLogoHtml: "◆",
-          quickLogoClass: "binance",
-          quickUrl: "https://accounts.binance.com/zh-CN/login",
-          logo: "◈"
-        },
-        hyper: {
-          title: "Hyperliquid",
-          linkText: "Hyperliquid官网",
-          tutorialBtn: "Hyperliquid授权教程",
-          tutorialSteps: [
-            "访问 Hyperliquid 官网并完成登录；",
-            "创建 API 前，先往 Hyperliquid 转入资金；",
-            "点击【更多】打开【API】界面 → 点击生成 API 钱包地址 → 点击【授权 API 钱包】生成【私钥】并保存；",
-            "授权 API 密钥后，点击右上角【存款】按钮获取【主钱包地址】；",
-            "获得“主钱包地址、API钱包地址、API钱包私钥”，复制填写至左侧输入框，点击添加授权；",
-            "首次需要通过钱包执行一次签名授权激活交易服务。"
-          ],
-          keyPlaceholder: "填写主钱包地址",
-          secretPlaceholder: "前往 Hyperliquid 创建API钱包地址后填写",
-          passPlaceholder: "创建API时设置，获取后填写",
-          keyLabel: "主钱包地址",
-          secretLabel: "API钱包地址",
-          passphraseLabel: "API钱包私钥",
-          showPassphrase: false,
-          showBindAccount: false,
-          hideModeSwitch: true,
-          globalNotice: "Hyperliquid 为链上 DEX，需使用钱包地址授权，流程与中心化交易所的 API Key 不同。",
-          leftTitle: "添加API账户",
-          warningHtml: "",
-          signupText: "Hyperliquid注册",
-          signupHref: "https://hyperliquid.xyz/",
-          quickSteps: [
-            "点击下面连接账户按钮，前往 Hyperliquid 官网",
-            "登录你的 Hyperliquid 账户",
-            "同意快捷API授权"
-          ],
-          quickLogoHtml: "◉",
-          quickLogoClass: "",
-          quickUrl: "",
-          logo: "◉"
-        }
-      };
-
-      function openAuthModal(exchange, url) {
-        title.textContent = `${exchange} · 快捷授权`;
-        frame.src = url;
-        openNew.href = url;
-        modal.classList.add("show");
-        modal.setAttribute("aria-hidden", "false");
-      }
-
-      function closeAuthModal() {
-        modal.classList.remove("show");
-        modal.setAttribute("aria-hidden", "true");
-        frame.src = "about:blank";
-      }
-
-      function openApiModal() {
-        apiAuthModal.classList.add("show");
-        apiAuthModal.setAttribute("aria-hidden", "false");
-      }
-
-      function closeApiModal() {
-        apiAuthModal.classList.remove("show");
-        apiAuthModal.setAttribute("aria-hidden", "true");
-      }
-
-      function setApiMode(mode) {
-        const activeMeta = apiTabMeta[activeApiTab] || apiTabMeta.okx;
-        if (activeMeta.hideModeSwitch) {
-          apiModeTabs.forEach((tab) => {
-            tab.classList.toggle("active", tab.getAttribute("data-api-mode") === "api");
-          });
-          apiContent.classList.remove("quick-mode");
-          apiContent.classList.add("hyper-mode");
-          return;
-        }
-        apiModeTabs.forEach((tab) => {
-          tab.classList.toggle("active", tab.getAttribute("data-api-mode") === mode);
-        });
-        apiContent.classList.toggle("quick-mode", mode === "quick");
-        apiContent.classList.remove("hyper-mode");
-        if (mode === "quick" && quickBanner) quickBanner.style.display = "flex";
-      }
-
-      function setApiTab(nextTab) {
-        const meta = apiTabMeta[nextTab] || apiTabMeta.okx;
-        activeApiTab = nextTab;
-        apiTabs.forEach((tab) => {
-          tab.classList.toggle("active", tab.getAttribute("data-api-tab") === nextTab);
-        });
-        if (apiTutorialBtn) apiTutorialBtn.textContent = meta.tutorialBtn || `${meta.title}授权教程`;
-        if (apiTutorialList) {
-          apiTutorialList.innerHTML = (meta.tutorialSteps || []).map((step) => `<li>${step}</li>`).join("");
-        }
-        if (apiWarningBox) {
-          if (meta.warningHtml) {
-            apiWarningBox.classList.add("show");
-            apiWarningBox.innerHTML = meta.warningHtml;
-          } else {
-            apiWarningBox.classList.remove("show");
-            apiWarningBox.innerHTML = "";
-          }
-        }
-        if (apiKeyLabel) {
-          apiKeyLabel.innerHTML = `${meta.keyLabel || "API Key"} <span class="req">*</span>`;
-        }
-        if (apiSecretLabel) {
-          apiSecretLabel.innerHTML = `${meta.secretLabel || "密钥"} <span class="req">*</span>`;
-        }
-        if (apiPassphraseLabel && apiAuthPassphraseInput) {
-          if (meta.passphraseLabel) {
-            apiPassphraseLabel.innerHTML = `${meta.passphraseLabel} <span class="req">*</span>`;
-            apiPassphraseLabel.style.display = "";
-            apiAuthPassphraseInput.style.display = "";
-          } else {
-            const passDisplay = meta.showPassphrase ? "" : "none";
-            apiPassphraseLabel.style.display = passDisplay;
-            apiAuthPassphraseInput.style.display = passDisplay;
-            apiPassphraseLabel.innerHTML = `密码<br>(Passphrase) <span class="req">*</span>`;
-          }
-        }
-        if (apiBindAccountOption) {
-          apiBindAccountOption.style.display = meta.showBindAccount ? "" : "none";
-        }
-        if (apiGlobalNotice) {
-          if (meta.globalNotice) {
-            apiGlobalNotice.classList.add("show");
-            apiGlobalNotice.textContent = meta.globalNotice;
-          } else {
-            apiGlobalNotice.classList.remove("show");
-            apiGlobalNotice.textContent = "";
-          }
-        }
-        if (apiLeftTitle) {
-          apiLeftTitle.textContent = meta.leftTitle || "";
-        }
-        apiAuthKeyInput.placeholder = meta.keyPlaceholder;
-        apiAuthSecretInput.placeholder = meta.secretPlaceholder;
-        apiAuthPassphraseInput.placeholder = meta.passPlaceholder;
-        if (apiSignupLink) {
-          apiSignupLink.textContent = meta.signupText || `${meta.title} 注册`;
-          apiSignupLink.href = meta.signupHref || "#";
-        }
-        quickExchangeName.textContent = meta.title;
-        quickAuthGoBtn.textContent = `前往连接我的${meta.title}账户`;
-        if (quickStepList) {
-          quickStepList.innerHTML = (meta.quickSteps || []).map((step) => `<li>${step}</li>`).join("");
-        }
-        quickTargetLogo.classList.remove("binance");
-        if (meta.quickLogoClass) quickTargetLogo.classList.add(meta.quickLogoClass);
-        quickTargetLogo.innerHTML = meta.quickLogoHtml || meta.logo || "A";
-        quickAuthGoBtn.disabled = !meta.quickUrl;
-        quickAuthGoBtn.style.opacity = meta.quickUrl ? "1" : "0.5";
-        quickAuthGoBtn.style.cursor = meta.quickUrl ? "pointer" : "not-allowed";
-        if (meta.hideModeSwitch) {
-          apiContent.classList.remove("quick-mode");
-          apiContent.classList.add("hyper-mode");
-        } else {
-          apiContent.classList.remove("hyper-mode");
-        }
-      }
-
-      quickButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          const exchange = btn.getAttribute("data-exchange") || "交易所";
-          const url = btn.getAttribute("data-url");
-          if (!url) return;
-          openAuthModal(exchange, url);
-        });
-      });
-      apiButtons.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          openApiModal();
-          setApiTab(btn.getAttribute("data-api-open-tab") || "okx");
-          setApiMode("api");
-        });
-      });
-      apiTabs.forEach((tab) => {
-        tab.addEventListener("click", () => setApiTab(tab.getAttribute("data-api-tab")));
-      });
-      apiModeTabs.forEach((tab) => {
-        tab.addEventListener("click", () => setApiMode(tab.getAttribute("data-api-mode")));
-      });
-      quickAuthGoBtn.addEventListener("click", () => {
-        const meta = apiTabMeta[activeApiTab] || apiTabMeta.okx;
-        if (!meta.quickUrl) return;
-        openAuthModal(meta.title, meta.quickUrl);
-      });
-      if (quickBannerClose) {
-        quickBannerClose.addEventListener("click", () => {
-          quickBannerClose.parentElement.style.display = "none";
-        });
-      }
-
-      closeBtn.addEventListener("click", closeAuthModal);
-      apiAuthClose.addEventListener("click", closeApiModal);
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal) closeAuthModal();
-      });
-      apiAuthModal.addEventListener("click", (e) => {
-        if (e.target === apiAuthModal) closeApiModal();
-      });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && modal.classList.contains("show")) closeAuthModal();
-        if (e.key === "Escape" && apiAuthModal.classList.contains("show")) closeApiModal();
-      });
-    })();
-  </script>
+  <script src="./authorize-page.js"></script>
 </body>
 </html>

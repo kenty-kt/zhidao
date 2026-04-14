@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>账户中心 · 知道AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #050910;
+      --line: rgba(255, 255, 255, 0.08);
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 520px at 50% -180px, rgba(56, 189, 248, 0.16), transparent 70%),
+        linear-gradient(180deg, #060b14, #050910);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    .menu-item { color: #8da0bf; transition: 0.2s; }
+    .menu-item:hover { color: #cdd8e8; background: rgba(255, 255, 255, 0.05); }
+    .menu-item.active {
+      color: #fff;
+      background: rgba(56, 189, 248, 0.16);
+      border-color: rgba(56, 189, 248, 0.35);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+    }
+    .panel {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      box-shadow: 0 20px 48px rgba(2, 8, 23, 0.26);
+    }
+    .stat-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,0.03);
+      padding: 18px;
+      min-height: 128px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.1);
+      font-size: 12px;
+      font-weight: 700;
+      color: #dbeafe;
+      background: rgba(255,255,255,0.04);
+    }
+    .pill.ok { color: #ccfbf1; background: rgba(16,185,129,0.14); border-color: rgba(16,185,129,0.36); }
+    .pill.warn { color: #fde68a; background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.36); }
+    .pill.danger { color: #fecaca; background: rgba(248,113,113,0.14); border-color: rgba(248,113,113,0.36); }
+    .section-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .subtle {
+      font-size: 12px;
+      color: #8ea1bf;
+    }
+    .exchange-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+    }
+    .exchange-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .exchange-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.05);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .exchange-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .exchange-desc {
+      font-size: 12px;
+      color: #8ea1bf;
+      margin-top: 4px;
+    }
+    .score-ring {
+      width: 128px;
+      height: 128px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      background: conic-gradient(#38bdf8 0deg, #38bdf8 var(--score-deg), rgba(255,255,255,0.08) var(--score-deg), rgba(255,255,255,0.08) 360deg);
+      margin: 20px auto 0;
+      position: relative;
+    }
+    .score-ring::after {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border-radius: inherit;
+      background: #09111c;
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .score-inner { position: relative; z-index: 1; text-align: center; }
+    .score-value {
+      font-size: 34px;
+      font-weight: 900;
+      line-height: 1;
+      color: #f8fafc;
+    }
+    .score-label {
+      margin-top: 6px;
+      font-size: 12px;
+      color: #8ea1bf;
+      font-weight: 700;
+    }
+    .score-list {
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      font-size: 12px;
+      color: #d7e1ee;
+      line-height: 1.7;
+      margin-top: 16px;
+    }
+    .hero {
+      padding: 22px 22px 20px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: #e2e8f0;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .action-btn.primary {
+      border-color: rgba(56,189,248,0.42);
+      background: rgba(56,189,248,0.16);
+      color: #e0f2fe;
+    }
+    .action-btn:hover { filter: brightness(1.06); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      text-align: left;
+      padding: 14px 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 13px;
+    }
+    th {
+      font-size: 12px;
+      color: #8ea1bf;
+      font-weight: 700;
+    }
+    .right { text-align: right; }
+    .empty-box {
+      border: 1px dashed rgba(255,255,255,0.14);
+      border-radius: 14px;
+      padding: 24px 18px;
+      color: #94a3b8;
+      text-align: center;
+      background: rgba(255,255,255,0.02);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .tab-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      height: 34px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #9fb0c8;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+    .tab-btn.active {
+      color: #fff;
+      border-color: rgba(56,189,248,0.36);
+      background: rgba(56,189,248,0.16);
+    }
+    .manage-grid {
+      display: grid;
+      gap: 12px;
+    }
+    .position-card {
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 14px;
+      background: rgba(255,255,255,0.03);
+      padding: 14px;
+    }
+    .position-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .position-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .position-meta {
+      font-size: 12px;
+      color: #8ea1bf;
+      margin-top: 4px;
+    }
+    .position-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .position-stat {
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 12px;
+      background: rgba(255,255,255,0.02);
+      padding: 10px 12px;
+    }
+    .position-stat-label {
+      font-size: 11px;
+      color: #8ea1bf;
+    }
+    .position-stat-value {
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .position-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      margin-top: 12px;
+      align-items: end;
+    }
+    .field-label {
+      display: block;
+      font-size: 11px;
+      color: #8ea1bf;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+    .field-input {
+      width: 100%;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+      color: #e2e8f0;
+      padding: 0 12px;
+      font-size: 13px;
+      outline: none;
+    }
+    .field-input:focus {
+      border-color: rgba(56,189,248,0.45);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.12);
+    }
+    .close-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(248,113,113,0.3);
+      background: rgba(248,113,113,0.12);
+      color: #fecaca;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .save-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(56,189,248,0.3);
+      background: rgba(56,189,248,0.12);
+      color: #dbeafe;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    @media (max-width: 1100px) {
+      .position-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .position-actions { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
+    <div class="flex items-center gap-3">
+      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
+      <div class="font-bold tracking-wide text-sm">账户中心</div>
+      <span class="px-2 py-1 rounded-full border border-sky-300/35 bg-sky-500/15 text-[11px] text-sky-200">Account Overview</span>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-[70px_1fr] h-[calc(100vh-56px)]">
+    <aside class="border-r border-white/10 bg-[#060b12] flex flex-col items-center py-3 gap-2">
+      <div class="w-10 h-10 rounded-xl bg-white/5 border border-white/10"></div>
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <a href="chat.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
+      <a href="fast.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">快讯</a>
+      <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
+      <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
+      <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">账户</div>
+    </aside>
+
+    <main class="min-w-0 overflow-auto p-5 md:p-8">
+      <div class="mx-auto w-full max-w-[1240px] space-y-5">
+        <section class="panel hero">
+          <div>
+            <div class="text-3xl md:text-4xl leading-none font-extrabold text-white">账户总览</div>
+            <div class="mt-3 text-sm text-slate-400">统一查看授权状态、资产摘要、账户结构和 AI 评分。</div>
+            <div class="mt-4 flex flex-wrap gap-2">
+              <span id="envPill" class="pill">未连接</span>
+              <span id="sourcePill" class="pill">数据源待检查</span>
+              <span id="lastUpdatedPill" class="pill">最近更新 --</span>
+            </div>
+          </div>
+          <div class="hero-actions">
+            <a class="action-btn primary" href="authorize.html">去授权</a>
+            <a class="action-btn" href="trade.html">查看交易页</a>
+            <button id="refreshBtn" class="action-btn" type="button">刷新数据</button>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="stat-card">
+            <div class="subtle">总权益</div>
+            <div id="totalEquityEl" class="mt-3 text-3xl font-black text-white">--</div>
+            <div class="mt-3 subtle">账户状态</div>
+            <div id="accountStatusText" class="mt-1 text-sm text-slate-200">未读取到账户数据</div>
+          </div>
+          <div class="stat-card">
+            <div class="subtle">可用余额</div>
+            <div id="availBalanceEl" class="mt-3 text-3xl font-black text-white">--</div>
+            <div class="mt-3 subtle">现金余额</div>
+            <div id="cashBalanceEl" class="mt-1 text-sm text-slate-200">--</div>
+          </div>
+          <div class="stat-card">
+            <div class="subtle">账户结构</div>
+            <div id="exposureValueEl" class="mt-3 text-3xl font-black text-white">--</div>
+            <div class="mt-3 subtle">仓位分布</div>
+            <div id="exposureMixEl" class="mt-1 text-sm text-slate-200">等待模拟持仓数据</div>
+          </div>
+        </section>
+
+        <section class="grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-5">
+          <div class="panel p-5">
+            <div class="flex items-center justify-between gap-3 mb-4">
+              <div>
+                <div class="section-title">交易所连接状态</div>
+                <div class="subtle mt-1">当前页面已切换为纯虚拟数据模式，账户状态、资产和持仓均使用本地模拟数据展示。</div>
+              </div>
+              <a href="authorize.html" class="action-btn">管理授权</a>
+            </div>
+            <div class="grid gap-3">
+              <div class="exchange-item">
+                <div class="exchange-left">
+                  <div class="exchange-logo">✣</div>
+                  <div>
+                    <div class="exchange-title">欧易 OKX</div>
+                    <div id="okxDescEl" class="exchange-desc">等待账户状态检查</div>
+                  </div>
+                </div>
+                <span id="okxStatusEl" class="pill">检查中</span>
+              </div>
+              <div class="exchange-item">
+                <div class="exchange-left">
+                  <div class="exchange-logo">◈</div>
+                  <div>
+                    <div class="exchange-title">币安 Binance</div>
+                    <div class="exchange-desc">本地已录入则展示模拟连接状态，未录入则提示待接入。</div>
+                  </div>
+                </div>
+                <span class="pill warn">待接入</span>
+              </div>
+              <div class="exchange-item">
+                <div class="exchange-left">
+                  <div class="exchange-logo">◉</div>
+                  <div>
+                    <div class="exchange-title">Hyperliquid</div>
+                    <div class="exchange-desc">本地已录入则展示模拟连接状态，未录入则提示待接入。</div>
+                  </div>
+                </div>
+                <span class="pill warn">待接入</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel p-5">
+            <div class="section-title">AI 账户评分</div>
+            <div class="subtle mt-1">基于账户连接状态、持仓集中度、杠杆和盈亏结构做轻量评分。</div>
+            <div class="score-ring" id="scoreRing" style="--score-deg: 0deg;">
+              <div class="score-inner">
+                <div id="scoreValueEl" class="score-value">--</div>
+                <div class="score-label">健康度</div>
+              </div>
+            </div>
+            <div id="scoreListEl" class="score-list">等待账户与持仓数据，稍后将生成评分说明。</div>
+          </div>
+        </section>
+
+        <section class="panel p-5">
+          <div class="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <div class="section-title">账户工作区</div>
+              <div class="subtle mt-1">在同一个区域查看最近成交和当前持仓，并直接模拟修改止盈止损或执行关仓。</div>
+            </div>
+            <span id="positionsCountPill" class="pill">仓位 0</span>
+          </div>
+          <div class="tab-row mb-4">
+            <button id="tabTradesBtn" class="tab-btn active" type="button">最近成交记录</button>
+            <button id="tabPositionsBtn" class="tab-btn" type="button">持仓</button>
+          </div>
+          <div id="workspaceTradesPanel">
+            <div id="recentTradesWrap">
+              <div class="empty-box">正在生成模拟成交记录…</div>
+            </div>
+          </div>
+          <div id="workspacePositionsPanel" style="display:none;">
+            <div id="positionsManagerWrap">
+              <div class="empty-box">正在生成模拟持仓数据…</div>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    (function () {
+      const AUTH_STORAGE_KEY = "zhidao_authorizations_v1";
+      const totalEquityEl = document.getElementById("totalEquityEl");
+      const availBalanceEl = document.getElementById("availBalanceEl");
+      const cashBalanceEl = document.getElementById("cashBalanceEl");
+      const exposureValueEl = document.getElementById("exposureValueEl");
+      const exposureMixEl = document.getElementById("exposureMixEl");
+      const accountStatusText = document.getElementById("accountStatusText");
+      const envPill = document.getElementById("envPill");
+      const sourcePill = document.getElementById("sourcePill");
+      const lastUpdatedPill = document.getElementById("lastUpdatedPill");
+      const okxStatusEl = document.getElementById("okxStatusEl");
+      const okxDescEl = document.getElementById("okxDescEl");
+      const positionsCountPill = document.getElementById("positionsCountPill");
+      const scoreRing = document.getElementById("scoreRing");
+      const scoreValueEl = document.getElementById("scoreValueEl");
+      const scoreListEl = document.getElementById("scoreListEl");
+      const recentTradesWrap = document.getElementById("recentTradesWrap");
+      const positionsManagerWrap = document.getElementById("positionsManagerWrap");
+      const refreshBtn = document.getElementById("refreshBtn");
+      const tabTradesBtn = document.getElementById("tabTradesBtn");
+      const tabPositionsBtn = document.getElementById("tabPositionsBtn");
+      const workspaceTradesPanel = document.getElementById("workspaceTradesPanel");
+      const workspacePositionsPanel = document.getElementById("workspacePositionsPanel");
+
+      let latestAccount = null;
+      let latestPositions = [];
+      let localConnections = [];
+      let latestTrades = [];
+      let positionDrafts = {};
+
+      function formatUsd(n) {
+        const v = Number(n);
+        if (!Number.isFinite(v)) return "--";
+        return `$${v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      }
+
+      function formatNum(n, digits) {
+        const v = Number(n);
+        if (!Number.isFinite(v)) return "--";
+        return v.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+      }
+
+      function setPill(el, text, type) {
+        el.textContent = text;
+        el.className = "pill" + (type ? ` ${type}` : "");
+      }
+
+      function readLocalConnections() {
+        try {
+          const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+          const parsed = raw ? JSON.parse(raw) : {};
+          return Array.isArray(parsed.connections) ? parsed.connections : [];
+        } catch (err) {
+          return [];
+        }
+      }
+
+      function makeMockAccount(connections) {
+        const primary = connections.find((item) => item.isDefault) || connections[0] || {
+          exchange: "okx",
+          title: "欧易OKX",
+          envType: "simulated",
+        };
+        const isSim = primary.envType === "simulated";
+        const seededBase = primary.exchange === "okx" ? 18240.35 : primary.exchange === "binance" ? 24150.82 : 12860.44;
+        return {
+          ok: true,
+          simulated: isSim,
+          totalEqUsd: seededBase,
+          usdtAvail: seededBase * 0.36,
+          usdtCash: seededBase * 0.42,
+          source: "local-mock",
+          title: primary.title,
+        };
+      }
+
+      function makeMockPositions(connections) {
+        const primary = connections.find((item) => item.isDefault) || connections[0] || {
+          exchange: "okx",
+          title: "欧易OKX",
+          envType: "simulated",
+        };
+        const base = primary.exchange === "binance"
+          ? [
+              { asset: "BNB", instrument: "BNB-USDT-SWAP", side: "LONG", usdtValue: 4280, qty: 8.2, entryPx: 522, markPx: 537, pnlPct: 2.87, leverage: 5 },
+              { asset: "BTC", instrument: "BTC-USDT-SWAP", side: "LONG", usdtValue: 6120, qty: 0.083, entryPx: 72800, markPx: 73540, pnlPct: 1.01, leverage: 4 },
+              { asset: "ETH", instrument: "ETH-USDT-SWAP", side: "SHORT", usdtValue: 3380, qty: 1.04, entryPx: 3620, markPx: 3582, pnlPct: 1.05, leverage: 6 },
+              { asset: "SOL", instrument: "SOL-USDT-SWAP", side: "LONG", usdtValue: 1940, qty: 11.6, entryPx: 162.1, markPx: 168.3, pnlPct: 3.82, leverage: 3 }
+            ]
+          : primary.exchange === "hyper"
+          ? [
+              { asset: "HYPE", instrument: "HYPE-USD-PERP", side: "LONG", usdtValue: 3160, qty: 422, entryPx: 7.15, markPx: 7.48, pnlPct: 4.62, leverage: 3 },
+              { asset: "ETH", instrument: "ETH-USDT-SWAP", side: "SHORT", usdtValue: 2840, qty: 0.86, entryPx: 3510, markPx: 3445, pnlPct: 1.85, leverage: 6 },
+              { asset: "BTC", instrument: "BTC-USDT-SWAP", side: "LONG", usdtValue: 4280, qty: 0.056, entryPx: 74420, markPx: 75680, pnlPct: 1.69, leverage: 4 },
+              { asset: "SOL", instrument: "SOL-USDT-SWAP", side: "LONG", usdtValue: 1680, qty: 10.2, entryPx: 160.8, markPx: 168.3, pnlPct: 4.66, leverage: 2 }
+            ]
+          : [
+              { asset: "BTC", instrument: "BTC-USDT-SWAP", side: "LONG", usdtValue: 8450, qty: 0.112, entryPx: 74220, markPx: 75680, pnlPct: 1.97, leverage: 5 },
+              { asset: "ETH", instrument: "ETH-USDT-SWAP", side: "LONG", usdtValue: 4920, qty: 1.38, entryPx: 3490, markPx: 3578, pnlPct: 2.52, leverage: 4 },
+              { asset: "SOL", instrument: "SOL-USDT-SWAP", side: "SHORT", usdtValue: 2760, qty: 18.3, entryPx: 168.4, markPx: 164.8, pnlPct: 2.14, leverage: 6 },
+              { asset: "DOGE", instrument: "DOGE-USDT-SWAP", side: "LONG", usdtValue: 1420, qty: 8650, entryPx: 0.1624, markPx: 0.1682, pnlPct: 3.57, leverage: 3 },
+              { asset: "PEPE", instrument: "PEPE-USDT-SWAP", side: "SHORT", usdtValue: 980, qty: 2400000, entryPx: 0.0000128, markPx: 0.0000123, pnlPct: 3.91, leverage: 4 },
+              { asset: "AVAX", instrument: "AVAX-USDT-SWAP", side: "LONG", usdtValue: 1180, qty: 31.5, entryPx: 36.2, markPx: 37.5, pnlPct: 3.59, leverage: 2 }
+            ];
+
+        return {
+          ok: true,
+          positions: base.map((item) => ({
+            ...item,
+            pair: item.instrument,
+            pnlValue: Number(item.usdtValue) * Number(item.pnlPct) / 100,
+          })),
+        };
+      }
+
+      function scoreState(score) {
+        if (score >= 80) return { text: "健康", type: "ok" };
+        if (score >= 60) return { text: "关注", type: "warn" };
+        return { text: "风险偏高", type: "danger" };
+      }
+
+      function getDraftForPosition(item) {
+        const key = item.instrument || item.asset;
+        if (!positionDrafts[key]) {
+          const isLong = String(item.side).toUpperCase() === "LONG";
+          const tp = isLong ? Number(item.entryPx || 0) * 1.05 : Number(item.entryPx || 0) * 0.95;
+          const sl = isLong ? Number(item.entryPx || 0) * 0.97 : Number(item.entryPx || 0) * 1.03;
+          positionDrafts[key] = { tp: Number(tp.toFixed(4)), sl: Number(sl.toFixed(4)) };
+        }
+        return positionDrafts[key];
+      }
+
+      function renderAccount(accountResp) {
+        latestAccount = accountResp;
+        if (!accountResp || accountResp.ok === false) {
+          totalEquityEl.textContent = "--";
+          availBalanceEl.textContent = "--";
+          cashBalanceEl.textContent = "--";
+          accountStatusText.textContent = "当前展示默认模拟账户";
+          setPill(envPill, "模拟盘", "warn");
+          setPill(sourcePill, "默认模拟数据", "warn");
+          setPill(okxStatusEl, "模拟盘", "warn");
+          okxDescEl.textContent = "未录入授权，已自动加载默认模拟账户。";
+          return;
+        }
+
+        totalEquityEl.textContent = formatUsd(accountResp.totalEqUsd);
+        availBalanceEl.textContent = formatUsd(accountResp.usdtAvail);
+        cashBalanceEl.textContent = formatUsd(accountResp.usdtCash);
+        const title = accountResp.title || "OKX";
+        accountStatusText.textContent = accountResp.simulated ? `已连接 ${title} 模拟盘账户` : `已连接 ${title} 实盘账户`;
+        setPill(envPill, accountResp.simulated ? "模拟盘" : "实盘", accountResp.simulated ? "warn" : "ok");
+        setPill(sourcePill, "本地模拟数据", "warn");
+        setPill(okxStatusEl, accountResp.simulated ? "模拟盘" : "已连接", accountResp.simulated ? "warn" : "ok");
+        okxDescEl.textContent = `${title} · 总权益 ${formatUsd(accountResp.totalEqUsd)} · 可用余额 ${formatUsd(accountResp.usdtAvail)}`;
+      }
+
+      function renderPositions(positionsResp) {
+        const items = positionsResp && Array.isArray(positionsResp.positions) ? positionsResp.positions : [];
+        latestPositions = items;
+        positionsCountPill.textContent = `仓位 ${items.length}`;
+
+        if (!items.length) {
+          exposureValueEl.textContent = "0";
+          exposureMixEl.textContent = "当前没有活跃持仓，可前往交易页查看模拟行情。";
+          positionsManagerWrap.innerHTML = '<div class="empty-box">当前没有活跃持仓。你可以先完成授权，或在交易页观察模拟行情。</div>';
+          return;
+        }
+
+        const totalNotional = items.reduce((sum, item) => sum + Math.abs(Number(item.usdtValue || 0)), 0);
+        const longCount = items.filter((item) => String(item.side).toUpperCase() === "LONG").length;
+        const shortCount = items.filter((item) => String(item.side).toUpperCase() === "SHORT").length;
+        exposureValueEl.textContent = formatUsd(totalNotional);
+        exposureMixEl.textContent = `多头 ${longCount} 个 · 空头 ${shortCount} 个 · 共 ${items.length} 个仓位`;
+
+        const cards = items.map((item) => {
+          const key = item.instrument || item.asset;
+          const draft = getDraftForPosition(item);
+          const pnlClass = Number(item.pnlPct || 0) >= 0 ? "text-emerald-300" : "text-rose-300";
+          return `
+            <div class="position-card" data-position-key="${key}">
+              <div class="position-top">
+                <div>
+                  <div class="position-name">${item.asset || "--"} <span class="${pnlClass}" style="font-size:12px;">${item.side || "--"}</span></div>
+                  <div class="position-meta">${item.instrument || item.pair || "--"} · 杠杆 ${item.leverage || "--"}x</div>
+                </div>
+                <div class="${pnlClass}" style="font-size:16px;font-weight:900;">${formatNum(item.pnlPct, 2)}%</div>
+              </div>
+              <div class="position-stat-grid">
+                <div class="position-stat"><div class="position-stat-label">持仓价值</div><div class="position-stat-value">${formatUsd(item.usdtValue)}</div></div>
+                <div class="position-stat"><div class="position-stat-label">数量</div><div class="position-stat-value">${formatNum(item.qty, 4)}</div></div>
+                <div class="position-stat"><div class="position-stat-label">入场价</div><div class="position-stat-value">${formatUsd(item.entryPx)}</div></div>
+                <div class="position-stat"><div class="position-stat-label">标记价</div><div class="position-stat-value">${formatUsd(item.markPx)}</div></div>
+              </div>
+              <div class="position-actions">
+                <div>
+                  <label class="field-label">止盈</label>
+                  <input class="field-input" data-role="tp" data-position-key="${key}" type="number" step="0.0001" value="${draft.tp}" />
+                </div>
+                <div>
+                  <label class="field-label">止损</label>
+                  <input class="field-input" data-role="sl" data-position-key="${key}" type="number" step="0.0001" value="${draft.sl}" />
+                </div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                  <button class="save-btn" data-action="save" data-position-key="${key}" type="button">保存</button>
+                  <button class="close-btn" data-action="close" data-position-key="${key}" type="button">关仓</button>
+                </div>
+              </div>
+            </div>
+          `;
+        }).join("");
+
+        positionsManagerWrap.innerHTML = `<div class="manage-grid">${cards}</div>`;
+      }
+
+      function computeScore() {
+        const connected = !!(latestAccount && latestAccount.ok !== false && Number.isFinite(Number(latestAccount.totalEqUsd)));
+        let score = connected ? 82 : 36;
+        const notes = [];
+
+        if (!connected) {
+          notes.push("账户尚未完成有效连接，当前评分主要基于接入状态。");
+        } else {
+          notes.push(`账户已连接 ${latestAccount.title || "默认账户"}，当前展示的是本地模拟账户数据。`);
+        }
+
+        const totalNotional = latestPositions.reduce((sum, item) => sum + Math.abs(Number(item.usdtValue || 0)), 0);
+        if (!latestPositions.length) {
+          score -= connected ? 4 : 0;
+          notes.push("当前没有活跃持仓，账户风险暴露较低。");
+        } else {
+          const largest = latestPositions.reduce((best, item) => {
+            return Math.abs(Number(item.usdtValue || 0)) > Math.abs(Number(best.usdtValue || 0)) ? item : best;
+          }, latestPositions[0]);
+          const concentration = totalNotional > 0 ? Math.abs(Number(largest.usdtValue || 0)) / totalNotional : 0;
+          if (concentration > 0.72) {
+            score -= 16;
+            notes.push(`最大仓位集中度 ${(concentration * 100).toFixed(0)}%，仓位偏集中。`);
+          } else {
+            notes.push(`最大仓位集中度 ${(concentration * 100).toFixed(0)}%，组合分散度尚可。`);
+          }
+
+          const highLeverageCount = latestPositions.filter((item) => Number(item.leverage || 0) >= 10).length;
+          if (highLeverageCount) {
+            score -= Math.min(18, highLeverageCount * 6);
+            notes.push(`检测到 ${highLeverageCount} 个高杠杆仓位，建议关注回撤风险。`);
+          } else {
+            notes.push("当前持仓杠杆水平较温和。");
+          }
+
+          const negativeCount = latestPositions.filter((item) => Number(item.pnlPct || 0) < 0).length;
+          if (negativeCount >= Math.ceil(latestPositions.length / 2)) {
+            score -= 10;
+            notes.push("亏损仓位占比偏高，需关注短期逆风暴露。");
+          } else {
+            notes.push("盈利与亏损仓位比例相对均衡。");
+          }
+        }
+
+        score = Math.max(0, Math.min(99, Math.round(score)));
+        const state = scoreState(score);
+        scoreRing.style.setProperty("--score-deg", `${Math.round(score / 100 * 360)}deg`);
+        scoreValueEl.textContent = String(score);
+        scoreListEl.textContent = notes.join(" ");
+        setPill(sourcePill, `AI 评分：${state.text}`, state.type);
+      }
+
+      function renderLocalConnections() {
+        localConnections = readLocalConnections();
+        const map = Object.fromEntries(localConnections.map((item) => [item.exchange, item]));
+        const binanceEntry = map.binance;
+        const hyperEntry = map.hyper;
+
+        const binancePill = document.querySelectorAll(".exchange-item .pill.warn")[0];
+        const hyperPill = document.querySelectorAll(".exchange-item .pill.warn")[1];
+        const descEls = document.querySelectorAll(".exchange-desc");
+        const binanceDesc = descEls[1];
+        const hyperDesc = descEls[2];
+
+        if (binanceEntry && binancePill && binanceDesc) {
+          binancePill.textContent = binanceEntry.mode === "quick" ? "快捷授权" : "已保存";
+          binancePill.className = `pill ${binanceEntry.envType === "simulated" ? "warn" : "ok"}`;
+          binanceDesc.textContent = `${binanceEntry.remark || "币安账户"} · ${binanceEntry.mode === "quick" ? "快捷授权" : "API 授权"} 已录入`;
+        }
+
+        if (hyperEntry && hyperPill && hyperDesc) {
+          hyperPill.textContent = hyperEntry.mode === "quick" ? "快捷授权" : "已保存";
+          hyperPill.className = `pill ${hyperEntry.envType === "simulated" ? "warn" : "ok"}`;
+          hyperDesc.textContent = `${hyperEntry.remark || "Hyperliquid账户"} · ${hyperEntry.mode === "quick" ? "快捷授权" : "API 授权"} 已录入`;
+        }
+
+        if (!localConnections.length) {
+          setPill(okxStatusEl, "默认模拟", "warn");
+          okxDescEl.textContent = "未录入授权，当前展示默认模拟账户与持仓。";
+        }
+      }
+
+      function makeMockTrades(connections) {
+        const primary = connections.find((item) => item.isDefault) || connections[0] || { exchange: "okx", title: "OKX" };
+        const exchangeName = primary.title || "OKX";
+        latestTrades = primary.exchange === "binance"
+          ? [
+              { asset: "BTC", side: "买入", price: 73240, qty: 0.018, pnl: 42.5, time: "今天 10:42", exchange: exchangeName },
+              { asset: "ETH", side: "卖出", price: 3598, qty: 0.62, pnl: -18.2, time: "今天 09:15", exchange: exchangeName },
+              { asset: "BNB", side: "买入", price: 531, qty: 2.8, pnl: 26.9, time: "昨天 22:08", exchange: exchangeName },
+              { asset: "SOL", side: "买入", price: 166.4, qty: 4.3, pnl: 13.1, time: "昨天 18:24", exchange: exchangeName },
+              { asset: "DOGE", side: "卖出", price: 0.1672, qty: 3200, pnl: 8.4, time: "昨天 14:03", exchange: exchangeName },
+              { asset: "ETH", side: "买入", price: 3544, qty: 0.48, pnl: 11.7, time: "昨天 11:50", exchange: exchangeName },
+              { asset: "BTC", side: "卖出", price: 72690, qty: 0.012, pnl: -7.8, time: "2天前 21:30", exchange: exchangeName },
+            ]
+          : primary.exchange === "hyper"
+          ? [
+              { asset: "HYPE", side: "买入", price: 7.21, qty: 120, pnl: 19.6, time: "今天 11:08", exchange: exchangeName },
+              { asset: "BTC", side: "买入", price: 74820, qty: 0.015, pnl: 24.1, time: "今天 08:56", exchange: exchangeName },
+              { asset: "ETH", side: "卖出", price: 3498, qty: 0.54, pnl: 9.2, time: "昨天 23:14", exchange: exchangeName },
+              { asset: "SOL", side: "买入", price: 161.2, qty: 6.2, pnl: 17.4, time: "昨天 20:02", exchange: exchangeName },
+              { asset: "PEPE", side: "卖出", price: 0.0000126, qty: 900000, pnl: 5.1, time: "昨天 16:36", exchange: exchangeName },
+              { asset: "ETH", side: "买入", price: 3450, qty: 0.32, pnl: -4.7, time: "2天前 09:44", exchange: exchangeName },
+              { asset: "BTC", side: "卖出", price: 74110, qty: 0.01, pnl: 6.9, time: "2天前 01:25", exchange: exchangeName },
+            ]
+          : [
+              { asset: "BTC", side: "买入", price: 74420, qty: 0.021, pnl: 31.6, time: "今天 11:20", exchange: exchangeName },
+              { asset: "ETH", side: "买入", price: 3526, qty: 0.75, pnl: 22.4, time: "今天 09:48", exchange: exchangeName },
+              { asset: "SOL", side: "卖出", price: 165.1, qty: 5.8, pnl: 10.2, time: "昨天 21:33", exchange: exchangeName },
+              { asset: "DOGE", side: "买入", price: 0.1648, qty: 4200, pnl: -6.8, time: "昨天 18:07", exchange: exchangeName },
+              { asset: "AVAX", side: "买入", price: 36.8, qty: 12.4, pnl: 14.9, time: "昨天 15:26", exchange: exchangeName },
+              { asset: "PEPE", side: "卖出", price: 0.0000125, qty: 1100000, pnl: 7.3, time: "昨天 10:14", exchange: exchangeName },
+              { asset: "ETH", side: "卖出", price: 3580, qty: 0.41, pnl: 9.8, time: "2天前 22:50", exchange: exchangeName },
+            ];
+      }
+
+      function renderRecentTrades() {
+        if (!latestTrades.length) {
+          recentTradesWrap.innerHTML = '<div class="empty-box">暂无模拟成交记录。</div>';
+          return;
+        }
+        const rows = latestTrades.map((item) => {
+          const pnlClass = Number(item.pnl || 0) >= 0 ? "text-emerald-300" : "text-rose-300";
+          const pnlText = `${Number(item.pnl || 0) >= 0 ? "+" : ""}${formatNum(item.pnl, 2)} USDT`;
+          return `
+            <tr>
+              <td><div class="font-semibold text-slate-100">${item.asset}</div><div class="text-[11px] text-slate-500 mt-1">${item.exchange}</div></td>
+              <td>${item.side}</td>
+              <td class="right">${formatUsd(item.price)}</td>
+              <td class="right">${formatNum(item.qty, 4)}</td>
+              <td class="right ${pnlClass}">${pnlText}</td>
+              <td class="right">${item.time}</td>
+            </tr>
+          `;
+        }).join("");
+        recentTradesWrap.innerHTML = `
+          <div class="overflow-auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>币种</th>
+                  <th>方向</th>
+                  <th class="right">成交价</th>
+                  <th class="right">数量</th>
+                  <th class="right">结果</th>
+                  <th class="right">时间</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      function switchWorkspaceTab(tab) {
+        const isTrades = tab === "trades";
+        tabTradesBtn.classList.toggle("active", isTrades);
+        tabPositionsBtn.classList.toggle("active", !isTrades);
+        workspaceTradesPanel.style.display = isTrades ? "" : "none";
+        workspacePositionsPanel.style.display = isTrades ? "none" : "";
+      }
+
+      function updatePositionDraft(key, field, value) {
+        if (!positionDrafts[key]) positionDrafts[key] = {};
+        positionDrafts[key][field] = value;
+      }
+
+      function closePosition(key) {
+        latestPositions = latestPositions.filter((item) => (item.instrument || item.asset) !== key);
+        renderPositions({ ok: true, positions: latestPositions });
+        computeScore();
+      }
+
+      function savePositionSettings(key) {
+        const draft = positionDrafts[key];
+        if (!draft) return;
+        window.alert(`已保存 ${key} 的模拟止盈/止损设置：止盈 ${draft.tp || "--"}，止损 ${draft.sl || "--"}`);
+      }
+
+      positionsManagerWrap.addEventListener("input", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLInputElement)) return;
+        const key = target.getAttribute("data-position-key");
+        const role = target.getAttribute("data-role");
+        if (!key || !role) return;
+        updatePositionDraft(key, role, target.value);
+      });
+
+      positionsManagerWrap.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const action = target.getAttribute("data-action");
+        const key = target.getAttribute("data-position-key");
+        if (!action || !key) return;
+        if (action === "close") closePosition(key);
+        if (action === "save") savePositionSettings(key);
+      });
+
+      tabTradesBtn.addEventListener("click", () => switchWorkspaceTab("trades"));
+      tabPositionsBtn.addEventListener("click", () => switchWorkspaceTab("positions"));
+
+      function loadAll() {
+        lastUpdatedPill.textContent = "最近更新 加载中…";
+        positionDrafts = {};
+        renderLocalConnections();
+        const finalAccount = makeMockAccount(localConnections);
+        const finalPositions = makeMockPositions(localConnections);
+        renderAccount(finalAccount);
+        renderPositions(finalPositions);
+        makeMockTrades(localConnections);
+        renderRecentTrades();
+        computeScore();
+        switchWorkspaceTab("trades");
+        lastUpdatedPill.textContent = `最近更新 ${new Date().toLocaleTimeString()}`;
+      }
+
+      refreshBtn.addEventListener("click", loadAll);
+      loadAll();
+    })();
+  </script>
+</body>
+</html>
