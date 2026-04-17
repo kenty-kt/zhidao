@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI助手对话 · 知道AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: #f3f4f6;
+    background:
+      radial-gradient(circle at 88% 58%, rgba(243, 158, 92, 0.08), transparent 18%),
+      linear-gradient(180deg, #171c22 0%, #11161b 100%);
+    overflow: hidden;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px),
+      radial-gradient(circle at center, rgba(255,255,255,0.09) 0.7px, transparent 0.8px);
+    background-size: 100% 1px, 1px 100%, 6px 6px;
+    opacity: 0.18;
+    pointer-events: none;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .app-shell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100vh;
+  }
+
+  .global-nav {
+    width: 70px;
+    background: #060b12;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 8px;
+  }
+
+  .nav-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .menu-item {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #8da0bf;
+    transition: 0.2s;
+  }
+
+  .menu-item:hover {
+    color: #cdd8e8;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .menu-item.active {
+    color: #fff;
+    background: rgba(14, 165, 255, 0.16);
+    border-color: rgba(14, 165, 255, 0.35);
+    box-shadow: 0 0 12px rgba(14, 165, 255, 0.2);
+  }
+
+  .sidebar {
+    width: 176px;
+    background: #2a3340;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 8px 10px;
+  }
+
+  .sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #f8fafc;
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+
+  .sidebar-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .collapse-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #d6dae2;
+    transition: background 0.2s ease;
+  }
+
+  .collapse-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .new-chat {
+    width: 100%;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.52);
+    background: transparent;
+    color: #f8fafc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .section-label {
+    color: rgba(255,255,255,0.32);
+    font-size: 10px;
+    margin: 4px 4px 10px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+
+  .history-list::-webkit-scrollbar,
+  .content-scroll::-webkit-scrollbar { width: 4px; }
+  .history-list::-webkit-scrollbar-thumb,
+  .content-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+  .history-list::-webkit-scrollbar-track,
+  .content-scroll::-webkit-scrollbar-track { background: transparent; }
+
+  .history-item {
+    border-radius: 10px;
+    padding: 10px 8px;
+    color: #d8dee8;
+  }
+
+  .history-item.active { background: rgba(0,0,0,0.18); }
+
+  .history-title {
+    font-size: 12px;
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+
+  .history-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .main-area {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .topbar {
+    height: 46px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding: 0 14px;
+  }
+
+  .login-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(4, 8, 15, 0.68);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-modal.open { display: flex; }
+
+  .login-panel {
+    width: min(100%, 480px);
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #23272e;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    padding: 22px;
+  }
+
+  .login-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 18px;
+  }
+
+  .login-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #f8fafc;
+  }
+
+  .login-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    color: #96a0b2;
+    font-size: 28px;
+    cursor: pointer;
+  }
+
+  .login-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #f3f4f6;
+    margin-bottom: 10px;
+  }
+
+  .login-field,
+  .login-code-wrap {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: #39414e;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    margin-bottom: 16px;
+  }
+
+  .login-field input,
+  .login-code-wrap input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #f8fafc;
+    font-size: 18px;
+    font-family: inherit;
+  }
+
+  .login-field input::placeholder,
+  .login-code-wrap input::placeholder {
+    color: rgba(255,255,255,0.35);
+  }
+
+  .login-code-wrap {
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .send-code-btn {
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 16px;
+    flex: 0 0 auto;
+    cursor: pointer;
+  }
+
+  .login-submit {
+    width: 100%;
+    height: 58px;
+    border-radius: 16px;
+    border: 0;
+    background: #f3f4f6;
+    color: #1f2937;
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+
+  .login-or {
+    text-align: center;
+    color: rgba(255,255,255,0.42);
+    font-size: 16px;
+    margin: 14px 0;
+  }
+
+  .login-socials {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .login-social {
+    height: 58px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: #39414e;
+    color: #f3f4f6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .content-scroll {
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+  }
+
+  .thread-wrap {
+    width: min(100%, 860px);
+    margin: 0 auto;
+    padding: 34px 24px 20px;
+  }
+
+  .user-question-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 18px;
+  }
+
+  .user-question {
+    max-width: 420px;
+    border-radius: 12px;
+    background: #2a303b;
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 16px 18px;
+    font-size: 16px;
+    color: #e8ebef;
+  }
+
+  .thinking-card {
+    border-radius: 12px;
+    background: rgba(37, 42, 52, 0.96);
+    border: 1px solid rgba(255,255,255,0.07);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: opacity 0.35s ease, max-height 0.45s ease, margin 0.35s ease, transform 0.35s ease;
+    max-height: 420px;
+  }
+
+  .thinking-card.is-hidden {
+    opacity: 0;
+    max-height: 0;
+    margin-bottom: 0;
+    transform: translateY(-10px);
+    border-width: 0;
+  }
+
+  .thinking-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  .thinking-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: #cdd4df;
+  }
+
+  .mini-bot {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #fafafb 0%, #dcdee4 100%);
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .mini-bot::before {
+    content: "";
+    position: absolute;
+    inset: 5px 4px 4px;
+    border-radius: 999px;
+    background: #273140;
+    border: 2px solid #f5a60e;
+  }
+
+  .thinking-body {
+    padding: 12px 16px 14px 18px;
+    color: #d7dce3;
+    font-size: 12px;
+    line-height: 1.75;
+  }
+
+  .thinking-step {
+    position: relative;
+    padding-left: 18px;
+    margin-bottom: 10px;
+  }
+
+  .thinking-step[hidden] { display: none; }
+
+  .thinking-step::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ff9f1c;
+    box-shadow: 0 0 0 2px rgba(255,159,28,0.15);
+  }
+
+  .thinking-step::after {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: 14px;
+    bottom: -12px;
+    width: 1px;
+    background: rgba(255,159,28,0.55);
+  }
+
+  .thinking-step:last-child::after { display: none; }
+
+  .thinking-sub {
+    color: #9da8b7;
+    margin-top: 2px;
+  }
+
+  .answer-box {
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 18px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #dee3ea;
+  }
+
+  .answer-box.is-streaming::after {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 1.1em;
+    margin-left: 4px;
+    background: rgba(255,255,255,0.8);
+    vertical-align: -0.18em;
+    animation: blink-caret 0.9s steps(1) infinite;
+  }
+
+  @keyframes blink-caret {
+    0%, 50% { opacity: 1; }
+    50.01%, 100% { opacity: 0; }
+  }
+
+  .answer-box p {
+    margin: 0 0 14px;
+  }
+
+  .answer-box h3 {
+    margin: 18px 0 8px;
+    font-size: 18px;
+    color: #f4f6f8;
+  }
+
+  .answer-box ul {
+    margin: 8px 0 14px 18px;
+    padding: 0;
+  }
+
+  .answer-box li {
+    margin-bottom: 6px;
+  }
+
+  .accent {
+    color: #f6a024;
+    font-weight: 700;
+  }
+
+  .toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255,255,255,0.45);
+    font-size: 12px;
+    padding-top: 8px;
+  }
+
+  .toolbar[hidden] { display: none; }
+
+  .composer-dock {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    padding: 12px 24px 16px;
+    background: linear-gradient(180deg, rgba(17,22,27,0) 0%, rgba(17,22,27,0.78) 18%, rgba(17,22,27,0.96) 100%);
+    backdrop-filter: blur(10px);
+  }
+
+  .composer {
+    width: min(100%, 612px);
+    margin: 0 auto;
+    background: rgba(35, 40, 49, 0.98);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.24);
+    padding: 14px 14px 12px;
+  }
+
+  .composer textarea {
+    width: 100%;
+    min-height: 76px;
+    resize: none;
+    border: 0;
+    outline: 0;
+    color: #f3f4f6;
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+  .composer textarea::placeholder { color: rgba(255,255,255,0.32); }
+
+  .composer-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .send-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 0;
+    background: #eef1f4;
+    color: #3a4452;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 960px) {
+    body { overflow: auto; }
+    .app-shell { min-height: 100vh; flex-direction: column; }
+    .global-nav {
+      width: 100%;
+      border-right: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 10px;
+    }
+    .sidebar {
+      width: 100%;
+      border-right: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .history-list {
+      max-height: 180px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .content-scroll { overflow: visible; }
+  }
+
+  @media (max-width: 640px) {
+    .history-list { grid-template-columns: 1fr; }
+    .thread-wrap { padding: 22px 16px 20px; }
+    .user-question { font-size: 14px; }
+    .answer-box { font-size: 14px; }
+    .topbar { padding: 0 10px; }
+    .composer-dock { padding: 10px 12px 12px; }
+  }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="global-nav">
+      <div class="nav-logo"></div>
+      <a href="index.html" class="menu-item">发现</a>
+      <div class="menu-item active">对话</div>
+      <a href="fast.html" class="menu-item">快讯</a>
+      <a href="trade.html" class="menu-item">交易</a>
+      <a href="trade2.html" class="menu-item">行情2</a>
+      <a href="ai-watch.html" class="menu-item">AI诊断</a>
+      <a href="authorize.html" class="menu-item">授权</a>
+      <a href="account.html" class="menu-item">账户</a>
+    </aside>
+
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-title">对话</div>
+        <a href="chat.html" class="collapse-btn" aria-label="返回对话页">‹</a>
+      </div>
+
+      <a href="ai-chat.html" class="new-chat">＋ <span>新对话</span></a>
+
+      <div class="section-label">前7天</div>
+      <div class="history-list">
+        <div class="history-item active">
+          <div class="history-title">使用的模型是什么？</div>
+          <div class="history-time">昨天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">联系客服方式指导</div>
+          <div class="history-time">前天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">永续合约转钱到现货损失问题</div>
+          <div class="history-time">前天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">交易策略是否靠谱吗？</div>
+          <div class="history-time">前天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">提现USDT的解决方法</div>
+          <div class="history-time">3天前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">每周市场报告设置与策略调整建议</div>
+          <div class="history-time">3天前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">AI知道 钱包持仓每日走势与链上...</div>
+          <div class="history-time">5天前</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar"></header>
+
+      <div class="content-scroll">
+        <div class="thread-wrap">
+          <div class="user-question-row">
+            <div class="user-question">BTC 巨鲸最近在做什么动作?</div>
+          </div>
+
+          <div class="thinking-card" id="thinkingCard">
+            <div class="thinking-head">
+              <div class="thinking-left">
+                <div class="mini-bot"></div>
+                <span>AI知道</span>
+                <span id="thinkingStatus" style="color: rgba(255,255,255,0.45);">思考中...</span>
+              </div>
+              <div style="color: rgba(255,255,255,0.45);">⌃</div>
+            </div>
+            <div class="thinking-body" id="thinkingBody">
+              <div class="thinking-step" hidden>
+                <div>问题分析完成</div>
+              </div>
+              <div class="thinking-step" hidden>
+                <div>收集相关信息</div>
+                <div class="thinking-sub">Q 市场情绪</div>
+                <div class="thinking-sub">Q 宏观对比</div>
+                <div class="thinking-sub">当前影响市场的主要驱动在风险</div>
+                <div class="thinking-sub">宏观层面: 地缘经济震荡、地缘政策、政策监管、关税和行业轮动、就业等三重风险</div>
+              </div>
+              <div class="thinking-step" hidden>
+                <div>数据处理与分析</div>
+              </div>
+              <div class="thinking-step" hidden>
+                <div>答案生成中...</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="answer-box is-streaming" id="answerBox"></div>
+
+          <template id="answerTemplate">
+            <p>根据 2026 年 3 月 4 日的最新市场数据和情绪分析，当前加密市场正处于“极端恐惧”阶段。比特币 AHR999 指数为 0.325。从历史经验看，这通常是分批进仓（Buy the Dip）的黄金窗口。</p>
+            <p>以下是为您精选的 5 个兼具基本面支撑与反弹潜力的币种：</p>
+            <h3>1. Solana (<span class="accent">$SOL</span>)</h3>
+            <ul>
+              <li><span class="accent">推荐理由：</span><span class="accent">$SOL</span> 展现了极强韧性，目前已经重回关键支撑位。随着 Solana Mobile Seeker 等硬件生态推进，其在支付和去中心化应用领域的领先地位越发稳固。</li>
+              <li><span class="accent">当前状态：</span>价格约 <span class="accent">$86.65</span>，24 小时小幅上涨 0.7%。</li>
+              <li><span class="accent">观点：</span>分析师认为若能突破 90 美元阻力位，有望迅速回升至 120 美元。</li>
+              <li><span class="accent">来源：</span>Solana Price Prediction cryptonews.com</li>
+            </ul>
+            <h3>2. <span class="accent">$NEAR</span> Protocol</h3>
+            <ul>
+              <li><span class="accent">推荐理由：</span>作为 AI 赛道的重要基石，<span class="accent">$NEAR</span> 受益于链上算力与应用生态的发展，具备较高的中期成长性。</li>
+              <li><span class="accent">补充判断：</span>当前阶段更适合逢低分批观察，耐心等待市场情绪修复。</li>
+            </ul>
+          </template>
+
+          <div class="toolbar" id="answerToolbar" hidden>
+              <span>⎘</span>
+              <span>18:38</span>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="composer-dock">
+        <div class="composer">
+            <textarea placeholder="问问就知道"></textarea>
+            <div class="composer-actions">
+              <button class="send-btn" type="button">↑</button>
+            </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const sleep = (ms) => new Promise((resolve) => window.setTimeout(resolve, ms));
+
+    async function streamThread() {
+      const thinkingCard = document.getElementById('thinkingCard');
+      const thinkingStatus = document.getElementById('thinkingStatus');
+      const thinkingSteps = Array.from(document.querySelectorAll('#thinkingBody .thinking-step'));
+      const answerBox = document.getElementById('answerBox');
+      const answerToolbar = document.getElementById('answerToolbar');
+      const answerTemplate = document.getElementById('answerTemplate');
+      const contentScroll = document.querySelector('.content-scroll');
+
+      for (const step of thinkingSteps) {
+        await sleep(480);
+        step.hidden = false;
+        contentScroll.scrollTop = contentScroll.scrollHeight;
+      }
+
+      await sleep(380);
+      thinkingStatus.textContent = '回答生成中...';
+
+      const fragment = answerTemplate.content.cloneNode(true);
+      const nodes = Array.from(fragment.children);
+
+      thinkingStatus.textContent = '思考完成';
+      thinkingCard.classList.add('is-hidden');
+
+      for (const node of nodes) {
+        await sleep(node.tagName === 'UL' ? 520 : 680);
+        answerBox.appendChild(node);
+        contentScroll.scrollTop = contentScroll.scrollHeight;
+      }
+
+      answerToolbar.hidden = false;
+      contentScroll.scrollTop = contentScroll.scrollHeight;
+      answerBox.classList.remove('is-streaming');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      streamThread();
+    });
+  </script>
+  <script src="./shared-topbar.js?v=8"></script>
+</body>
+</html>

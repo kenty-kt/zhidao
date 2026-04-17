@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI助手 · 知道AI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --bg: #12171d;
+    --panel: #242b36;
+    --panel-soft: rgba(255, 255, 255, 0.04);
+    --panel-strong: rgba(255, 255, 255, 0.08);
+    --line: rgba(255, 255, 255, 0.08);
+    --text: #f3f4f6;
+    --muted: #a3acb9;
+    --chip: #20262f;
+    --orange: #ee9a69;
+    --gold: #b69659;
+    --blue: #4f79ff;
+    --green: #2ac179;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    color: var(--text);
+    background:
+      radial-gradient(circle at 14% 22%, rgba(243, 158, 92, 0.17), transparent 18%),
+      radial-gradient(circle at 16% 86%, rgba(243, 158, 92, 0.18), transparent 16%),
+      radial-gradient(circle at 91% 58%, rgba(246, 150, 101, 0.22), transparent 16%),
+      linear-gradient(180deg, #171c22 0%, #11161b 100%);
+    overflow: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+      radial-gradient(circle at center, rgba(255,255,255,0.12) 0.7px, transparent 0.8px);
+    background-size: 100% 1px, 1px 100%, 6px 6px;
+    mix-blend-mode: soft-light;
+    opacity: 0.22;
+    pointer-events: none;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  .app-shell {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    height: 100vh;
+  }
+
+  .global-nav {
+    width: 70px;
+    background: #060b12;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px 0;
+    gap: 8px;
+  }
+
+  .nav-logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .menu-item {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #8da0bf;
+    transition: 0.2s;
+  }
+
+  .menu-item:hover {
+    color: #cdd8e8;
+    background: rgba(255,255,255,0.05);
+  }
+
+  .menu-item.active {
+    color: #fff;
+    background: rgba(14, 165, 255, 0.16);
+    border-color: rgba(14, 165, 255, 0.35);
+    box-shadow: 0 0 12px rgba(14, 165, 255, 0.2);
+  }
+
+  .sidebar {
+    width: 176px;
+    background: #2a3340;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 8px 10px;
+    transition: width 0.22s ease, padding 0.22s ease, border-color 0.22s ease;
+    overflow: hidden;
+  }
+
+  .app-shell.sidebar-collapsed .sidebar {
+    width: 0;
+    padding: 16px 0 10px;
+    border-right-color: transparent;
+  }
+
+  .app-shell.sidebar-collapsed .sidebar > * {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sidebar-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #f8fafc;
+    margin-bottom: 14px;
+    padding: 0 4px;
+  }
+
+  .sidebar-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .collapse-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #d6dae2;
+    transition: background 0.2s ease;
+  }
+
+  .collapse-btn:hover { background: rgba(255,255,255,0.08); }
+
+  .sidebar-reopen {
+    position: fixed;
+    left: 86px;
+    top: 18px;
+    z-index: 20;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(31, 37, 46, 0.9);
+    color: #d6dae2;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+
+  .app-shell.sidebar-collapsed .sidebar-reopen {
+    display: inline-flex;
+  }
+
+  .new-chat {
+    width: 100%;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.52);
+    background: transparent;
+    color: #f8fafc;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .section-label {
+    color: rgba(255,255,255,0.32);
+    font-size: 10px;
+    margin: 4px 4px 10px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    overflow: auto;
+    padding-right: 2px;
+  }
+
+  .history-list::-webkit-scrollbar,
+  .main-area::-webkit-scrollbar { width: 4px; }
+  .history-list::-webkit-scrollbar-thumb,
+  .main-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+  .history-list::-webkit-scrollbar-track,
+  .main-area::-webkit-scrollbar-track { background: transparent; }
+
+  .history-item {
+    border-radius: 10px;
+    padding: 10px 8px;
+    color: #d8dee8;
+  }
+
+  .history-item.active { background: rgba(0,0,0,0.18); }
+
+  .history-title {
+    font-size: 12px;
+    line-height: 1.35;
+    margin-bottom: 4px;
+  }
+
+  .history-time {
+    font-size: 10px;
+    color: rgba(255,255,255,0.42);
+  }
+
+  .main-area {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .topbar {
+    height: 46px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .login-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(4, 8, 15, 0.68);
+    backdrop-filter: blur(10px);
+  }
+
+  .login-modal.open { display: flex; }
+
+  .login-panel {
+    width: min(100%, 480px);
+    border-radius: 22px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: #23272e;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.45);
+    padding: 22px;
+  }
+
+  .login-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 18px;
+  }
+
+  .login-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: #f8fafc;
+  }
+
+  .login-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    border: 0;
+    background: transparent;
+    color: #96a0b2;
+    font-size: 28px;
+    cursor: pointer;
+  }
+
+  .login-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #f3f4f6;
+    margin-bottom: 10px;
+  }
+
+  .login-field,
+  .login-code-wrap {
+    width: 100%;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: #39414e;
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    padding: 0 18px;
+    margin-bottom: 16px;
+  }
+
+  .login-field input,
+  .login-code-wrap input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #f8fafc;
+    font-size: 18px;
+    font-family: inherit;
+  }
+
+  .login-field input::placeholder,
+  .login-code-wrap input::placeholder {
+    color: rgba(255,255,255,0.35);
+  }
+
+  .login-code-wrap {
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .send-code-btn {
+    border: 0;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    font-size: 16px;
+    flex: 0 0 auto;
+    cursor: pointer;
+  }
+
+  .login-submit {
+    width: 100%;
+    height: 58px;
+    border-radius: 16px;
+    border: 0;
+    background: #f3f4f6;
+    color: #1f2937;
+    font-size: 22px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 6px;
+  }
+
+  .login-or {
+    text-align: center;
+    color: rgba(255,255,255,0.42);
+    font-size: 16px;
+    margin: 14px 0;
+  }
+
+  .login-socials {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .login-social {
+    height: 58px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.04);
+    background: #39414e;
+    color: #f3f4f6;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .hero-wrap {
+    flex: 1;
+    min-height: 780px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 42px 30px 40px;
+    position: relative;
+  }
+
+  .hero-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 50% 30%, rgba(255,255,255,0.02), transparent 30%),
+      radial-gradient(circle at 48% 49%, rgba(0,0,0,0.16), transparent 25%);
+    pointer-events: none;
+  }
+
+  .mascot {
+    width: 82px;
+    height: 82px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #fafafb 0%, #dcdee4 100%);
+    box-shadow:
+      0 12px 36px rgba(0,0,0,0.28),
+      inset 0 -6px 10px rgba(0,0,0,0.07);
+    position: relative;
+    margin-bottom: 22px;
+  }
+
+  .mascot::before,
+  .mascot::after {
+    content: "";
+    position: absolute;
+    top: 26px;
+    width: 10px;
+    height: 26px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #81858d, #4b515b);
+  }
+
+  .mascot::before { left: -4px; }
+  .mascot::after { right: -4px; }
+
+  .mascot-face {
+    position: absolute;
+    left: 13px;
+    top: 17px;
+    width: 56px;
+    height: 40px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, #33404f, #1c2430);
+    border: 3px solid #f59f0c;
+    box-shadow: inset 0 4px 8px rgba(255,255,255,0.06);
+  }
+
+  .mascot-eye {
+    position: absolute;
+    top: 13px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fdf335;
+    box-shadow: 0 0 10px rgba(253,243,53,0.55);
+  }
+
+  .mascot-eye.left { left: 12px; }
+  .mascot-eye.right { right: 12px; }
+
+  .mascot-mouth {
+    position: absolute;
+    left: 21px;
+    bottom: 9px;
+    width: 14px;
+    height: 8px;
+    border: 2px solid #7cf37f;
+    border-top: 0;
+    border-radius: 0 0 14px 14px;
+  }
+
+  .hero-title {
+    font-size: clamp(34px, 4vw, 58px);
+    line-height: 1.15;
+    font-weight: 500;
+    margin: 0;
+    text-align: center;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,0.96);
+  }
+
+  .hero-subtitle {
+    margin-top: 10px;
+    font-size: clamp(16px, 1.35vw, 26px);
+    color: rgba(255,255,255,0.74);
+    text-align: center;
+  }
+
+  .category-bar {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 980px;
+  }
+
+  .category-chip {
+    min-height: 36px;
+    padding: 0 16px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(35, 41, 50, 0.92);
+    color: #dce2eb;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
+    cursor: pointer;
+  }
+
+  .category-chip.active {
+    color: #fff;
+    border-color: rgba(255,255,255,0.55);
+    background: rgba(26, 30, 38, 0.96);
+  }
+
+  .category-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    font-size: 15px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  .suggest-chip {
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+    background: rgba(35, 41, 50, 0.9);
+    color: #dadfea;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .suggest-grid {
+    margin-top: 46px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    max-width: 940px;
+  }
+
+  .suggest-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .suggest-chip {
+    min-height: 30px;
+    padding: 0 14px;
+    font-size: 12px;
+    color: #c6ccd7;
+    background: rgba(39, 45, 56, 0.82);
+  }
+
+  .composer {
+    width: min(100%, 612px);
+    margin-top: auto;
+    background: rgba(35, 40, 49, 0.98);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 16px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.24);
+    padding: 14px 14px 12px;
+  }
+
+  .composer textarea {
+    width: 100%;
+    min-height: 76px;
+    resize: none;
+    border: 0;
+    outline: 0;
+    color: #f3f4f6;
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+  }
+
+  .composer textarea::placeholder { color: rgba(255,255,255,0.32); }
+
+  .composer-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 4px;
+  }
+
+  .send-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 0;
+    background: #eef1f4;
+    color: #3a4452;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  @media (max-width: 960px) {
+    body { overflow: auto; }
+    .app-shell { min-height: 100vh; flex-direction: column; }
+    .app-shell.sidebar-collapsed .sidebar {
+      width: 100%;
+      padding: 0;
+      border-bottom-color: transparent;
+      max-height: 0;
+    }
+    .app-shell.sidebar-collapsed .sidebar > * {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .global-nav {
+      width: 100%;
+      border-right: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 10px;
+    }
+    .sidebar {
+      width: 100%;
+      border-right: 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding-bottom: 12px;
+    }
+    .history-list {
+      max-height: 180px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .main-area { overflow: visible; }
+    .hero-wrap { min-height: auto; padding: 28px 18px 24px; }
+    .composer { width: min(100%, 680px); }
+    .sidebar-reopen { left: 16px; top: 72px; }
+  }
+
+  @media (max-width: 640px) {
+    .history-list { grid-template-columns: 1fr; }
+    .hero-title { font-size: 28px; }
+    .hero-subtitle { font-size: 15px; }
+    .category-chip { font-size: 12px; padding: 0 12px; min-height: 32px; }
+    .suggest-chip { font-size: 11px; padding: 0 10px; }
+    .composer { margin-top: 40px; }
+  }
+</style>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="global-nav">
+      <div class="nav-logo"></div>
+      <a href="index.html" class="menu-item">发现</a>
+      <div class="menu-item active">对话</div>
+      <a href="fast.html" class="menu-item">快讯</a>
+      <a href="trade.html" class="menu-item">交易</a>
+      <a href="trade2.html" class="menu-item">行情2</a>
+      <a href="ai-watch.html" class="menu-item">AI诊断</a>
+      <a href="authorize.html" class="menu-item">授权</a>
+      <a href="account.html" class="menu-item">账户</a>
+    </aside>
+
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-title">对话</div>
+        <a href="chat.html" class="collapse-btn" aria-label="返回对话页">‹</a>
+      </div>
+
+      <a href="ai-chat.html" class="new-chat">＋ <span>新对话</span></a>
+
+      <div class="section-label">前7天</div>
+      <div class="history-list">
+        <div class="history-item active">
+          <div class="history-title">使用的模型是什么？</div>
+          <div class="history-time">昨天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">联系客服方式指导</div>
+          <div class="history-time">前天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">永续合约转钱到现货损失问题</div>
+          <div class="history-time">前天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">交易策略是否靠谱吗？</div>
+          <div class="history-time">前天</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">提现USDT的解决方法</div>
+          <div class="history-time">3天前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">每周市场报告设置与策略调整建议</div>
+          <div class="history-time">3天前</div>
+        </div>
+        <div class="history-item">
+          <div class="history-title">AI知道 钱包持仓每日走势与链上...</div>
+          <div class="history-time">5天前</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <button id="sidebarReopenBtn" class="sidebar-reopen" type="button" aria-label="展开对话历史">›</button>
+
+    <main class="main-area">
+      <header class="topbar"></header>
+
+      <section class="hero-wrap">
+        <div class="mascot" aria-hidden="true">
+          <div class="mascot-face">
+            <span class="mascot-eye left"></span>
+            <span class="mascot-eye right"></span>
+            <span class="mascot-mouth"></span>
+          </div>
+        </div>
+
+        <h1 class="hero-title">你好~ 我什么都知道</h1>
+        <div class="hero-subtitle">您的行情助手，随时为您解答加密货币相关问题</div>
+
+        <div class="category-bar">
+          <button class="category-chip active" type="button" data-category="hot"><span class="category-icon">🔥</span><span>热门趋势</span></button>
+          <button class="category-chip" type="button" data-category="crypto"><span class="category-icon" style="color:#f59e0b;">₿</span><span>加密货币</span></button>
+          <button class="category-chip" type="button" data-category="macro"><span class="category-icon" style="color:#60a5fa;">⟳</span><span>宏观</span></button>
+          <button class="category-chip" type="button" data-category="sentiment"><span class="category-icon" style="color:#fb7185;">♡</span><span>市场情绪</span></button>
+          <button class="category-chip" type="button" data-category="workflow"><span class="category-icon" style="color:#a855f7;">⇆</span><span>工作链</span></button>
+          <button class="category-chip" type="button" data-category="prediction"><span class="category-icon" style="color:#3b82f6;">◎</span><span>预测市场</span></button>
+          <button class="category-chip" type="button" data-category="learning"><span class="category-icon" style="color:#10b981;">⬢</span><span>学习</span></button>
+        </div>
+
+        <div id="suggestGrid" class="suggest-grid"></div>
+
+        <div class="composer">
+          <textarea placeholder="问问就知道"></textarea>
+          <div class="composer-actions">
+            <button class="send-btn" type="button">↑</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script>
+    (function () {
+      const SIDEBAR_STATE_KEY = "zhidao_ai_chat_sidebar_v1";
+      const CATEGORY_QUESTIONS = {
+        hot: [
+          "BTC 近 4 小时资金流向怎么看？",
+          "ETH 短线是否有补涨信号？",
+          "本周市场热点会围绕哪些赛道展开？",
+          "稳定币监管最新进展会怎么影响市场？",
+          "NFT 最近回暖是真需求还是短炒？",
+          "DeFi 新叙事里有哪些值得关注的项目？",
+          "本周最值得盯的链上数据有哪些？",
+          "现在适合做趋势跟随还是震荡交易？",
+          "山寨币轮动到哪个阶段了？"
+        ],
+        crypto: [
+          "BTC/USDT 当前位置适合追多吗？",
+          "ETH 现阶段是补仓机会还是减仓窗口？",
+          "SOL 最近强势的核心逻辑是什么？",
+          "BNB 生态最近有什么值得关注的变化？",
+          "XRP/USDT 的关键压力位和支撑位在哪？",
+          "DOGE 这种 Meme 币该怎么看仓位管理？",
+          "OKB 最近和平台业务联动强吗？",
+          "LTC 还有没有资金回流的可能？"
+        ],
+        macro: [
+          "美联储利率路径对加密市场影响有多大？",
+          "美元指数回落会不会带动 BTC 继续上行？",
+          "今晚 CPI 公布前应该怎么做风险控制？",
+          "纳指和 BTC 的相关性最近增强了吗？",
+          "美国大选周期会给加密市场带来什么主题机会？",
+          "中东地缘风险升温时加密资产通常怎么表现？",
+          "黄金上涨为什么有时利多 BTC 有时反而压制？",
+          "如果美债收益率继续上行，市场会先杀哪类资产？"
+        ],
+        sentiment: [
+          "现在市场情绪是贪婪还是观望？",
+          "社媒热度上升是不是山寨起涨前信号？",
+          "恐慌指数回落后，适合做左侧布局吗？",
+          "大 V 集体喊多时要不要反着看？",
+          "链上巨鲸加仓会不会带动散户追涨？",
+          "交易所净流入上升通常意味着什么？",
+          "最近的爆仓分布说明多空哪边更脆弱？",
+          "新闻面偏暖但价格不涨，说明了什么？"
+        ],
+        workflow: [
+          "我想搭一套每天复盘的提问模板，怎么设计？",
+          "如何把行情、新闻、链上数据串成固定工作流？",
+          "日内交易前应该先检查哪 5 项指标？",
+          "适合我这种上班族的加密交易流程怎么搭？",
+          "怎么把 AI 对话结果整理成可执行交易清单？",
+          "做波段时，什么时候该更新止盈止损？",
+          "如何记录每次开仓的理由和复盘结果？",
+          "我想建立一个风险预警工作流，应该包含哪些步骤？"
+        ],
+        prediction: [
+          "BTC 今晚突破前高的概率有多大？",
+          "ETH 下周跑赢 BTC 的概率怎么看？",
+          "SOL 本轮能不能重新站上关键高点？",
+          "本周最可能出现异动的主流币是哪一个？",
+          "山寨季什么时候启动的概率更高？",
+          "预测市场里现在最值得跟踪的主题是什么？",
+          "如果 BTC 横盘，资金更可能流向哪条赛道？",
+          "未来 24 小时波动率会不会明显放大？"
+        ],
+        learning: [
+          "什么是永续合约和现货的核心区别？",
+          "新手如何理解资金费率对交易的影响？",
+          "链上数据里最常见的几个指标怎么读？",
+          "做仓位管理时为什么不能满仓？",
+          "K 线里的假突破应该怎么识别？",
+          "止盈止损的合理设置方法有哪些？",
+          "如何判断一个叙事是长期主题还是短期炒作？",
+          "加密市场里什么叫高胜率而不是高频率？"
+        ]
+      };
+
+      const suggestGrid = document.getElementById("suggestGrid");
+      const categoryButtons = Array.from(document.querySelectorAll("[data-category]"));
+      const appShell = document.querySelector(".app-shell");
+      const collapseBtn = document.querySelector(".collapse-btn");
+      const reopenBtn = document.getElementById("sidebarReopenBtn");
+
+      function setSidebarCollapsed(collapsed) {
+        appShell.classList.toggle("sidebar-collapsed", collapsed);
+        if (collapseBtn) {
+          collapseBtn.textContent = collapsed ? "›" : "‹";
+          collapseBtn.setAttribute("aria-label", collapsed ? "展开对话页" : "收起对话页");
+        }
+        if (reopenBtn) {
+          reopenBtn.setAttribute("aria-hidden", collapsed ? "false" : "true");
+        }
+        localStorage.setItem(SIDEBAR_STATE_KEY, collapsed ? "collapsed" : "expanded");
+      }
+
+      function renderSuggestions(category) {
+        const questions = CATEGORY_QUESTIONS[category] || CATEGORY_QUESTIONS.hot;
+        const rows = [];
+        for (let i = 0; i < questions.length; i += 4) rows.push(questions.slice(i, i + 4));
+        suggestGrid.innerHTML = rows.map((row) => `
+          <div class="suggest-row">
+            ${row.map((question) => `<a href="ai-chat-thread.html" class="suggest-chip">${question}</a>`).join("")}
+          </div>
+        `).join("");
+      }
+
+      categoryButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          categoryButtons.forEach((item) => item.classList.toggle("active", item === button));
+          renderSuggestions(button.dataset.category);
+        });
+      });
+
+      if (collapseBtn) {
+        collapseBtn.addEventListener("click", (event) => {
+          event.preventDefault();
+          setSidebarCollapsed(!appShell.classList.contains("sidebar-collapsed"));
+        });
+      }
+
+      if (reopenBtn) {
+        reopenBtn.addEventListener("click", () => {
+          setSidebarCollapsed(false);
+        });
+      }
+
+      renderSuggestions("hot");
+      setSidebarCollapsed(localStorage.getItem(SIDEBAR_STATE_KEY) === "collapsed");
+    })();
+  </script>
+  <script src="./shared-topbar.js?v=8"></script>
+</body>
+</html>

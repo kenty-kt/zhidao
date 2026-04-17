@@ -147,6 +147,13 @@
       line-height: 1.7;
       margin-top: 16px;
     }
+    .score-panel-link {
+      cursor: pointer;
+    }
+    .score-panel-link:hover {
+      border-color: rgba(56,189,248,0.26);
+      box-shadow: 0 18px 40px rgba(2, 8, 23, 0.22);
+    }
     .hero {
       padding: 22px 22px 20px;
       display: flex;
@@ -159,6 +166,36 @@
       display: flex;
       gap: 10px;
       flex-wrap: wrap;
+    }
+    .hero-title-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .privacy-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: #dbeafe;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+    }
+    .privacy-btn:hover {
+      border-color: rgba(56, 189, 248, 0.35);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .privacy-btn svg {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+    .privacy-btn svg path {
+      fill: #cfe6ff;
     }
     .action-btn {
       height: 38px;
@@ -227,6 +264,55 @@
       color: #fff;
       border-color: rgba(56,189,248,0.36);
       background: rgba(56,189,248,0.16);
+    }
+    .workspace-bottom-table {
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+    }
+    .workspace-desk-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .workspace-desk-tab {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: #dbeafe;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .workspace-desk-tab.active {
+      background: rgba(56,189,248,0.16);
+      border-color: rgba(56,189,248,0.34);
+      color: #fff;
+    }
+    .workspace-desk-panel {
+      display: none;
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+    .workspace-desk-panel.active {
+      display: block;
+    }
+    .action-mini {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbe4f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
     }
     .manage-grid {
       display: grid;
@@ -328,6 +414,27 @@
       font-weight: 800;
       cursor: pointer;
     }
+    .workspace-select {
+      height: 36px;
+      min-width: 150px;
+      padding: 0 34px 0 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background:
+        linear-gradient(45deg, transparent 50%, #94a3b8 50%) calc(100% - 14px) calc(50% - 2px) / 6px 6px no-repeat,
+        linear-gradient(135deg, #94a3b8 50%, transparent 50%) calc(100% - 10px) calc(50% - 2px) / 6px 6px no-repeat,
+        rgba(255,255,255,0.04);
+      color: #e5e7eb;
+      font-size: 13px;
+      font-weight: 700;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .workspace-select:focus {
+      border-color: rgba(56,189,248,0.38);
+      box-shadow: 0 0 0 3px rgba(56,189,248,0.12);
+    }
     @media (max-width: 1100px) {
       .position-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .position-actions { grid-template-columns: 1fr; }
@@ -336,11 +443,6 @@
 </head>
 <body>
   <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
-    <div class="flex items-center gap-3">
-      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
-      <div class="font-bold tracking-wide text-sm">账户中心</div>
-      <span class="px-2 py-1 rounded-full border border-sky-300/35 bg-sky-500/15 text-[11px] text-sky-200">Account Overview</span>
-    </div>
   </header>
 
   <div class="grid grid-cols-[70px_1fr] h-[calc(100vh-56px)]">
@@ -350,6 +452,7 @@
       <a href="chat.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
       <a href="fast.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">快讯</a>
       <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="trade2.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">行情2</a>
       <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
       <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
       <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">账户</div>
@@ -359,11 +462,13 @@
       <div class="mx-auto w-full max-w-[1240px] space-y-5">
         <section class="panel hero">
           <div>
-            <div class="text-3xl md:text-4xl leading-none font-extrabold text-white">账户总览</div>
+            <div class="hero-title-row">
+              <div class="text-3xl md:text-4xl leading-none font-extrabold text-white">账户总览</div>
+              <button id="privacyToggleBtn" class="privacy-btn" type="button" aria-label="隐藏数字" title="隐藏数字"></button>
+            </div>
             <div class="mt-3 text-sm text-slate-400">统一查看授权状态、资产摘要、账户结构和 AI 评分。</div>
             <div class="mt-4 flex flex-wrap gap-2">
-              <span id="envPill" class="pill">未连接</span>
-              <span id="sourcePill" class="pill">数据源待检查</span>
+              <span id="sourcePill" class="pill" hidden style="display:none;">数据源待检查</span>
               <span id="lastUpdatedPill" class="pill">最近更新 --</span>
             </div>
           </div>
@@ -376,7 +481,7 @@
 
         <section class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div class="stat-card">
-            <div class="subtle">总权益</div>
+            <div class="subtle">总资产</div>
             <div id="totalEquityEl" class="mt-3 text-3xl font-black text-white">--</div>
             <div class="mt-3 subtle">账户状态</div>
             <div id="accountStatusText" class="mt-1 text-sm text-slate-200">未读取到账户数据</div>
@@ -384,14 +489,12 @@
           <div class="stat-card">
             <div class="subtle">可用余额</div>
             <div id="availBalanceEl" class="mt-3 text-3xl font-black text-white">--</div>
-            <div class="mt-3 subtle">现金余额</div>
-            <div id="cashBalanceEl" class="mt-1 text-sm text-slate-200">--</div>
           </div>
           <div class="stat-card">
             <div class="subtle">账户结构</div>
             <div id="exposureValueEl" class="mt-3 text-3xl font-black text-white">--</div>
             <div class="mt-3 subtle">仓位分布</div>
-            <div id="exposureMixEl" class="mt-1 text-sm text-slate-200">等待模拟持仓数据</div>
+            <div id="exposureMixEl" class="mt-1 text-sm text-slate-200">等待现货与合约资产结构数据</div>
           </div>
         </section>
 
@@ -438,13 +541,12 @@
             </div>
           </div>
 
-          <div class="panel p-5">
+          <div id="scorePanel" class="panel p-5">
             <div class="section-title">AI 账户评分</div>
             <div class="subtle mt-1">基于账户连接状态、持仓集中度、杠杆和盈亏结构做轻量评分。</div>
             <div class="score-ring" id="scoreRing" style="--score-deg: 0deg;">
               <div class="score-inner">
                 <div id="scoreValueEl" class="score-value">--</div>
-                <div class="score-label">健康度</div>
               </div>
             </div>
             <div id="scoreListEl" class="score-list">等待账户与持仓数据，稍后将生成评分说明。</div>
@@ -457,20 +559,45 @@
               <div class="section-title">账户工作区</div>
               <div class="subtle mt-1">在同一个区域查看最近成交和当前持仓，并直接模拟修改止盈止损或执行关仓。</div>
             </div>
-            <span id="positionsCountPill" class="pill">仓位 0</span>
-          </div>
-          <div class="tab-row mb-4">
-            <button id="tabTradesBtn" class="tab-btn active" type="button">最近成交记录</button>
-            <button id="tabPositionsBtn" class="tab-btn" type="button">持仓</button>
-          </div>
-          <div id="workspaceTradesPanel">
-            <div id="recentTradesWrap">
-              <div class="empty-box">正在生成模拟成交记录…</div>
+            <div class="flex items-center gap-3">
+              <select id="workspaceExchangeSelect" class="workspace-select" aria-label="交易所切换">
+                <option value="binance">币安</option>
+                <option value="okx" selected>欧易OKX</option>
+                <option value="hyper">Hyperliquid</option>
+              </select>
+              <span id="positionsCountPill" class="pill">仓位 0</span>
             </div>
           </div>
-          <div id="workspacePositionsPanel" style="display:none;">
-            <div id="positionsManagerWrap">
-              <div class="empty-box">正在生成模拟持仓数据…</div>
+          <div class="workspace-bottom-table">
+            <div class="workspace-desk-tabs">
+              <button id="tabPositionsBtn" class="workspace-desk-tab active" type="button">持仓(2)</button>
+              <button id="tabOpenOrdersBtn" class="workspace-desk-tab" type="button">当前委托(8)</button>
+              <button id="tabTradesBtn" class="workspace-desk-tab" type="button">交易历史</button>
+              <button id="tabHistoryOrdersBtn" class="workspace-desk-tab" type="button">订单历史</button>
+            </div>
+            <div id="workspacePositionsPanel" class="workspace-desk-panel active">
+              <div class="tab-row mb-4">
+                <button id="subtabSpotBtn" class="tab-btn active" type="button">现货</button>
+                <button id="subtabContractBtn" class="tab-btn" type="button">合约</button>
+              </div>
+              <div id="positionsManagerWrap">
+                <div class="empty-box">正在生成模拟持仓数据…</div>
+              </div>
+            </div>
+            <div id="workspaceOpenOrdersPanel" class="workspace-desk-panel">
+              <div id="openOrdersWrap">
+                <div class="empty-box">正在生成模拟委托记录…</div>
+              </div>
+            </div>
+            <div id="workspaceTradesPanel" class="workspace-desk-panel">
+              <div id="recentTradesWrap">
+                <div class="empty-box">正在生成模拟成交记录…</div>
+              </div>
+            </div>
+            <div id="workspaceHistoryOrdersPanel" class="workspace-desk-panel">
+              <div id="historyOrdersWrap">
+                <div class="empty-box">正在生成模拟订单历史…</div>
+              </div>
             </div>
           </div>
         </section>
@@ -484,7 +611,6 @@
       const AUTH_STORAGE_KEY = "zhidao_authorizations_v1";
       const totalEquityEl = document.getElementById("totalEquityEl");
       const availBalanceEl = document.getElementById("availBalanceEl");
-      const cashBalanceEl = document.getElementById("cashBalanceEl");
       const exposureValueEl = document.getElementById("exposureValueEl");
       const exposureMixEl = document.getElementById("exposureMixEl");
       const accountStatusText = document.getElementById("accountStatusText");
@@ -497,19 +623,40 @@
       const scoreRing = document.getElementById("scoreRing");
       const scoreValueEl = document.getElementById("scoreValueEl");
       const scoreListEl = document.getElementById("scoreListEl");
+      const scorePanel = document.getElementById("scorePanel");
       const recentTradesWrap = document.getElementById("recentTradesWrap");
+      const openOrdersWrap = document.getElementById("openOrdersWrap");
+      const historyOrdersWrap = document.getElementById("historyOrdersWrap");
       const positionsManagerWrap = document.getElementById("positionsManagerWrap");
       const refreshBtn = document.getElementById("refreshBtn");
+      const privacyToggleBtn = document.getElementById("privacyToggleBtn");
       const tabTradesBtn = document.getElementById("tabTradesBtn");
       const tabPositionsBtn = document.getElementById("tabPositionsBtn");
+      const tabOpenOrdersBtn = document.getElementById("tabOpenOrdersBtn");
+      const tabHistoryOrdersBtn = document.getElementById("tabHistoryOrdersBtn");
+      const subtabSpotBtn = document.getElementById("subtabSpotBtn");
+      const subtabContractBtn = document.getElementById("subtabContractBtn");
+      const workspaceExchangeSelect = document.getElementById("workspaceExchangeSelect");
       const workspaceTradesPanel = document.getElementById("workspaceTradesPanel");
+      const workspaceOpenOrdersPanel = document.getElementById("workspaceOpenOrdersPanel");
+      const workspaceHistoryOrdersPanel = document.getElementById("workspaceHistoryOrdersPanel");
       const workspacePositionsPanel = document.getElementById("workspacePositionsPanel");
 
       let latestAccount = null;
       let latestPositions = [];
+      let latestSpotHoldings = [];
       let localConnections = [];
       let latestTrades = [];
+      let latestOpenOrders = [];
+      let latestHistoryOrders = [];
       let positionDrafts = {};
+      let currentPositionsSubtab = "spot";
+      let currentWorkspaceExchange = "okx";
+      let currentWorkspaceDesk = "positions";
+      let privacyEnabled = true;
+      const originalTextMap = new WeakMap();
+      const EYE_OPEN_ICON = `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M515.2 224c-307.2 0-492.8 313.6-492.8 313.6s214.4 304 492.8 304 492.8-304 492.8-304S822.4 224 515.2 224zM832 652.8c-102.4 86.4-211.2 140.8-320 140.8s-217.6-51.2-320-140.8c-35.2-32-70.4-64-99.2-99.2-6.4-6.4-9.6-12.8-16-19.2 3.2-6.4 9.6-12.8 12.8-19.2 25.6-35.2 57.6-70.4 92.8-102.4 99.2-89.6 208-144 329.6-144s230.4 54.4 329.6 144c35.2 32 64 67.2 92.8 102.4 3.2 6.4 9.6 12.8 12.8 19.2-3.2 6.4-9.6 12.8-16 19.2C902.4 585.6 870.4 620.8 832 652.8z"></path><path d="M512 345.6c-96 0-169.6 76.8-169.6 169.6 0 96 76.8 169.6 169.6 169.6 96 0 169.6-76.8 169.6-169.6C681.6 422.4 604.8 345.6 512 345.6zM512 640c-67.2 0-121.6-54.4-121.6-121.6 0-67.2 54.4-121.6 121.6-121.6 67.2 0 121.6 54.4 121.6 121.6C633.6 582.4 579.2 640 512 640z"></path></svg>`;
+      const EYE_CLOSED_ICON = `<svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M469.333333 681.386667c-36.053333-2.432-71.253333-8.533333-104.96-17.92l-69.802666 149.674666a42.368 42.368 0 0 1-56.533334 20.266667 42.666667 42.666667 0 0 1-20.821333-56.32l66.986667-143.658667a451.712 451.712 0 0 1-148.906667-112.682666 388.693333 388.693333 0 0 1-70.570667-119.338667 42.666667 42.666667 0 1 1 80.128-29.354667 303.445333 303.445333 0 0 0 55.210667 93.098667C270.634667 547.413333 383.018667 597.333333 505.728 597.333333c122.752 0 235.136-49.962667 305.706667-132.181333a303.445333 303.445333 0 0 0 55.210666-93.098667 42.666667 42.666667 0 0 1 80.128 29.354667 388.693333 388.693333 0 0 1-70.570666 119.338667 423.68 423.68 0 0 1-18.773334 20.48l104.362667 104.362666a42.666667 42.666667 0 0 1-0.298667 60.032 42.368 42.368 0 0 1-60.032 0.298667l-109.653333-109.653333c-20.48 14.08-42.24 26.581333-65.024 37.418666l66.901333 143.36a42.666667 42.666667 0 0 1-20.821333 56.362667 42.368 42.368 0 0 1-56.533333-20.266667l-69.717334-149.546666a520.533333 520.533333 0 0 1-91.946666 16.810666v130.645334A42.666667 42.666667 0 0 1 512 853.333333c-23.722667 0-42.666667-18.944-42.666667-42.24v-129.706666z"></path><path d="M176.128 524.373333a42.368 42.368 0 0 1 60.032 0.256 42.666667 42.666667 0 0 1 0.298667 60.074667l-121.216 121.216a42.368 42.368 0 0 1-60.074667-0.298667 42.666667 42.666667 0 0 1-0.298667-60.032l121.258667-121.258666z"></path></svg>`;
 
       function formatUsd(n) {
         const v = Number(n);
@@ -528,6 +675,43 @@
         el.className = "pill" + (type ? ` ${type}` : "");
       }
 
+      function maskDigits(text) {
+        return String(text || "").replace(/[0-9]/g, "*");
+      }
+
+      function applyPrivacyMask() {
+        const main = document.querySelector("main");
+        if (!main) return;
+        const walker = document.createTreeWalker(main, NodeFilter.SHOW_TEXT, {
+          acceptNode(node) {
+            if (!node.parentElement) return NodeFilter.FILTER_REJECT;
+            if (node.parentElement.closest("script, style")) return NodeFilter.FILTER_REJECT;
+            if (originalTextMap.has(node)) return NodeFilter.FILTER_ACCEPT;
+            if (!node.textContent || !/[0-9]/.test(node.textContent)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        });
+        const nodes = [];
+        while (walker.nextNode()) nodes.push(walker.currentNode);
+        nodes.forEach((node) => {
+          if (!originalTextMap.has(node)) originalTextMap.set(node, node.textContent);
+          node.textContent = privacyEnabled ? maskDigits(originalTextMap.get(node)) : originalTextMap.get(node);
+        });
+      }
+
+      function syncPrivacyButton() {
+        if (!privacyToggleBtn) return;
+        privacyToggleBtn.innerHTML = privacyEnabled ? EYE_CLOSED_ICON : EYE_OPEN_ICON;
+        privacyToggleBtn.setAttribute("aria-label", privacyEnabled ? "显示数字" : "隐藏数字");
+        privacyToggleBtn.title = privacyEnabled ? "显示数字" : "隐藏数字";
+      }
+
+      function setPrivacy(enabled) {
+        privacyEnabled = enabled;
+        syncPrivacyButton();
+        applyPrivacyMask();
+      }
+
       function readLocalConnections() {
         try {
           const raw = localStorage.getItem(AUTH_STORAGE_KEY);
@@ -538,7 +722,28 @@
         }
       }
 
-      function makeMockAccount(connections) {
+      function normalizeWorkspaceExchange(exchange) {
+        if (exchange === "binance" || exchange === "hyper" || exchange === "okx") return exchange;
+        return "okx";
+      }
+
+      function getWorkspaceConnections(connections, exchangeOverride) {
+        const exchange = normalizeWorkspaceExchange(exchangeOverride || currentWorkspaceExchange);
+        const title = exchange === "binance" ? "币安" : exchange === "hyper" ? "Hyperliquid" : "欧易OKX";
+        const matched = (connections || []).filter((item) => item.exchange === exchange);
+        if (matched.length) {
+          return matched.map((item, index) => ({ ...item, isDefault: index === 0 }));
+        }
+        return [{
+          exchange,
+          title,
+          envType: "simulated",
+          isDefault: true,
+        }];
+      }
+
+      function makeMockAccount(connections, exchangeOverride) {
+        connections = getWorkspaceConnections(connections, exchangeOverride);
         const primary = connections.find((item) => item.isDefault) || connections[0] || {
           exchange: "okx",
           title: "欧易OKX",
@@ -557,7 +762,8 @@
         };
       }
 
-      function makeMockPositions(connections) {
+      function makeMockPositions(connections, exchangeOverride) {
+        connections = getWorkspaceConnections(connections, exchangeOverride);
         const primary = connections.find((item) => item.isDefault) || connections[0] || {
           exchange: "okx",
           title: "欧易OKX",
@@ -596,6 +802,34 @@
         };
       }
 
+      function makeMockSpotHoldings(connections, exchangeOverride) {
+        connections = getWorkspaceConnections(connections, exchangeOverride);
+        const primary = connections.find((item) => item.isDefault) || connections[0] || {
+          exchange: "okx",
+          title: "欧易OKX",
+          envType: "simulated",
+        };
+        const base = primary.exchange === "binance"
+          ? [
+              { asset: "BTC", qty: 0.0842, price: 73540, value: 6194.07, changePct: 1.01 },
+              { asset: "ETH", qty: 1.72, price: 3582, value: 6161.04, changePct: 1.85 },
+              { asset: "BNB", qty: 6.5, price: 537, value: 3490.5, changePct: 2.87 },
+            ]
+          : primary.exchange === "hyper"
+          ? [
+              { asset: "USDC", qty: 4820, price: 1, value: 4820, changePct: 0 },
+              { asset: "BTC", qty: 0.034, price: 75680, value: 2573.12, changePct: 1.69 },
+              { asset: "ETH", qty: 0.74, price: 3445, value: 2549.3, changePct: -1.85 },
+            ]
+          : [
+              { asset: "BTC", qty: 0.062, price: 75680, value: 4692.16, changePct: 1.97 },
+              { asset: "ETH", qty: 1.06, price: 3578, value: 3792.68, changePct: 2.52 },
+              { asset: "SOL", qty: 15.2, price: 164.8, value: 2504.96, changePct: -2.14 },
+              { asset: "USDT", qty: 3625, price: 1, value: 3625, changePct: 0 },
+            ];
+        return { ok: true, holdings: base };
+      }
+
       function scoreState(score) {
         if (score >= 80) return { text: "健康", type: "ok" };
         if (score >= 60) return { text: "关注", type: "warn" };
@@ -618,43 +852,40 @@
         if (!accountResp || accountResp.ok === false) {
           totalEquityEl.textContent = "--";
           availBalanceEl.textContent = "--";
-          cashBalanceEl.textContent = "--";
           accountStatusText.textContent = "当前展示默认模拟账户";
-          setPill(envPill, "模拟盘", "warn");
-          setPill(sourcePill, "默认模拟数据", "warn");
-          setPill(okxStatusEl, "模拟盘", "warn");
+          setPill(okxStatusEl, "未连接", "warn");
           okxDescEl.textContent = "未录入授权，已自动加载默认模拟账户。";
           return;
         }
 
         totalEquityEl.textContent = formatUsd(accountResp.totalEqUsd);
         availBalanceEl.textContent = formatUsd(accountResp.usdtAvail);
-        cashBalanceEl.textContent = formatUsd(accountResp.usdtCash);
         const title = accountResp.title || "OKX";
-        accountStatusText.textContent = accountResp.simulated ? `已连接 ${title} 模拟盘账户` : `已连接 ${title} 实盘账户`;
-        setPill(envPill, accountResp.simulated ? "模拟盘" : "实盘", accountResp.simulated ? "warn" : "ok");
-        setPill(sourcePill, "本地模拟数据", "warn");
-        setPill(okxStatusEl, accountResp.simulated ? "模拟盘" : "已连接", accountResp.simulated ? "warn" : "ok");
-        okxDescEl.textContent = `${title} · 总权益 ${formatUsd(accountResp.totalEqUsd)} · 可用余额 ${formatUsd(accountResp.usdtAvail)}`;
+        accountStatusText.textContent = `已连接 ${title} 账户`;
+        setPill(okxStatusEl, "已连接", accountResp.simulated ? "warn" : "ok");
+        okxDescEl.textContent = `${title} · 总资产 ${formatUsd(accountResp.totalEqUsd)} · 可用余额 ${formatUsd(accountResp.usdtAvail)}`;
       }
 
       function renderPositions(positionsResp) {
         const items = positionsResp && Array.isArray(positionsResp.positions) ? positionsResp.positions : [];
         latestPositions = items;
-        positionsCountPill.textContent = `仓位 ${items.length}`;
+        positionsCountPill.textContent = `持仓 ${latestSpotHoldings.length + items.length}`;
 
-        if (!items.length) {
+        const spotTotal = latestSpotHoldings.reduce((sum, item) => sum + Math.abs(Number(item.value || 0)), 0);
+        const contractTotal = items.reduce((sum, item) => sum + Math.abs(Number(item.usdtValue || 0)), 0);
+
+        if (!items.length && !latestSpotHoldings.length) {
           exposureValueEl.textContent = "0";
-          exposureMixEl.textContent = "当前没有活跃持仓，可前往交易页查看模拟行情。";
+          exposureMixEl.textContent = "当前没有活跃持仓，现货与合约资产均处于空仓状态。";
           positionsManagerWrap.innerHTML = '<div class="empty-box">当前没有活跃持仓。你可以先完成授权，或在交易页观察模拟行情。</div>';
           return;
         }
 
-        const totalNotional = items.reduce((sum, item) => sum + Math.abs(Number(item.usdtValue || 0)), 0);
+        const totalNotional = spotTotal + contractTotal;
         const longCount = items.filter((item) => String(item.side).toUpperCase() === "LONG").length;
         const shortCount = items.filter((item) => String(item.side).toUpperCase() === "SHORT").length;
         exposureValueEl.textContent = formatUsd(totalNotional);
-        exposureMixEl.textContent = `多头 ${longCount} 个 · 空头 ${shortCount} 个 · 共 ${items.length} 个仓位`;
+        exposureMixEl.textContent = `现货 ${formatUsd(spotTotal)} · 合约 ${formatUsd(contractTotal)}${items.length ? ` · 合约多头 ${longCount} 个 · 合约空头 ${shortCount} 个` : ""}`;
 
         const cards = items.map((item) => {
           const key = item.instrument || item.asset;
@@ -692,8 +923,32 @@
             </div>
           `;
         }).join("");
+        const spotCards = latestSpotHoldings.map((item) => {
+          const changeClass = Number(item.changePct || 0) >= 0 ? "text-emerald-300" : "text-rose-300";
+          const sign = Number(item.changePct || 0) >= 0 ? "+" : "";
+          return `
+            <div class="position-card">
+              <div class="position-top">
+                <div>
+                  <div class="position-name">${item.asset || "--"} <span class="${changeClass}" style="font-size:12px;">现货</span></div>
+                  <div class="position-meta">按最新价格估值 · 可直接在交易页查看</div>
+                </div>
+                <div class="${changeClass}" style="font-size:16px;font-weight:900;">${sign}${formatNum(item.changePct, 2)}%</div>
+              </div>
+              <div class="position-stat-grid">
+                <div class="position-stat"><div class="position-stat-label">持仓市值</div><div class="position-stat-value">${formatUsd(item.value)}</div></div>
+                <div class="position-stat"><div class="position-stat-label">数量</div><div class="position-stat-value">${formatNum(item.qty, 4)}</div></div>
+                <div class="position-stat"><div class="position-stat-label">现价</div><div class="position-stat-value">${formatUsd(item.price)}</div></div>
+                <div class="position-stat"><div class="position-stat-label">类型</div><div class="position-stat-value">现货</div></div>
+              </div>
+            </div>
+          `;
+        }).join("");
 
-        positionsManagerWrap.innerHTML = `<div class="manage-grid">${cards}</div>`;
+        const content = currentPositionsSubtab === "spot"
+          ? (spotCards || '<div class="empty-box">当前没有现货持仓。</div>')
+          : (cards || '<div class="empty-box">当前没有合约持仓。</div>');
+        positionsManagerWrap.innerHTML = `<div class="manage-grid">${content}</div>`;
       }
 
       function computeScore() {
@@ -745,7 +1000,6 @@
         scoreRing.style.setProperty("--score-deg", `${Math.round(score / 100 * 360)}deg`);
         scoreValueEl.textContent = String(score);
         scoreListEl.textContent = notes.join(" ");
-        setPill(sourcePill, `AI 评分：${state.text}`, state.type);
       }
 
       function renderLocalConnections() {
@@ -776,9 +1030,15 @@
           setPill(okxStatusEl, "默认模拟", "warn");
           okxDescEl.textContent = "未录入授权，当前展示默认模拟账户与持仓。";
         }
+        if (scorePanel) {
+          const unauthorized = !localConnections.length;
+          scorePanel.classList.toggle("score-panel-link", unauthorized);
+          scorePanel.title = unauthorized ? "点击打开账户弹窗" : "";
+        }
       }
 
-      function makeMockTrades(connections) {
+      function makeMockTrades(connections, exchangeOverride) {
+        connections = getWorkspaceConnections(connections, exchangeOverride);
         const primary = connections.find((item) => item.isDefault) || connections[0] || { exchange: "okx", title: "OKX" };
         const exchangeName = primary.title || "OKX";
         latestTrades = primary.exchange === "binance"
@@ -810,6 +1070,51 @@
               { asset: "PEPE", side: "卖出", price: 0.0000125, qty: 1100000, pnl: 7.3, time: "昨天 10:14", exchange: exchangeName },
               { asset: "ETH", side: "卖出", price: 3580, qty: 0.41, pnl: 9.8, time: "2天前 22:50", exchange: exchangeName },
             ];
+      }
+
+      function makeMockOpenOrders(connections, exchangeOverride) {
+        connections = getWorkspaceConnections(connections, exchangeOverride);
+        const primary = connections.find((item) => item.isDefault) || connections[0] || { exchange: "okx", title: "OKX" };
+        const name = primary.title || "OKX";
+        latestOpenOrders = primary.exchange === "binance"
+          ? [
+              { asset: "BTC/USDT", side: "买入", type: "限价", price: "$72,880", qty: "0.15", status: "挂单中", time: "09:42:10", action: "撤单" },
+              { asset: "ETH/USDT", side: "卖出", type: "止盈", price: "$3,612", qty: "0.80", status: "待触发", time: "09:30:42", action: "编辑" },
+              { asset: "BNB/USDT", side: "买入", type: "限价", price: "$531.2", qty: "3.2", status: "挂单中", time: "08:57:48", action: "撤单" },
+            ]
+          : primary.exchange === "hyper"
+          ? [
+              { asset: "BTC/USDT", side: "买入", type: "限价", price: "$74,120", qty: "0.08", status: "挂单中", time: "10:08:12", action: "撤单" },
+              { asset: "HYPE/USDT", side: "卖出", type: "止盈", price: "$7.68", qty: "80", status: "待触发", time: "09:11:40", action: "编辑" },
+              { asset: "SOL/USDT", side: "买入", type: "市价", price: "按市价", qty: "4.5", status: "排队中", time: "08:41:34", action: "取消" },
+            ]
+          : [
+              { asset: "BTC/USDT", side: "买入", type: "限价", price: "$74,020", qty: "0.12", status: "挂单中", time: "09:42:10", action: "撤单" },
+              { asset: "ETH/USDT", side: "卖出", type: "限价", price: "$3,588", qty: "0.90", status: "部分成交", time: "09:30:42", action: "编辑" },
+              { asset: "SOL/USDT", side: "买入", type: "止损", price: "$162.8", qty: "8.0", status: "待触发", time: "09:22:56", action: "撤单" },
+            ];
+        latestOpenOrders = latestOpenOrders.map((item) => ({ ...item, exchange: name }));
+      }
+
+      function makeMockHistoryOrders(connections, exchangeOverride) {
+        connections = getWorkspaceConnections(connections, exchangeOverride);
+        const primary = connections.find((item) => item.isDefault) || connections[0] || { exchange: "okx", title: "OKX" };
+        const name = primary.title || "OKX";
+        latestHistoryOrders = primary.exchange === "binance"
+          ? [
+              { time: "昨天 22:10", asset: "BTC/USDT", orderType: "限价", side: "买入", price: "$72,200", qty: "0.18", status: "已成交", note: "Binance 回踩加仓" },
+              { time: "昨天 21:44", asset: "ETH/USDT", orderType: "止盈", side: "卖出", price: "$3,640", qty: "0.80", status: "已成交", note: "自动止盈" },
+            ]
+          : primary.exchange === "hyper"
+          ? [
+              { time: "昨天 22:10", asset: "BTC/USDT", orderType: "限价", side: "买入", price: "$74,050", qty: "0.06", status: "已成交", note: "Hyperliquid 分批挂单" },
+              { time: "昨天 20:36", asset: "HYPE/USDT", orderType: "止损", side: "卖出", price: "$7.02", qty: "60", status: "已撤销", note: "波动恢复" },
+            ]
+          : [
+              { time: "昨天 22:10", asset: "BTC/USDT", orderType: "限价", side: "买入", price: "$73,520", qty: "0.16", status: "已成交", note: "OKX 回踩加仓" },
+              { time: "昨天 21:44", asset: "ETH/USDT", orderType: "止盈", side: "卖出", price: "$3,612", qty: "0.80", status: "已成交", note: "自动止盈" },
+            ];
+        latestHistoryOrders = latestHistoryOrders.map((item) => ({ ...item, exchange: name }));
       }
 
       function renderRecentTrades() {
@@ -850,12 +1155,68 @@
         `;
       }
 
+      function renderOpenOrders() {
+        if (!latestOpenOrders.length) {
+          openOrdersWrap.innerHTML = '<div class="empty-box">暂无模拟委托记录。</div>';
+          return;
+        }
+        const rows = latestOpenOrders.map((item) => `
+          <tr>
+            <td><div class="font-semibold text-slate-100">${item.asset}</div><div class="text-[11px] text-slate-500 mt-1">${item.exchange}</div></td>
+            <td>${item.side}</td>
+            <td>${item.type}</td>
+            <td class="right">${item.price}</td>
+            <td class="right">${item.qty}</td>
+            <td class="right">${item.status}</td>
+            <td class="right">${item.time}</td>
+            <td class="right"><button class="action-mini" type="button">${item.action}</button></td>
+          </tr>
+        `).join("");
+        openOrdersWrap.innerHTML = `<div class="overflow-auto"><table><thead><tr><th>币种</th><th>方向</th><th>类型</th><th class="right">委托价</th><th class="right">数量</th><th class="right">状态</th><th class="right">时间</th><th class="right">操作</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      }
+
+      function renderHistoryOrders() {
+        if (!latestHistoryOrders.length) {
+          historyOrdersWrap.innerHTML = '<div class="empty-box">暂无模拟订单历史。</div>';
+          return;
+        }
+        const rows = latestHistoryOrders.map((item) => `
+          <tr>
+            <td>${item.time}</td>
+            <td><div class="font-semibold text-slate-100">${item.asset}</div><div class="text-[11px] text-slate-500 mt-1">${item.exchange}</div></td>
+            <td>${item.orderType}</td>
+            <td>${item.side}</td>
+            <td class="right">${item.price}</td>
+            <td class="right">${item.qty}</td>
+            <td class="right">${item.status}</td>
+            <td class="right">${item.note}</td>
+          </tr>
+        `).join("");
+        historyOrdersWrap.innerHTML = `<div class="overflow-auto"><table><thead><tr><th>时间</th><th>币种</th><th>订单类型</th><th>方向</th><th class="right">委托价</th><th class="right">数量</th><th class="right">状态</th><th class="right">备注</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+      }
+
       function switchWorkspaceTab(tab) {
-        const isTrades = tab === "trades";
-        tabTradesBtn.classList.toggle("active", isTrades);
-        tabPositionsBtn.classList.toggle("active", !isTrades);
-        workspaceTradesPanel.style.display = isTrades ? "" : "none";
-        workspacePositionsPanel.style.display = isTrades ? "none" : "";
+        currentWorkspaceDesk = tab;
+        const map = {
+          positions: workspacePositionsPanel,
+          openOrders: workspaceOpenOrdersPanel,
+          trades: workspaceTradesPanel,
+          historyOrders: workspaceHistoryOrdersPanel,
+        };
+        tabPositionsBtn.classList.toggle("active", tab === "positions");
+        tabOpenOrdersBtn.classList.toggle("active", tab === "openOrders");
+        tabTradesBtn.classList.toggle("active", tab === "trades");
+        tabHistoryOrdersBtn.classList.toggle("active", tab === "historyOrders");
+        Object.entries(map).forEach(([key, panel]) => {
+          panel.classList.toggle("active", key === tab);
+        });
+      }
+
+      function switchPositionsSubtab(tab) {
+        currentPositionsSubtab = tab;
+        subtabSpotBtn.classList.toggle("active", tab === "spot");
+        subtabContractBtn.classList.toggle("active", tab === "contract");
+        renderPositions({ ok: true, positions: latestPositions });
       }
 
       function updatePositionDraft(key, field, value) {
@@ -894,22 +1255,54 @@
         if (action === "save") savePositionSettings(key);
       });
 
-      tabTradesBtn.addEventListener("click", () => switchWorkspaceTab("trades"));
       tabPositionsBtn.addEventListener("click", () => switchWorkspaceTab("positions"));
+      tabOpenOrdersBtn.addEventListener("click", () => switchWorkspaceTab("openOrders"));
+      tabTradesBtn.addEventListener("click", () => switchWorkspaceTab("trades"));
+      tabHistoryOrdersBtn.addEventListener("click", () => switchWorkspaceTab("historyOrders"));
+      subtabSpotBtn.addEventListener("click", () => switchPositionsSubtab("spot"));
+      subtabContractBtn.addEventListener("click", () => switchPositionsSubtab("contract"));
+      if (workspaceExchangeSelect) {
+        workspaceExchangeSelect.addEventListener("change", () => {
+          currentWorkspaceExchange = normalizeWorkspaceExchange(workspaceExchangeSelect.value);
+          loadAll();
+        });
+      }
+      if (scorePanel) {
+        scorePanel.addEventListener("click", () => {
+          if (localConnections.length) return;
+          const accountModal = document.getElementById("sharedAccountModal");
+          if (accountModal) {
+            accountModal.classList.add("open");
+            accountModal.setAttribute("aria-hidden", "false");
+            return;
+          }
+          document.dispatchEvent(new CustomEvent("zhidao-open-account-modal"));
+        });
+      }
+      privacyToggleBtn.addEventListener("click", () => setPrivacy(!privacyEnabled));
 
       function loadAll() {
         lastUpdatedPill.textContent = "最近更新 加载中…";
         positionDrafts = {};
         renderLocalConnections();
-        const finalAccount = makeMockAccount(localConnections);
-        const finalPositions = makeMockPositions(localConnections);
+        if (workspaceExchangeSelect) workspaceExchangeSelect.value = currentWorkspaceExchange;
+        const finalAccount = makeMockAccount(localConnections, currentWorkspaceExchange);
+        const finalPositions = makeMockPositions(localConnections, currentWorkspaceExchange);
+        const finalSpotHoldings = makeMockSpotHoldings(localConnections, currentWorkspaceExchange);
+        latestSpotHoldings = finalSpotHoldings.holdings || [];
         renderAccount(finalAccount);
         renderPositions(finalPositions);
-        makeMockTrades(localConnections);
+        makeMockTrades(localConnections, currentWorkspaceExchange);
+        makeMockOpenOrders(localConnections, currentWorkspaceExchange);
+        makeMockHistoryOrders(localConnections, currentWorkspaceExchange);
         renderRecentTrades();
+        renderOpenOrders();
+        renderHistoryOrders();
         computeScore();
-        switchWorkspaceTab("trades");
+        switchPositionsSubtab("spot");
+        switchWorkspaceTab(currentWorkspaceDesk);
         lastUpdatedPill.textContent = `最近更新 ${new Date().toLocaleTimeString()}`;
+        applyPrivacyMask();
       }
 
       refreshBtn.addEventListener("click", loadAll);
@@ -917,4 +1310,5 @@
     })();
   </script>
 </body>
+<script src="./shared-topbar.js?v=8"></script>
 </html>

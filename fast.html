@@ -47,6 +47,355 @@
       transition: 0.2s ease;
     }
     .news-card:hover { border-color: rgba(96,165,250,0.22); transform: translateY(-1px); }
+    .story-card {
+      padding: 16px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025));
+    }
+    .story-top {
+      display: block;
+    }
+    .story-title {
+      font-size: 21px;
+      line-height: 1.35;
+      font-weight: 800;
+      color: #f8fafc;
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+    .story-summary {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #9eacbf;
+      margin-bottom: 10px;
+    }
+    .story-summary.clamped {
+      max-height: calc(1.7em * 3);
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .story-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #fbbf24;
+      font-size: 13px;
+      font-weight: 800;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      cursor: pointer;
+    }
+    .story-thumb-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      width: min(100%, 400px);
+      margin-top: 10px;
+      margin-bottom: 6px;
+    }
+    .story-thumb {
+      position: relative;
+      min-height: 92px;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      background-size: cover;
+      background-position: center;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+      cursor: pointer;
+    }
+    .story-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(10,14,20,0.04), rgba(10,14,20,0.22));
+      pointer-events: none;
+    }
+    .hero-badge {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      z-index: 1;
+      width: 30px;
+      height: 30px;
+      border-radius: 10px;
+      background: rgba(5,10,22,0.8);
+      border: 1px solid rgba(255,255,255,0.09);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e7eef9;
+      font-size: 13px;
+      box-shadow: 0 12px 24px rgba(0,0,0,0.22);
+    }
+    .hero-overlay {
+      display: none;
+    }
+    .quote-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(248,250,252,0.08), rgba(248,250,252,0.04));
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 14px 16px;
+      margin-bottom: 12px;
+    }
+    .quote-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .quote-side {
+      height: 34px;
+      min-width: 46px;
+      padding: 0 12px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      color: #fff;
+    }
+    .quote-side.sell { background: linear-gradient(135deg, #fb7185, #f43f5e); }
+    .quote-side.buy { background: linear-gradient(135deg, #34d399, #10b981); }
+    .quote-symbol {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 28px;
+      font-weight: 800;
+      color: #f59e0b;
+      flex: 0 0 auto;
+    }
+    .asset-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 24px;
+      font-weight: 800;
+      color: #f8fafc;
+      flex: 0 0 auto;
+    }
+    .quote-ticker {
+      font-size: 16px;
+      font-weight: 800;
+      color: #f8fafc;
+    }
+    .quote-price {
+      text-align: right;
+      flex: 0 0 auto;
+    }
+    .quote-price strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      color: #f8fafc;
+      letter-spacing: -0.03em;
+    }
+    .quote-price span {
+      display: block;
+      margin-top: 6px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+    .quote-price .up { color: #34d399; }
+    .quote-price .down { color: #f43f5e; }
+    .insight-box {
+      border-radius: 18px;
+      border: 1px solid rgba(251,191,36,0.18);
+      background: linear-gradient(180deg, rgba(251,191,36,0.08), rgba(250,204,21,0.04));
+      padding: 12px 14px;
+      margin-bottom: 12px;
+    }
+    .insight-head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fbbf24;
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .metric-card {
+      border-radius: 18px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 12px 10px;
+      text-align: center;
+    }
+    .metric-label {
+      font-size: 11px;
+      color: #7b8ca3;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 800;
+      color: #f8fafc;
+      letter-spacing: -0.03em;
+    }
+    .metric-value.up { color: #34d399; }
+    .metric-value.down { color: #f43f5e; }
+    .story-cta {
+      width: 100%;
+      height: 52px;
+      border-radius: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 800;
+      text-decoration: none;
+      border: 1px solid transparent;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .story-cta.buy {
+      color: #b9f5dc;
+      background: rgba(16,185,129,0.16);
+      border-color: rgba(16,185,129,0.28);
+    }
+    .story-cta.sell {
+      color: #ffd2d9;
+      background: rgba(244,63,94,0.16);
+      border-color: rgba(244,63,94,0.28);
+    }
+    .image-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(2, 6, 23, 0.82);
+      backdrop-filter: blur(10px);
+    }
+    .image-lightbox.open { display: flex; }
+    .lightbox-panel {
+      position: relative;
+      max-width: min(92vw, 1080px);
+      max-height: 88vh;
+      width: auto;
+    }
+    .lightbox-image {
+      display: block;
+      max-width: 100%;
+      max-height: 88vh;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+      background: #0f172a;
+    }
+    .lightbox-close {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(15,23,42,0.7);
+      color: #f8fafc;
+      font-size: 18px;
+      cursor: pointer;
+    }
+    .account-empty {
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.03);
+      padding: 18px 16px;
+      text-align: center;
+    }
+    .account-empty-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      margin-bottom: 8px;
+    }
+    .account-empty-desc {
+      font-size: 12px;
+      color: #94a3b8;
+      line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .account-empty-btn {
+      height: 36px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(96,165,250,0.28);
+      background: rgba(59,130,246,0.14);
+      color: #dbeafe;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .auth-lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(2, 6, 23, 0.8);
+      backdrop-filter: blur(10px);
+    }
+    .auth-lightbox.open { display: flex; }
+    .auth-panel {
+      position: relative;
+      width: min(1100px, 96vw);
+      height: min(860px, 92vh);
+      border-radius: 22px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #0b1120;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    }
+    .auth-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #0b1120;
+    }
+    .auth-close {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 1;
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(15,23,42,0.7);
+      color: #f8fafc;
+      font-size: 18px;
+      cursor: pointer;
+    }
     .chip {
       display: inline-flex;
       align-items: center;
@@ -164,22 +513,35 @@
     }
     .content-shell {
       display: grid;
-      grid-template-columns: minmax(0, 1fr) 500px;
+      grid-template-columns: minmax(0, 1fr) 400px;
       min-width: 0;
     }
     @media (max-width: 1180px) {
       .content-shell { grid-template-columns: minmax(0, 1fr); }
       .right-panel { border-left: none; border-top: 1px solid rgba(255,255,255,0.05); max-height: none; }
     }
+    @media (max-width: 900px) {
+      .story-title { font-size: 22px; }
+      .quote-strip { flex-direction: column; align-items: stretch; }
+      .quote-price { text-align: left; }
+      .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 640px) {
+      .story-card { padding: 14px; }
+      .story-title { font-size: 18px; }
+      .story-summary { font-size: 13px; }
+      .story-thumb-grid { width: min(100%, 320px); gap: 8px; }
+      .story-thumb { min-height: 78px; border-radius: 10px; }
+      .quote-symbol { width: 46px; height: 46px; font-size: 22px; }
+      .asset-icon { width: 46px; height: 46px; font-size: 20px; }
+      .quote-price strong { font-size: 22px; }
+      .metric-grid { grid-template-columns: 1fr; }
+      .story-cta { height: 48px; font-size: 15px; }
+    }
   </style>
 </head>
 <body>
   <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#070b12]/90 backdrop-blur z-40">
-    <div class="flex items-center gap-3">
-      <a href="index.html" class="px-3 h-8 inline-flex items-center rounded-lg border border-white/15 bg-white/5 text-xs font-semibold text-slate-300 hover:text-white">返回首页</a>
-      <div class="font-bold tracking-wide text-sm">快讯中心</div>
-      <span class="px-2 py-1 rounded-full border border-sky-300/35 bg-sky-500/15 text-[11px] text-sky-200">Fast News</span>
-    </div>
   </header>
 
   <div class="page-shell">
@@ -189,6 +551,7 @@
       <a href="chat.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
       <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">快讯</div>
       <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <a href="trade2.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">行情2</a>
       <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
       <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
       <a href="account.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">账户</a>
@@ -202,84 +565,160 @@
             <div class="space-y-4">
               <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
                 <div class="text-xs text-slate-500 pt-3">16:42</div>
-                <div class="news-card p-4">
-                  <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="text-[10px] text-slate-500 font-medium">REUTERS</span>
-                    <span class="chip" style="color:#34d399;border-color:rgba(52,211,153,.24);background:rgba(16,185,129,.12)">利多信号</span>
-                    <span class="chip">加密市场</span>
+                <div class="news-card story-card" data-story-card>
+                  <div class="story-top">
+                    <div>
+                      <h3 class="story-title" data-title>加载中...</h3>
+                      <div class="story-summary clamped" data-summary>正在读取 RSS 正文内容...</div>
+                      <button class="story-link" type="button" data-story-toggle hidden>查看全部 <span>›</span></button>
+                      <div class="story-thumb-grid" data-thumbs hidden></div>
+                    </div>
                   </div>
-                  <h3 class="text-base font-bold text-white mb-2">比特币算力创历史新高，机构累积热潮持续升温</h3>
-                  <div class="ai-box mb-3">
-                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 深度解读</div>
-                    <div class="text-sm text-slate-300 leading-relaxed">链上数据显示大量资金从交易所转移至冷钱包，72 小时内网络哈希率显著抬升。历史上类似阶段通常伴随 BTC 风险偏好回暖。</div>
-                  </div>
-                  <div class="grid grid-cols-2 md:grid-cols-4 gap-2 mb-3">
-                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">推荐资产</div><div class="text-sm font-bold text-white mt-1">BTC</div></div>
-                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">AI 评分</div><div class="text-sm font-bold text-emerald-400 mt-1">91</div></div>
-                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">情绪</div><div class="text-sm font-bold text-emerald-400 mt-1">偏多</div></div>
-                    <div class="news-card p-2.5"><div class="text-[10px] text-slate-500">跟踪</div><div class="text-sm font-bold text-white mt-1">ETF 流入</div></div>
-                  </div>
-                  <div class="flex items-center justify-between gap-3 flex-wrap">
-                    <div class="text-xs text-slate-500">AI 建议：优先观察 BTC 回调后的确认机会。</div>
-                    <a class="action-btn primary" href="trade.html">去交易</a>
+                  <div style="margin-top:16px;">
+                    <div class="quote-strip">
+                      <div class="quote-left">
+                        <div class="quote-side sell">利空</div>
+                        <div class="asset-icon">₿</div>
+                        <div>
+                          <div class="quote-ticker">BTC</div>
+                        </div>
+                      </div>
+                      <div class="quote-price">
+                        <strong>$74,315.75</strong>
+                        <span class="up">+0.5%</span>
+                      </div>
+                    </div>
+                    <div class="insight-box">
+                      <div class="insight-head"><span>🤖</span><span>知道 AI</span></div>
+                      <div class="text-[15px] text-slate-200 leading-8">NXC 的动作更像是业务聚焦，而不是彻底离场。对 BTC 来说，这意味着机构对数字资产的配置逻辑仍在，只是风险敞口从交易所股权切换为链上核心资产。</div>
+                    </div>
+                    <div class="metric-grid">
+                      <div class="metric-card"><div class="metric-label">24h 涨跌</div><div class="metric-value up">+0.5%</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最高</div><div class="metric-value">$74,727.29</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最低</div><div class="metric-value">$73,617.32</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 交易量</div><div class="metric-value">$41.31B</div></div>
+                    </div>
+                    <a class="story-cta sell" href="trade.html">↘ 卖出</a>
                   </div>
                 </div>
               </div>
 
               <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
                 <div class="text-xs text-slate-500 pt-3">15:18</div>
-                <div class="news-card p-4">
-                  <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="text-[10px] text-slate-500 font-medium">BLOOMBERG</span>
-                    <span class="chip" style="color:#fbbf24;border-color:rgba(251,191,36,.24);background:rgba(245,158,11,.12)">中性偏强</span>
-                    <span class="chip">宏观</span>
+                <div class="news-card story-card" data-story-card>
+                  <div class="story-top">
+                    <div>
+                      <h3 class="story-title" data-title>加载中...</h3>
+                      <div class="story-summary clamped" data-summary>正在读取 RSS 正文内容...</div>
+                      <button class="story-link" type="button" data-story-toggle hidden>查看全部 <span>›</span></button>
+                      <div class="story-thumb-grid" data-thumbs hidden></div>
+                    </div>
                   </div>
-                  <h3 class="text-base font-bold text-white mb-2">美债收益率回落，风险资产短线获得喘息窗口</h3>
-                  <div class="ai-box mb-3">
-                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 摘要</div>
-                    <div class="text-sm text-slate-300 leading-relaxed">收益率回落缓和了高估值资产压力，短线有利于科技和加密风险偏好修复，但持续性仍需看后续通胀数据。</div>
-                  </div>
-                  <div class="flex items-center justify-between gap-3 flex-wrap">
-                    <div class="text-xs text-slate-500">关联资产：ETH / SOL / NVDA</div>
-                    <a class="action-btn" href="index.html">返回对话</a>
+                  <div style="margin-top:16px;">
+                    <div class="quote-strip">
+                      <div class="quote-left">
+                        <div class="quote-side buy">利多</div>
+                        <div class="asset-icon">Ξ</div>
+                        <div>
+                          <div class="quote-ticker">ETH</div>
+                        </div>
+                      </div>
+                      <div class="quote-price">
+                        <strong>$2,335.77</strong>
+                        <span class="up">+1.5%</span>
+                      </div>
+                    </div>
+                    <div class="insight-box">
+                      <div class="insight-head"><span>🤖</span><span>知道 AI</span></div>
+                      <div class="text-[15px] text-slate-200 leading-8">如果收益率继续下探，科技和主流币更容易出现估值修复行情；但若后续数据反弹，当前这波修复更可能只是情绪回补，而不是趋势反转。</div>
+                    </div>
+                    <div class="metric-grid">
+                      <div class="metric-card"><div class="metric-label">24h 涨跌</div><div class="metric-value up">+1.5%</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最高</div><div class="metric-value">$2,401.35</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最低</div><div class="metric-value">$2,311.49</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 交易量</div><div class="metric-value">$20.44B</div></div>
+                    </div>
+                    <a class="story-cta buy" href="trade.html">↗ 买入</a>
                   </div>
                 </div>
               </div>
 
               <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
                 <div class="text-xs text-slate-500 pt-3">13:56</div>
-                <div class="news-card p-4">
-                  <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="text-[10px] text-slate-500 font-medium">THE BLOCK</span>
-                    <span class="chip" style="color:#fb7185;border-color:rgba(248,113,113,.24);background:rgba(248,113,113,.12)">风险预警</span>
-                    <span class="chip">DeFi</span>
+                <div class="news-card story-card" data-story-card>
+                  <div class="story-top">
+                    <div>
+                      <h3 class="story-title" data-title>加载中...</h3>
+                      <div class="story-summary clamped" data-summary>正在读取 RSS 正文内容...</div>
+                      <button class="story-link" type="button" data-story-toggle hidden>查看全部 <span>›</span></button>
+                      <div class="story-thumb-grid" data-thumbs hidden></div>
+                    </div>
                   </div>
-                  <h3 class="text-base font-bold text-white mb-2">某链上协议出现异常大额转出，社区关注资金安全</h3>
-                  <div class="ai-box mb-3">
-                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 风险分析</div>
-                    <div class="text-sm text-slate-300 leading-relaxed">该事件更偏向情绪扰动，短线可能压制 DeFi 板块估值。若扩散到主流协议，需关注市场避险情绪上升。</div>
+                  <div style="margin-top:16px;">
+                    <div class="quote-strip">
+                      <div class="quote-left">
+                        <div class="quote-side sell">利空</div>
+                        <div class="asset-icon">A</div>
+                        <div>
+                          <div class="quote-ticker">AAVE</div>
+                        </div>
+                      </div>
+                      <div class="quote-price">
+                        <strong>$107.84</strong>
+                        <span class="up">+8.53%</span>
+                      </div>
+                    </div>
+                    <div class="insight-box">
+                      <div class="insight-head"><span>🤖</span><span>知道 AI</span></div>
+                      <div class="text-[15px] text-slate-200 leading-8">当前更像情绪扰动而非已经落地的系统性爆雷，但一旦协议 TVL 连续流失，DeFi 估值会进入“去风险溢价”阶段。短线不宜追高小市值代币。</div>
+                    </div>
+                    <div class="metric-grid">
+                      <div class="metric-card"><div class="metric-label">24h 涨跌</div><div class="metric-value up">+8.53%</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最高</div><div class="metric-value">$108.62</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最低</div><div class="metric-value">$97.61</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 交易量</div><div class="metric-value">$388.54M</div></div>
+                    </div>
+                    <a class="story-cta sell" href="trade.html">↘ 卖出</a>
                   </div>
-                  <div class="text-xs text-slate-500">建议：避免追高小市值 DeFi 代币，优先观察市场是否出现二次发酵。</div>
                 </div>
               </div>
 
               <div class="grid grid-cols-[54px_1fr] md:grid-cols-[90px_1fr] gap-3 items-start">
                 <div class="text-xs text-slate-500 pt-3">11:07</div>
-                <div class="news-card p-4">
-                  <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <span class="text-[10px] text-slate-500 font-medium">CNBC</span>
-                    <span class="chip" style="color:#34d399;border-color:rgba(52,211,153,.24);background:rgba(16,185,129,.12)">主线逻辑</span>
-                    <span class="chip">AI 科技</span>
+                <div class="news-card story-card" data-story-card>
+                  <div class="story-top">
+                    <div>
+                      <h3 class="story-title" data-title>加载中...</h3>
+                      <div class="story-summary clamped" data-summary>正在读取 RSS 正文内容...</div>
+                      <button class="story-link" type="button" data-story-toggle hidden>查看全部 <span>›</span></button>
+                      <div class="story-thumb-grid" data-thumbs hidden></div>
+                    </div>
                   </div>
-                  <h3 class="text-base font-bold text-white mb-2">AI 基础设施资本开支继续上修，算力链景气延续</h3>
-                  <div class="ai-box mb-3">
-                    <div class="text-[10px] font-bold text-sky-300 uppercase tracking-[0.08em] mb-1">AI 观点</div>
-                    <div class="text-sm text-slate-300 leading-relaxed">上游 GPU、HBM 与先进封装仍是最强主线，市场短线波动不改中期产业资本支出方向。</div>
-                  </div>
-                  <div class="grid grid-cols-3 gap-2">
-                    <div class="news-card p-2.5 text-center"><div class="text-[10px] text-slate-500">MSFT</div><div class="text-sm font-bold text-white mt-1">78</div></div>
-                    <div class="news-card p-2.5 text-center"><div class="text-[10px] text-slate-500">GOOGL</div><div class="text-sm font-bold text-white mt-1">85</div></div>
-                    <div class="news-card p-2.5 text-center"><div class="text-[10px] text-slate-500">NVDA</div><div class="text-sm font-bold text-emerald-400 mt-1">94</div></div>
+                  <div style="margin-top:16px;">
+                    <div class="quote-strip">
+                      <div class="quote-left">
+                        <div class="quote-side buy">利多</div>
+                        <div class="asset-icon">◎</div>
+                        <div>
+                          <div class="quote-ticker">SOL</div>
+                        </div>
+                      </div>
+                      <div class="quote-price">
+                        <strong>$83.59</strong>
+                        <span class="up">+2.6%</span>
+                      </div>
+                    </div>
+                    <div class="insight-box">
+                      <div class="insight-head"><span>🤖</span><span>知道 AI</span></div>
+                      <div class="text-[15px] text-slate-200 leading-8">这类新闻对科技主线的影响不只是情绪，还会改变市场对未来两个季度盈利预期。高 Beta 资产往往先于基本面验证而被资金定价。</div>
+                    </div>
+                    <div class="metric-grid">
+                      <div class="metric-card"><div class="metric-label">24h 涨跌</div><div class="metric-value up">+2.6%</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最高</div><div class="metric-value">$87.45</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 最低</div><div class="metric-value">$82.75</div></div>
+                      <div class="metric-card"><div class="metric-label">24h 交易量</div><div class="metric-value">$4.42B</div></div>
+                    </div>
+                    <a class="story-cta buy" href="trade.html">↗ 买入</a>
                   </div>
                 </div>
               </div>
@@ -294,7 +733,7 @@
             <div class="text-xs font-bold text-white">AI 账户评分</div>
             <span class="ai-badge">实时更新</span>
           </div>
-          <div class="card-inner p-3 mb-3 flex items-center gap-3">
+          <div id="accountHealthCard" class="card-inner p-3 mb-3 flex items-center gap-3" hidden style="display:none;">
             <div class="relative w-14 h-14 flex-shrink-0">
               <svg viewBox="0 0 56 56" class="w-14 h-14 -rotate-90">
                 <circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="5"></circle>
@@ -316,13 +755,21 @@
               <div class="text-[10px] text-slate-300 leading-relaxed mt-1">账户已连接，当前展示的是综合账户评分说明。</div>
             </div>
           </div>
-          <div class="space-y-2">
+          <div id="accountEmptyState" class="account-empty">
+            <div class="account-empty-title">还未授权任何交易</div>
+            <div class="account-empty-desc">完成交易所授权后，这里会显示账户资产、AI 评分和当前状态。</div>
+            <button id="openAuthModalBtn" class="account-empty-btn" type="button">前往授权</button>
+          </div>
+          <div id="accountAssetList" class="space-y-2" hidden>
             <div class="flex items-center gap-2 p-2 rounded-lg bg-emerald-950/20 border border-emerald-900/20">
               <div class="w-6 h-6 rounded bg-emerald-500/20 flex items-center justify-center text-[9px] font-bold text-emerald-400">N</div>
               <div class="flex-1 min-w-0">
                 <div class="flex justify-between">
                   <span class="text-[11px] font-medium text-white">NVDA</span>
-                  <span class="text-[11px] text-emerald-400">+3.46%</span>
+                  <div class="text-right">
+                    <div class="text-[11px] font-bold text-white">$912.40</div>
+                    <div class="text-[11px] text-emerald-400">+3.46%</div>
+                  </div>
                 </div>
                 <div class="text-[9px] text-emerald-400">↑ AI 主线持续强化</div>
               </div>
@@ -333,7 +780,10 @@
               <div class="flex-1 min-w-0">
                 <div class="flex justify-between">
                   <span class="text-[11px] font-medium text-white">BTC</span>
-                  <span class="text-[11px] text-emerald-400">+4.82%</span>
+                  <div class="text-right">
+                    <div class="text-[11px] font-bold text-white">$74,315.75</div>
+                    <div class="text-[11px] text-emerald-400">+4.82%</div>
+                  </div>
                 </div>
                 <div class="text-[9px] text-emerald-400">↑ 减半+降息双催化</div>
               </div>
@@ -344,7 +794,10 @@
               <div class="flex-1 min-w-0">
                 <div class="flex justify-between">
                   <span class="text-[11px] font-medium text-white">GOLD</span>
-                  <span class="text-[11px] text-emerald-400">+1.15%</span>
+                  <div class="text-right">
+                    <div class="text-[11px] font-bold text-white">$2,381.20</div>
+                    <div class="text-[11px] text-emerald-400">+1.15%</div>
+                  </div>
                 </div>
                 <div class="text-[9px] text-amber-400">→ 美元走弱支撑</div>
               </div>
@@ -355,47 +808,15 @@
               <div class="flex-1 min-w-0">
                 <div class="flex justify-between">
                   <span class="text-[11px] font-medium text-white">XLE</span>
-                  <span class="text-[11px] text-red-400">-0.82%</span>
+                  <div class="text-right">
+                    <div class="text-[11px] font-bold text-white">$88.70</div>
+                    <div class="text-[11px] text-red-400">-0.82%</div>
+                  </div>
                 </div>
                 <div class="text-[9px] text-red-400">↓ 欧佩克不确定性</div>
               </div>
               <div class="text-[10px] text-red-400 font-bold">↓</div>
             </div>
-          </div>
-        </div>
-
-        <div class="p-4 border-b border-white/5">
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-1.5">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><rect x="3" y="3" width="7" height="9" rx="1"></rect><rect x="14" y="3" width="7" height="5" rx="1"></rect><rect x="14" y="12" width="7" height="9" rx="1"></rect><rect x="3" y="16" width="7" height="5" rx="1"></rect></svg>
-              <span class="text-xs font-bold text-white">AI 热点方块图</span>
-            </div>
-            <div class="flex items-center gap-1">
-              <span class="signal-dot" style="background:#60a5fa"></span>
-              <span class="text-[9px] text-blue-400">实时热度</span>
-            </div>
-          </div>
-          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:3px;">
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.22);"><span class="tm-dom">57.64%</span><span class="tm-name">BTC</span><span class="tm-chg" style="color:#34d399">+0.34%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.15);"><span class="tm-dom">10.70%</span><span class="tm-name">Stable</span><span class="tm-chg" style="color:#f87171">-0.01%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.15);"><span class="tm-dom">10.61%</span><span class="tm-name">ETH</span><span class="tm-chg" style="color:#34d399">+0.88%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e40af);border-color:rgba(96,165,250,0.15);"><span class="tm-dom">8.47%</span><span class="tm-name">Layer1</span><span class="tm-chg" style="color:#60a5fa">+1.17%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">4.28%</span><span class="tm-name">CeFi</span><span class="tm-chg" style="color:#34d399">+1.42%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">4.06%</span><span class="tm-name">PayFi</span><span class="tm-chg" style="color:#34d399">+0.39%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#065f46);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">1.38%</span><span class="tm-name">DeFi</span><span class="tm-chg" style="color:#34d399">+2.07%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.1);"><span class="tm-dom">1.07%</span><span class="tm-name">Meme</span><span class="tm-chg" style="color:#34d399">+3.75%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e293b);border-color:rgba(148,163,184,0.08);"><span class="tm-dom">0.58%</span><span class="tm-name">Others</span><span class="tm-chg" style="color:#94a3b8">+1.67%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#312e81,#4c1d95);border-color:rgba(167,139,250,0.4);box-shadow:0 0 12px rgba(139,92,246,0.3);"><span class="tm-dom" style="color:rgba(196,181,253,0.65);">0.40%</span><span class="tm-name">AI</span><span class="tm-chg" style="color:#c4b5fd">+9.89%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e40af);border-color:rgba(96,165,250,0.1);"><span class="tm-dom">0.23%</span><span class="tm-name">Layer2</span><span class="tm-chg" style="color:#60a5fa">+1.31%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.1);"><span class="tm-dom">0.15%</span><span class="tm-name">DePIN</span><span class="tm-chg" style="color:#f87171">-0.05%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.08);"><span class="tm-dom">0.14%</span><span class="tm-name">SocFi</span><span class="tm-chg" style="color:#34d399">+0.85%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#1e3a5f,#1e293b);border-color:rgba(148,163,184,0.07);"><span class="tm-dom">0.13%</span><span class="tm-name">RWA</span><span class="tm-chg" style="color:#94a3b8">+0.14%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(248,113,113,0.12);"><span class="tm-dom">0.09%</span><span class="tm-name">GameFi</span><span class="tm-chg" style="color:#f87171">-0.10%</span></div>
-            <div class="tm-cell" style="height:54px;background:linear-gradient(135deg,#14532d,#166534);border-color:rgba(52,211,153,0.08);"><span class="tm-dom">0.06%</span><span class="tm-name">NFT</span><span class="tm-chg" style="color:#34d399">+0.45%</span></div>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;padding:4px 2px 0;">
-            <div style="width:7px;height:7px;border-radius:2px;background:#166534;"></div><span style="font-size:9px;color:#475569;">涨</span>
-            <div style="width:7px;height:7px;border-radius:2px;background:#7f1d1d;"></div><span style="font-size:9px;color:#475569;">跌</span>
           </div>
         </div>
 
@@ -517,5 +938,273 @@
       </aside>
     </div>
   </div>
+  <div class="image-lightbox" id="imageLightbox" aria-hidden="true">
+    <div class="lightbox-panel">
+      <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭预览">×</button>
+      <img class="lightbox-image" id="lightboxImage" alt="缩略图预览">
+    </div>
+  </div>
+  <div class="auth-lightbox" id="authLightbox" aria-hidden="true">
+    <div class="auth-panel">
+      <button class="auth-close" id="authCloseBtn" type="button" aria-label="关闭授权弹窗">×</button>
+      <iframe class="auth-frame" id="authFrame" src="about:blank" title="授权弹窗"></iframe>
+    </div>
+  </div>
+  <script>
+    const FEED_URL = '/api/feed/rss?url=' + encodeURIComponent('https://blockcast.it/feed');
+    const AUTH_STORAGE_KEY = 'zhidao_authorizations_v1';
+    const FALLBACK_ITEMS = [
+      {
+        title: 'Matrixport 关联巨鲸两天内平仓获利 5900 万美元',
+        text: 'Matrixport 关联巨鲸在过去两天内通过 4 个地址平仓所有多头，涉及 1500 枚 BTC 和 12 万枚 ETH，共实现利润 5900 万美元。市场更关注的是大额地址的节奏切换是否会影响短线风险偏好，同时这类地址的平仓路径也可能成为判断主流币短期波动节奏的重要观察点。相关地址此前曾多次在阶段性高位附近减仓，因此本次集中平仓也被部分交易员视为风险降档信号。若后续链上继续出现大额净流出，可能进一步强化市场对短线回撤的预期；反之，如果只是阶段性获利了结，那么价格在回踩后仍可能重新回到震荡区间上沿。',
+        images: [
+          'https://images.unsplash.com/photo-1642104704074-907c0698cbd9?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1621761191319-c6fb62004040?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1642790106117-e829e14a795f?auto=format&fit=crop&w=400&q=80',
+        ],
+        date: '2026-04-16T16:42:00+08:00',
+      },
+      {
+        title: '稳定币资金回流交易所，主流币流动性边际改善',
+        text: '链上数据显示稳定币余额重新回流中心化交易所，说明场内可交易资金有回升迹象。若后续成交量同步放大，BTC 与 ETH 的短线波动区间可能继续上移。资金面改善通常领先于价格反应，因此观察稳定币净流入与盘口深度变化，会比只看涨跌更有前瞻性。',
+        images: [
+          'https://images.unsplash.com/photo-1518186285589-2f7649de83e0?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1640161704729-cbe966a08476?auto=format&fit=crop&w=400&q=80',
+        ],
+        date: '2026-04-16T15:18:00+08:00',
+      },
+      {
+        title: '某 DeFi 协议资金异动后，社区仍在等待进一步说明',
+        text: '协议地址出现大额转账后，团队给出初步说明，但市场尚未完全消化事件影响。短期内相关资产波动率可能维持高位，更适合等待新的链上确认信号。如果后续没有二次异动，情绪冲击可能快速衰减；反之则需要重新评估板块风险溢价。',
+        images: [
+          'https://images.unsplash.com/photo-1622630998477-20aa696ecb05?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1639322537138-5e513100b36e?auto=format&fit=crop&w=400&q=80',
+        ],
+        date: '2026-04-16T13:56:00+08:00',
+      },
+      {
+        title: 'AI 基建主线延续，风险偏好抬升带动高弹性资产走强',
+        text: '多家科技公司继续加码 AI 基础设施投资，订单与资本开支指引均维持高位。市场风险偏好回暖的背景下，高弹性资产与科技主线形成联动修复。只要产业资本开支不掉头，这条主线通常就仍会被资金反复定价。',
+        images: [
+          'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=400&q=80',
+          'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&w=400&q=80',
+        ],
+        date: '2026-04-16T11:07:00+08:00',
+      },
+    ];
+
+    function decodeHtml(value) {
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = value || '';
+      return textarea.value;
+    }
+
+    function extractText(html) {
+      const doc = new DOMParser().parseFromString(html || '', 'text/html');
+      return (doc.body.textContent || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function extractImages(html) {
+      const doc = new DOMParser().parseFromString(html || '', 'text/html');
+      const urls = [];
+      doc.querySelectorAll('img').forEach((img) => {
+        const src = img.getAttribute('src');
+        if (src && !urls.includes(src)) urls.push(src);
+      });
+      return urls.slice(0, 4);
+    }
+
+    function parseFeed(xml) {
+      const doc = new DOMParser().parseFromString(xml, 'text/xml');
+      return Array.from(doc.querySelectorAll('item')).map((item) => {
+        const title = item.querySelector('title')?.textContent?.trim() || '';
+        const descriptionRaw =
+          item.querySelector('content\\:encoded')?.textContent ||
+          item.querySelector('description')?.textContent ||
+          '';
+        const description = decodeHtml(descriptionRaw);
+        const text = extractText(description);
+        const images = extractImages(description);
+        const date = item.querySelector('pubDate')?.textContent?.trim() || '';
+        return { title, text, images, date };
+      });
+    }
+
+    function formatFeedTime(pubDate, fallback) {
+      if (!pubDate) return fallback;
+      const d = new Date(pubDate);
+      if (Number.isNaN(d.getTime())) return fallback;
+      const datePart = d.toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit' });
+      const timePart = d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false });
+      return `${datePart} ${timePart}`;
+    }
+
+    function renderThumbs(container, images) {
+      container.innerHTML = '';
+      if (!images.length) {
+        container.hidden = true;
+        return;
+      }
+      images.forEach((src) => {
+        const thumb = document.createElement('div');
+        thumb.className = 'story-thumb';
+        thumb.style.backgroundImage = `url("${src.replace(/"/g, '&quot;')}")`;
+        thumb.dataset.fullsrc = src;
+        container.appendChild(thumb);
+      });
+      container.hidden = false;
+    }
+
+    function setupLightbox() {
+      const lightbox = document.getElementById('imageLightbox');
+      const lightboxImage = document.getElementById('lightboxImage');
+      const closeBtn = document.getElementById('lightboxClose');
+
+      const closeLightbox = () => {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        lightboxImage.removeAttribute('src');
+      };
+
+      document.addEventListener('click', (event) => {
+        const thumb = event.target.closest('.story-thumb');
+        if (thumb && thumb.dataset.fullsrc) {
+          lightboxImage.src = thumb.dataset.fullsrc;
+          lightbox.classList.add('open');
+          lightbox.setAttribute('aria-hidden', 'false');
+          return;
+        }
+        if (event.target === lightbox) {
+          closeLightbox();
+        }
+      });
+
+      closeBtn.addEventListener('click', closeLightbox);
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && lightbox.classList.contains('open')) {
+          closeLightbox();
+        }
+      });
+    }
+
+    function setAuthorizedUi(hasAuth) {
+      const emptyState = document.getElementById('accountEmptyState');
+      const assetList = document.getElementById('accountAssetList');
+      const healthCard = document.getElementById('accountHealthCard');
+      if (emptyState) emptyState.hidden = hasAuth;
+      if (assetList) assetList.hidden = !hasAuth;
+      if (healthCard) {
+        healthCard.hidden = !hasAuth;
+        healthCard.style.display = hasAuth ? 'flex' : 'none';
+      }
+    }
+
+    function setupAuthModal() {
+      const lightbox = document.getElementById('authLightbox');
+      const frame = document.getElementById('authFrame');
+      const openBtn = document.getElementById('openAuthModalBtn');
+      const closeBtn = document.getElementById('authCloseBtn');
+
+      const closeModal = () => {
+        lightbox.classList.remove('open');
+        lightbox.setAttribute('aria-hidden', 'true');
+        frame.src = 'about:blank';
+      };
+
+      openBtn?.addEventListener('click', () => {
+        const accountModal = document.getElementById('sharedAccountModal');
+        if (accountModal) {
+          accountModal.classList.add('open');
+          accountModal.setAttribute('aria-hidden', 'false');
+          return;
+        }
+        document.dispatchEvent(new CustomEvent('zhidao-open-account-modal'));
+      });
+
+      closeBtn?.addEventListener('click', closeModal);
+      lightbox?.addEventListener('click', (event) => {
+        if (event.target === lightbox) closeModal();
+      });
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && lightbox.classList.contains('open')) {
+          closeModal();
+        }
+      });
+    }
+
+    function syncAccountState() {
+      let hasAuth = false;
+      try {
+        const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+        const parsed = raw ? JSON.parse(raw) : {};
+        hasAuth = Array.isArray(parsed.connections) && parsed.connections.length > 0;
+      } catch (error) {
+        hasAuth = false;
+      }
+      setAuthorizedUi(hasAuth);
+    }
+
+    function bindSummaryToggle(summary, toggle, forceShow = false) {
+      summary.classList.add('clamped');
+      toggle.innerHTML = '查看全部 <span>›</span>';
+
+      requestAnimationFrame(() => {
+        const needsToggle = forceShow || summary.scrollHeight > summary.clientHeight + 2;
+        toggle.hidden = !needsToggle;
+        if (!needsToggle) {
+          summary.classList.remove('clamped');
+          return;
+        }
+
+        toggle.onclick = () => {
+          const isClamped = summary.classList.contains('clamped');
+          summary.classList.toggle('clamped', !isClamped);
+          toggle.innerHTML = isClamped ? '收起 <span>‹</span>' : '查看全部 <span>›</span>';
+        };
+      });
+    }
+
+    async function hydrateFeed() {
+      const cards = Array.from(document.querySelectorAll('[data-story-card]'));
+      const applyItems = (items, options = {}) => {
+        const forceToggle = Boolean(options.forceToggle);
+        cards.forEach((card, index) => {
+          const item = items[index];
+          if (!item) return;
+          const title = card.querySelector('[data-title]');
+          const summary = card.querySelector('[data-summary]');
+          const thumbs = card.querySelector('[data-thumbs]');
+          const toggle = card.querySelector('[data-story-toggle]');
+          const timeCell = card.parentElement.querySelector('.text-xs.text-slate-500');
+
+          title.textContent = item.title || title.textContent;
+          summary.textContent = item.text || '暂无正文摘要';
+          renderThumbs(thumbs, item.images || []);
+          if (timeCell) timeCell.textContent = formatFeedTime(item.date, timeCell.textContent);
+          bindSummaryToggle(summary, toggle, forceToggle && index === 0);
+        });
+      };
+
+      try {
+        const resp = await fetch(FEED_URL);
+        const data = await resp.json();
+        if (!data.ok || !data.xml) throw new Error(data.error || 'feed unavailable');
+        const items = parseFeed(data.xml).slice(0, cards.length);
+        applyItems(items.length ? items : FALLBACK_ITEMS, { forceToggle: !items.length });
+      } catch (error) {
+        console.error('feed hydrate failed', error);
+        applyItems(FALLBACK_ITEMS, { forceToggle: true });
+      }
+    }
+
+    setupLightbox();
+    setupAuthModal();
+    syncAccountState();
+    window.addEventListener('focus', syncAccountState);
+    window.addEventListener('storage', syncAccountState);
+    hydrateFeed();
+  </script>
 </body>
+<script src="./shared-topbar.js?v=8"></script>
 </html>

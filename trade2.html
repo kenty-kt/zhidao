@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>行情2 · 知道AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg: #151a20;
+      --panel: #232a33;
+      --panel-2: #2b3440;
+      --line: rgba(255,255,255,0.08);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --green: #1dd1a1;
+      --red: #f25f72;
+      --amber: #f59e0b;
+      --blue: #3b82f6;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      color: var(--text);
+      background:
+        radial-gradient(1000px 480px at 70% -200px, rgba(59,130,246,0.12), transparent 70%),
+        linear-gradient(180deg, #11161c, #151a20);
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+    body.light-theme {
+      --bg: #eef2f6;
+      --panel: #ffffff;
+      --panel-2: #f4f7fb;
+      --line: rgba(15, 23, 42, 0.08);
+      --text: #1f2937;
+      --muted: #64748b;
+      background:
+        radial-gradient(1000px 480px at 70% -200px, rgba(59,130,246,0.10), transparent 70%),
+        linear-gradient(180deg, #f8fbff, #eef2f6);
+    }
+    .menu-item { color: #8da0bf; transition: 0.2s; }
+    .menu-item:hover { color: #cdd8e8; background: rgba(255,255,255,0.05); }
+    .menu-item.active {
+      color: #fff;
+      background: rgba(56,189,248,0.14);
+      border-color: rgba(56,189,248,0.28);
+      box-shadow: 0 0 12px rgba(56,189,248,0.18);
+    }
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 18px 40px rgba(2,8,23,0.22);
+    }
+    .subpanel {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 14px;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      border-radius: 10px;
+      padding: 0 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbe4f0;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 70px 299px 1fr 330px;
+      grid-template-areas: "nav left main right";
+      height: calc(100vh - 56px);
+    }
+    .layout.left-collapsed {
+      grid-template-columns: 70px minmax(0, 1fr) 330px;
+      grid-template-areas: "nav main right";
+    }
+    .layout.right-collapsed {
+      grid-template-columns: 70px 299px minmax(0, 1fr);
+      grid-template-areas: "nav left main";
+    }
+    .layout.left-collapsed.right-collapsed {
+      grid-template-columns: 70px minmax(0, 1fr);
+      grid-template-areas: "nav main";
+    }
+    .left-rail { grid-area: nav; }
+    .rail-logo {
+      position: fixed;
+      top: 8px;
+      left: 15px;
+      z-index: 60;
+      width: 40px;
+      height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.28));
+    }
+    .rail-logo svg {
+      width: 34px;
+      height: 34px;
+      display: block;
+    }
+    .market-left { grid-area: left; min-width: 0; }
+    .market-main { grid-area: main; min-width: 0; }
+    .right-book { grid-area: right; min-width: 0; }
+    .layout.left-collapsed .market-left,
+    .layout.right-collapsed .right-book {
+      display: none;
+    }
+    .watch-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 7px 6px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .watch-tab-btn {
+      position: relative;
+      border: none;
+      background: transparent;
+      color: #d1d5db;
+      font-size: 9px;
+      font-weight: 800;
+      padding: 8px 12px 9px;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+    .watch-tab-btn.active {
+      background: #3a4558;
+      color: #fff;
+    }
+    .watch-tab-btn:not(.active):hover {
+      color: #fff;
+      background: rgba(255,255,255,0.04);
+    }
+    .watch-toolbar {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 8px;
+      padding-right: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .exchange-select {
+      height: 28px;
+      min-width: 98px;
+      padding: 0 26px 0 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background:
+        linear-gradient(45deg, transparent 50%, #94a3b8 50%) calc(100% - 12px) calc(50% - 2px) / 6px 6px no-repeat,
+        linear-gradient(135deg, #94a3b8 50%, transparent 50%) calc(100% - 8px) calc(50% - 2px) / 6px 6px no-repeat,
+        rgba(255,255,255,0.04);
+      color: #e5e7eb;
+      font-size: 9px;
+      font-weight: 700;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+      margin-bottom: 6px;
+    }
+    .exchange-select:focus {
+      border-color: rgba(56,189,248,0.35);
+    }
+    .toolbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .pane-toggle-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.04);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .pane-toggle-btn:hover {
+      background: rgba(255,255,255,0.08);
+    }
+    .pane-reopen-btn {
+      position: fixed;
+      z-index: 35;
+      width: 30px;
+      height: 48px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(19,27,39,0.88);
+      color: #e5e7eb;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 10px 24px rgba(15,23,42,0.18);
+      backdrop-filter: blur(12px);
+    }
+    .pane-reopen-btn.left {
+      left: 78px;
+      top: 84px;
+    }
+    .pane-reopen-btn.right {
+      right: 10px;
+      top: 146px;
+    }
+    .layout.left-collapsed ~ .pane-reopen-btn.left,
+    .layout.right-collapsed ~ .pane-reopen-btn.right {
+      display: inline-flex;
+    }
+    .favorites-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1;
+      border-radius: 14px;
+      background: #22272f;
+      border: 1px solid rgba(255,255,255,0.09);
+      overflow: hidden;
+      box-shadow: 0 18px 42px rgba(3, 7, 18, 0.28);
+    }
+    .right-head-main {
+      min-width: 0;
+      flex: 1;
+    }
+    .right-exchange-name {
+      margin-top: 6px;
+      line-height: 1.15;
+      white-space: normal;
+      word-break: break-word;
+    }
+    .favorites-panel {
+      display: none;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1;
+      overflow: hidden;
+    }
+    .favorites-panel.active {
+      display: flex;
+    }
+    .watch-head {
+      display: grid;
+      grid-template-columns: 1.3fr 0.8fr 0.8fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 12px;
+      color: #9ca3af;
+      font-size: 9px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    .watch-head-left {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .watch-head-sort {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+    }
+    .sort-stack {
+      display: inline-flex;
+      flex-direction: column;
+      gap: 2px;
+      transform: translateY(-1px);
+    }
+    .sort-stack i {
+      width: 0;
+      height: 0;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      opacity: 0.6;
+    }
+    .sort-stack .up {
+      border-bottom: 5px solid #6b7280;
+    }
+    .sort-stack .down {
+      border-top: 5px solid #6b7280;
+    }
+    .sort-stack.active .up,
+    .sort-stack.active .down {
+      opacity: 1;
+    }
+    .sort-stack.active .down {
+      border-top-color: #ff9f1c;
+    }
+    .watch-empty {
+      padding: 26px 9px 10px;
+      text-align: center;
+      color: #8f97a4;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .candidate-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 9px;
+      padding: 5px 14px 12px;
+      overflow: auto;
+      align-content: start;
+      min-height: 0;
+      flex: 1;
+    }
+    .candidate-card {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 64px;
+      padding: 13px 10px;
+      border-radius: 7px;
+      border: 1px solid #3a4350;
+      background: #252b34;
+      color: #f3f4f6;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+    .candidate-card:hover {
+      border-color: #475161;
+      transform: translateY(-1px);
+    }
+    .candidate-card.selected {
+      border-color: #3a4350;
+      box-shadow: none;
+    }
+    .candidate-check {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+      background: #ff9f1c;
+      color: #111827;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 900;
+      flex-shrink: 0;
+    }
+    .candidate-main {
+      min-width: 0;
+    }
+    .candidate-symbol {
+      font-size: 17px;
+      line-height: 1.1;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+    .favorite-actions {
+      padding: 15px 12px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+    .favorite-cta {
+      width: calc(100% - 24px);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 10px;
+      background: #d4d4d4;
+      color: #1f2937;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+    .favorite-cta:hover {
+      filter: brightness(1.03);
+    }
+    .favorite-cta:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .favorite-note {
+      color: #9ca3af;
+      font-size: 9px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .watch-list {
+      display: grid;
+      gap: 10px;
+      overflow: auto;
+      padding: 5px 14px 9px;
+      min-height: 0;
+      align-content: start;
+    }
+    .watch-item {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 0.8fr;
+      gap: 10px;
+      align-items: center;
+      padding: 10px 9px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid #37404c;
+      text-align: left;
+      cursor: pointer;
+    }
+    .watch-item.active {
+      background: rgba(255,255,255,0.06);
+      border-color: #4b5563;
+    }
+    .watch-item-symbol {
+      font-size: 12px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+    .watch-item-price,
+    .watch-item-change {
+      font-size: 9px;
+      font-weight: 700;
+      text-align: right;
+    }
+    .watch-item-empty {
+      padding: 28px 16px;
+      color: #8f97a4;
+      text-align: center;
+      font-size: 9px;
+      font-weight: 600;
+    }
+    .market-head,
+    .market-row {
+      display: grid;
+      grid-template-columns: 18px 1.3fr 0.9fr 0.8fr 1fr;
+      gap: 8px;
+      align-items: center;
+    }
+    .market-head {
+      padding: 10px 14px;
+      color: #9ca3af;
+      font-size: 9px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      flex-shrink: 0;
+    }
+    .market-list {
+      display: block;
+      overflow: auto;
+      padding: 0;
+      min-height: 0;
+    }
+    .market-row {
+      width: 100%;
+      padding: 12px 14px;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+    }
+    .market-row.active {
+      background: rgba(255,255,255,0.03);
+    }
+    .market-star {
+      width: 16px;
+      height: 16px;
+      color: #aeb7c4;
+      opacity: 0.95;
+      flex-shrink: 0;
+    }
+    .market-pair {
+      min-width: 0;
+    }
+    .market-pair-symbol {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f3f4f6;
+    }
+    .market-cell {
+      font-size: 9px;
+      font-weight: 700;
+      text-align: right;
+      color: #e5e7eb;
+    }
+    .search-icon {
+      width: 14px;
+      height: 14px;
+      border: 2px solid #a1a1aa;
+      border-radius: 50%;
+      position: relative;
+      display: inline-block;
+      opacity: 0.9;
+      flex-shrink: 0;
+    }
+    .search-icon::after {
+      content: "";
+      position: absolute;
+      right: -4px;
+      bottom: -1px;
+      width: 6px;
+      height: 2px;
+      border-radius: 999px;
+      background: #a1a1aa;
+      transform: rotate(45deg);
+    }
+    .chart-shell {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      gap: 8px;
+    }
+    .tv-wrap {
+      position: relative;
+      flex: 1;
+      min-height: 280px;
+      border-radius: 0 0 16px 16px;
+      overflow: hidden;
+      background: #1c2129;
+    }
+    #tvChart {
+      position: absolute;
+      inset: 0;
+    }
+    .fallback-chart {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      background:
+        linear-gradient(to bottom, rgba(255,255,255,0.04) 1px, transparent 1px) 0 0 / 100% 56px,
+        linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px) 0 0 / 72px 100%,
+        linear-gradient(180deg, rgba(15,23,42,0.12), rgba(15,23,42,0)),
+        #1c2129;
+    }
+    .fallback-chart-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .fallback-chart-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      color: #cbd5e1;
+    }
+    .fallback-chart-meta {
+      text-align: right;
+      color: #94a3b8;
+      font-size: 11px;
+      line-height: 1.5;
+    }
+    .fallback-chart-svg {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+    .fallback-chart-axis {
+      position: absolute;
+      right: 14px;
+      top: 68px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: rgba(148,163,184,0.85);
+      font-size: 11px;
+      text-align: right;
+      pointer-events: none;
+    }
+    .pair-tabs {
+      display: flex;
+      gap: 8px;
+      overflow: auto;
+      padding-bottom: 2px;
+    }
+    .pair-tab {
+      min-width: 152px;
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+      cursor: pointer;
+    }
+    .pair-tab.active {
+      background: rgba(16,185,129,0.10);
+      border-color: rgba(16,185,129,0.22);
+    }
+    .chart-header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      align-items: center;
+      padding: 8px 10px;
+    }
+    .toolbar-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px 6px;
+      color: var(--muted);
+      font-size: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .orderbook-list {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .order-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .bottom-table table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .bottom-table th, .bottom-table td {
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      font-size: 12px;
+      text-align: left;
+    }
+    .bottom-table th { color: var(--muted); font-weight: 700; }
+    .desk-tab.active {
+      background: rgba(59,130,246,0.16);
+      border-color: rgba(59,130,246,0.28);
+      color: #fff;
+    }
+    .bottom-table {
+      height: 280px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+    }
+    .desk-panel { display: none; min-height: 0; }
+    .desk-panel.active { display: block; }
+    .bottom-table-fixed {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+    .action-mini {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: #dbe4f0;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .header-user-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: linear-gradient(180deg, rgba(76,110,203,0.95), rgba(59,130,246,0.82));
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(59,130,246,0.22);
+    }
+    .header-user-btn:hover {
+      filter: brightness(1.05);
+    }
+    .header-control-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      color: #dbe4f0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+    .header-control-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+    }
+    .header-lang-select {
+      height: 36px;
+      min-width: 94px;
+      padding: 0 30px 0 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background:
+        linear-gradient(45deg, transparent 50%, #94a3b8 50%) calc(100% - 14px) calc(50% - 2px) / 6px 6px no-repeat,
+        linear-gradient(135deg, #94a3b8 50%, transparent 50%) calc(100% - 10px) calc(50% - 2px) / 6px 6px no-repeat,
+        rgba(255,255,255,0.04);
+      color: #e5e7eb;
+      font-size: 12px;
+      font-weight: 700;
+      appearance: none;
+      outline: none;
+      cursor: pointer;
+    }
+    .header-lang-select:focus {
+      border-color: rgba(56,189,248,0.38);
+    }
+    body.light-theme .menu-item { color: #64748b; }
+    body.light-theme .menu-item:hover { color: #1f2937; background: rgba(15,23,42,0.05); }
+    body.light-theme .menu-item.active { color: #111827; background: rgba(59,130,246,0.12); border-color: rgba(59,130,246,0.22); box-shadow: none; }
+    body.light-theme .panel,
+    body.light-theme .favorites-shell,
+    body.light-theme .subpanel { background: rgba(255,255,255,0.96); border-color: rgba(15,23,42,0.08); box-shadow: 0 12px 28px rgba(15,23,42,0.08); }
+    body.light-theme .market-left,
+    body.light-theme .right-book { background: #f4f7fb !important; border-color: rgba(15,23,42,0.08) !important; }
+    body.light-theme .watch-tab-btn { color: #64748b; }
+    body.light-theme .watch-tab-btn.active { background: #dbe7f6; color: #111827; }
+    body.light-theme .watch-tab-btn:not(.active):hover { color: #111827; background: rgba(15,23,42,0.05); }
+    body.light-theme .watch-head,
+    body.light-theme .market-head,
+    body.light-theme .toolbar-row,
+    body.light-theme .bottom-table th { color: #64748b; border-color: rgba(15,23,42,0.08); }
+    body.light-theme .watch-item,
+    body.light-theme .candidate-card,
+    body.light-theme .market-row,
+    body.light-theme .pair-tab,
+    body.light-theme .action-mini { background: #f8fafc; border-color: rgba(15,23,42,0.10); color: #111827; }
+    body.light-theme .watch-item-symbol,
+    body.light-theme .market-pair-symbol,
+    body.light-theme .candidate-symbol,
+    body.light-theme .symbol-badge,
+    body.light-theme .shared-kv-value { color: #111827; }
+    body.light-theme .watch-empty,
+    body.light-theme .favorite-note,
+    body.light-theme .market-pair-meta,
+    body.light-theme .watch-item-empty,
+    body.light-theme .watch-head-sort,
+    body.light-theme .watch-item-market { color: #64748b; }
+    body.light-theme header { background: rgba(255,255,255,0.88) !important; border-color: rgba(15,23,42,0.08) !important; }
+    body.light-theme .header-control-btn,
+    body.light-theme .header-lang-select { background-color: rgba(15,23,42,0.04); border-color: rgba(15,23,42,0.10); color: #111827; }
+    body.light-theme .header-user-btn { box-shadow: 0 8px 20px rgba(59,130,246,0.12); }
+    body.light-theme .tv-wrap,
+    body.light-theme .fallback-chart { background: #eef4fb; }
+    .scroll-area {
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,255,255,0.10) transparent;
+    }
+    .insight-card { display: none; }
+    .order-mid {
+      font-size: 30px;
+      font-weight: 900;
+      padding: 14px 0;
+    }
+    .symbol-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .spark {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #17c964;
+    }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.10); border-radius: 999px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    @media (max-width: 1440px) {
+      .layout { grid-template-columns: 70px 299px 1fr 300px; }
+      .candidate-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .candidate-symbol { font-size: 17px; }
+      .candidate-meta { font-size: 10px; }
+      .favorite-cta { font-size: 15px; }
+      .layout.left-collapsed { grid-template-columns: 70px minmax(0, 1fr) 300px; }
+    }
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 70px 1fr; }
+      .market-left, .right-book { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="h-14 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 bg-[#10151c]/90 backdrop-blur z-40">
+  </header>
+  <div class="rail-logo" aria-hidden="true">
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="logoLeft" x1="9" y1="44" x2="31" y2="17" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#2AA7FF"/>
+          <stop offset="1" stop-color="#8A3FFC"/>
+        </linearGradient>
+        <linearGradient id="logoRight" x1="30" y1="43" x2="54" y2="18" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#FF5B7F"/>
+          <stop offset="1" stop-color="#FF9F1C"/>
+        </linearGradient>
+      </defs>
+      <path d="M11.5 42.5c-2.7-2.7-2.7-7.1 0-9.8l10.1-10.1c2.7-2.7 7.1-2.7 9.8 0l7.1 7.1-6.3 6.3-5.4-5.4a2.3 2.3 0 0 0-3.2 0l-5.7 5.7a2.3 2.3 0 0 0 0 3.2l5.4 5.4-6.3 6.3-7.5-7.5Z" fill="url(#logoLeft)"/>
+      <path d="M52.5 42.5c2.7-2.7 2.7-7.1 0-9.8L42.4 22.6c-2.7-2.7-7.1-2.7-9.8 0l-7.1 7.1 6.3 6.3 5.4-5.4a2.3 2.3 0 0 1 3.2 0l5.7 5.7a2.3 2.3 0 0 1 0 3.2l-5.4 5.4 6.3 6.3 7.5-7.5Z" fill="url(#logoRight)"/>
+      <rect x="45.5" y="9" width="9" height="9" rx="2.2" transform="rotate(45 45.5 9)" fill="#FF9F1C"/>
+    </svg>
+  </div>
+
+  <div class="layout">
+    <aside class="left-rail border-r border-white/10 bg-[#0d1218] flex flex-col items-center pt-2 pb-3 gap-2">
+      <a href="index.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">发现</a>
+      <a href="chat.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">对话</a>
+      <a href="fast.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">快讯</a>
+      <a href="trade.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">交易</a>
+      <div class="menu-item active w-12 h-12 rounded-xl border inline-flex flex-col items-center justify-center text-[11px]">行情2</div>
+      <a href="ai-watch.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">AI诊断</a>
+      <a href="authorize.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">授权</a>
+      <a href="account.html" class="menu-item w-12 h-12 rounded-xl border border-transparent inline-flex flex-col items-center justify-center text-[11px]">账户</a>
+    </aside>
+
+    <aside class="market-left border-r border-white/10 bg-[#161c24] p-3 flex flex-col gap-3 scroll-area">
+      <div class="favorites-shell">
+        <div class="watch-toolbar">
+          <div class="watch-tabs">
+            <button id="favoritesTabBtn" class="watch-tab-btn active" data-watch-tab="favorites">自选</button>
+            <button class="watch-tab-btn" data-watch-tab="market">市场</button>
+          </div>
+          <div class="toolbar-actions">
+            <select id="exchangeSelect" class="exchange-select" aria-label="交易所切换">
+              <option value="币安">币安</option>
+              <option value="欧易OKX" selected>欧易OKX</option>
+              <option value="Hyperliquid">Hyperliquid</option>
+            </select>
+            <button id="leftPaneToggleBtn" class="pane-toggle-btn" type="button" aria-label="收起左侧栏">‹</button>
+          </div>
+        </div>
+        <section id="favoritesPanel" class="favorites-panel active">
+          <div class="watch-head">
+            <div class="watch-head-left">
+              <span class="search-icon" aria-hidden="true"></span>
+              <span class="watch-head-sort">名称 <span class="sort-stack active"><i class="up"></i><i class="down"></i></span></span>
+            </div>
+            <span class="watch-head-sort">最新价 <span class="sort-stack"><i class="up"></i><i class="down"></i></span></span>
+            <span class="watch-head-sort">今日涨幅 <span class="sort-stack"><i class="up"></i><i class="down"></i></span></span>
+          </div>
+          <div id="favoritesList" class="watch-list" style="display:none;"></div>
+          <div id="favoritesEmpty" class="watch-empty">暂无自选</div>
+          <div id="candidateGrid" class="candidate-grid"></div>
+          <div class="favorite-actions">
+            <button id="favoriteAddBtn" class="favorite-cta" type="button">一键添加到自选</button>
+            <div class="favorite-note">不太感兴趣,自定义添加</div>
+          </div>
+        </section>
+        <section id="marketPanel" class="favorites-panel">
+          <div class="market-head">
+            <div></div>
+            <div>交易对</div>
+            <div class="text-right">价格</div>
+            <div class="text-right">涨跌幅</div>
+            <div class="text-right">成交额</div>
+          </div>
+          <div id="marketWatchList" class="market-list"></div>
+        </section>
+      </div>
+      <div class="panel p-4 space-y-3">
+        <div class="text-lg font-bold text-white">永续合约概览</div>
+        <div class="flex justify-between text-slate-400"><span>余额</span><span class="text-slate-200">$50.88</span></div>
+        <div class="flex justify-between text-slate-400"><span>持仓总价值</span><span class="text-slate-200">$2,847.32</span></div>
+        <div class="flex justify-between text-slate-400"><span>未实现盈亏</span><span class="text-emerald-400">+$134.90</span></div>
+        <div class="flex justify-between text-slate-400"><span>全仓保证金率</span><span class="text-slate-200">22.53%</span></div>
+        <div class="flex justify-between text-slate-400"><span>全仓账户杠杆</span><span class="text-slate-200">4.5x</span></div>
+      </div>
+    </aside>
+
+    <main class="market-main p-3 md:p-4 min-w-0 overflow-auto">
+      <div class="chart-shell h-full">
+        <div id="pairTabs" class="pair-tabs">
+        </div>
+
+        <div class="panel flex-1 min-h-0 flex flex-col">
+          <div class="chart-header border-b border-white/10">
+            <div class="flex items-center gap-4 flex-wrap">
+              <div id="activePrice" class="text-2xl font-black text-emerald-400">--</div>
+              <div id="activeChangeValue" class="font-bold">--</div>
+              <div id="activeMark" class="text-slate-400">标记价格 --</div>
+              <div id="activeFunding" class="text-slate-400">资金费率 --</div>
+            </div>
+            <div class="flex items-center gap-3 text-sm text-slate-300 flex-wrap">
+              <span id="statHigh">24h最高价 --</span>
+              <span id="statLow">24h最低价 --</span>
+              <span id="statVolume">24h成交量 --</span>
+            </div>
+          </div>
+          <div class="toolbar-row">
+            <span>1秒</span><span>1分</span><span>5分</span><span class="pill">15分</span><span>1小时</span><span>4小时</span><span>1日</span>
+            <span style="margin-left:auto;">内置图表</span>
+          </div>
+          <div class="tv-wrap"><div id="tvChart"></div></div>
+        </div>
+
+        <div class="panel bottom-table">
+          <div class="flex gap-2 p-3 border-b border-white/10">
+            <button class="pill desk-tab active" data-desk-tab="positions">持仓(2)</button>
+            <button class="pill desk-tab" data-desk-tab="openOrders">当前委托(8)</button>
+            <button class="pill desk-tab" data-desk-tab="trades">交易历史</button>
+            <button class="pill desk-tab" data-desk-tab="historyOrders">订单历史</button>
+          </div>
+          <div id="positionsPanel" class="desk-panel active bottom-table-fixed">
+            <table>
+              <thead>
+                <tr><th>币种</th><th>数量</th><th>持仓价值</th><th>入场价格</th><th>标记价格</th><th>盈亏</th><th>保证金</th><th>强平价格</th><th>止盈/止损</th><th>操盘类型</th><th>资金费率</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>ETH <span class="pill text-emerald-300">20x</span></td><td>0.0579</td><td id="ethValue">$--</td><td id="ethEntry">$--</td><td id="ethMark">$--</td><td id="ethPnl" class="text-rose-400">--</td><td>$2,729.0509</td><td>$5.61</td><td><span class="pill">添加 / 编辑</span></td><td>自动 / 市价</td><td>$0.2,2076</td></tr>
+                <tr><td>SOL <span class="pill text-rose-300">20x</span></td><td>1.6</td><td id="solValue">$--</td><td id="solEntry">$--</td><td id="solMark">$--</td><td id="solPnl" class="text-rose-400">--</td><td>$115.466</td><td>$5.86</td><td><span class="pill">添加 / 编辑</span></td><td>自动 / 市价</td><td>$0.0,496</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="openOrdersPanel" class="desk-panel bottom-table-fixed">
+            <table>
+              <thead>
+                <tr><th>币种</th><th>方向</th><th>类型</th><th>委托价</th><th>数量</th><th>状态</th><th>时间</th><th>操作</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>BTC/USDT</td><td class="text-emerald-400">买入</td><td>限价</td><td>$64,820</td><td>0.35</td><td>挂单中</td><td>09:42:10</td><td><button class="action-mini">撤单</button></td></tr>
+                <tr><td>ETH/USDT</td><td class="text-rose-400">卖出</td><td>限价</td><td>$3,412</td><td>1.20</td><td>部分成交</td><td>09:30:42</td><td><button class="action-mini">编辑</button></td></tr>
+                <tr><td>SOL/USDT</td><td class="text-emerald-400">买入</td><td>止损</td><td>$148.8</td><td>12</td><td>排队中</td><td>09:22:56</td><td><button class="action-mini">撤单</button></td></tr>
+                <tr><td>BNB/USDT</td><td class="text-rose-400">卖出</td><td>限价</td><td>$611.2</td><td>4.5</td><td>挂单中</td><td>09:18:10</td><td><button class="action-mini">编辑</button></td></tr>
+                <tr><td>DOGE/USDT</td><td class="text-emerald-400">买入</td><td>市价</td><td>按市价</td><td>8000</td><td>待触发</td><td>09:12:21</td><td><button class="action-mini">取消</button></td></tr>
+                <tr><td>XRP/USDT</td><td class="text-rose-400">卖出</td><td>条件单</td><td>$0.621</td><td>1200</td><td>挂单中</td><td>08:57:48</td><td><button class="action-mini">编辑</button></td></tr>
+                <tr><td>LTC/USDT</td><td class="text-emerald-400">买入</td><td>限价</td><td>$84.2</td><td>25</td><td>挂单中</td><td>08:41:34</td><td><button class="action-mini">撤单</button></td></tr>
+                <tr><td>PEPE/USDT</td><td class="text-rose-400">卖出</td><td>限价</td><td>$0.000012</td><td>1200000</td><td>挂单中</td><td>08:28:55</td><td><button class="action-mini">编辑</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="tradesPanel" class="desk-panel bottom-table-fixed">
+            <table>
+              <thead>
+                <tr><th>时间</th><th>币种</th><th>方向</th><th>成交价</th><th>数量</th><th>成交额</th><th>结果</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>09:40:02</td><td>BTC/USDT</td><td class="text-emerald-400">开多</td><td>$66,281.2</td><td>0.15</td><td>$9,942.18</td><td class="text-emerald-400">+$124.8</td></tr>
+                <tr><td>09:31:44</td><td>ETH/USDT</td><td class="text-rose-400">平多</td><td>$3,408.6</td><td>0.8</td><td>$2,726.88</td><td class="text-rose-400">-$21.4</td></tr>
+                <tr><td>09:20:11</td><td>SOL/USDT</td><td class="text-emerald-400">开多</td><td>$148.3</td><td>6.0</td><td>$889.8</td><td class="text-emerald-400">+$15.2</td></tr>
+                <tr><td>09:07:58</td><td>BNB/USDT</td><td class="text-rose-400">开空</td><td>$607.1</td><td>2.2</td><td>$1,335.62</td><td class="text-emerald-400">+$38.6</td></tr>
+                <tr><td>08:49:14</td><td>DOGE/USDT</td><td class="text-emerald-400">开多</td><td>$0.1462</td><td>5000</td><td>$731.0</td><td class="text-rose-400">-$8.3</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div id="historyOrdersPanel" class="desk-panel bottom-table-fixed">
+            <table>
+              <thead>
+                <tr><th>时间</th><th>币种</th><th>订单类型</th><th>方向</th><th>委托价</th><th>数量</th><th>状态</th><th>备注</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>昨天 22:10</td><td>BTC/USDT</td><td>限价</td><td>买入</td><td>$65,200</td><td>0.25</td><td>已成交</td><td>回踩加仓</td></tr>
+                <tr><td>昨天 21:44</td><td>ETH/USDT</td><td>止盈</td><td>卖出</td><td>$3,452</td><td>0.80</td><td>已成交</td><td>自动止盈</td></tr>
+                <tr><td>昨天 20:36</td><td>SOL/USDT</td><td>止损</td><td>卖出</td><td>$145.6</td><td>6.00</td><td>已撤销</td><td>波动恢复</td></tr>
+                <tr><td>昨天 18:04</td><td>BNB/USDT</td><td>限价</td><td>卖出</td><td>$612.0</td><td>2.20</td><td>部分成交</td><td>分批减仓</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-book border-l border-white/10 bg-[#171d25] p-3 flex flex-col gap-3 scroll-area">
+      <div class="panel p-4">
+        <div class="flex items-start justify-between gap-3">
+          <div class="right-head-main">
+            <div id="rightSymbol" class="text-4xl font-black">BTC/USDT</div>
+            <div class="right-exchange-name text-amber-300 font-bold">Hyperliquid</div>
+          </div>
+          <button id="rightPaneToggleBtn" class="pane-toggle-btn" type="button" aria-label="收起右侧栏">›</button>
+        </div>
+        <div class="grid grid-cols-2 gap-3 mt-4 text-sm">
+          <div><div class="text-slate-400">24小时涨跌</div><div id="rightChange" class="font-bold mt-1">--</div></div>
+          <div><div class="text-slate-400">最新价格</div><div id="rightPrice" class="text-slate-100 font-bold mt-1">--</div></div>
+          <div><div class="text-slate-400">24小时成交量</div><div id="rightVolume" class="text-slate-100 font-bold mt-1">--</div></div>
+          <div><div class="text-slate-400">24小时最高</div><div id="rightHigh" class="text-slate-100 font-bold mt-1">--</div></div>
+        </div>
+      </div>
+      <div class="panel p-3">
+        <div class="flex gap-2 mb-3">
+          <button class="pill">订单簿</button>
+          <button class="pill">交易</button>
+        </div>
+        <div class="orderbook-list">
+          <div class="order-row text-slate-400"><span>价格(USDT)</span><span>数量</span><span>总量</span></div>
+          <div class="order-row"><span class="text-rose-400">$101,001.72</span><span>0.795369</span><span>0.795369</span></div>
+          <div class="order-row"><span class="text-rose-400">$101,001.72</span><span>0.785293</span><span>0.760384</span></div>
+          <div class="order-row"><span class="text-rose-400">$101,001.72</span><span>0.659026</span><span>0.629417</span></div>
+          <div class="order-row"><span class="text-rose-400">$101,001.72</span><span>0.795369</span><span>0.795369</span></div>
+          <div class="order-row"><span class="text-rose-400">$101,001.72</span><span>0.760384</span><span>0.659026</span></div>
+          <div class="order-row"><span class="text-rose-400">$101,001.72</span><span>0.629417</span><span>0.629417</span></div>
+          <div id="orderMid" class="order-mid text-emerald-400">--</div>
+          <div id="bidRows"></div>
+        </div>
+      </div>
+      <div class="panel p-4">
+        <div class="flex justify-between text-slate-400"><span>价差</span><span>$5.6 (0.008%)</span></div>
+        <div class="flex justify-between text-slate-400 mt-2"><span>比例</span><span>● 48.2%  ● 51.8%</span></div>
+      </div>
+    </aside>
+  </div>
+  <button id="leftPaneReopenBtn" class="pane-reopen-btn left" type="button" aria-label="展开左侧栏">›</button>
+  <button id="rightPaneReopenBtn" class="pane-reopen-btn right" type="button" aria-label="展开右侧栏">‹</button>
+  <script>
+    const SYMBOLS = [
+      { key: "BTCUSDT", label: "BTC/USDT", tv: "BINANCE:BTCUSDT", market: "欧易OKX USDT", icon: "₿", color: "#f7931a" },
+      { key: "ETHUSDT", label: "ETH/USDT", tv: "BINANCE:ETHUSDT", market: "欧易OKX USDT", icon: "⬢", color: "#627eea" },
+      { key: "BNBUSDT", label: "BNB/USDT", tv: "BINANCE:BNBUSDT", market: "币安", icon: "◈", color: "#f3ba2f" },
+      { key: "SOLUSDT", label: "SOL/USDT", tv: "BINANCE:SOLUSDT", market: "欧易OKX USDT", icon: "◎", color: "#14f195" },
+      { key: "DOGEUSDT", label: "DOGE/USDT", tv: "BINANCE:DOGEUSDT", market: "币安 USDT 永续", icon: "Ð", color: "#c2a633" },
+      { key: "XRPUSDT", label: "XRP/USDT", tv: "BINANCE:XRPUSDT", market: "币安 USDT 永续", icon: "✕", color: "#23292f" },
+      { key: "LTCUSDT", label: "LTC/USDT", tv: "BINANCE:LTCUSDT", market: "币安", icon: "Ł", color: "#345c9c" }
+    ];
+
+    const EXTRA_SYMBOL_META = [
+      { key: "OKBUSDT", label: "OKB/USDT", market: "欧易OKX USDT", icon: "O", color: "#111827", fetchable: false }
+    ];
+
+    const FAVORITE_CANDIDATES = [
+      { key: "BTCUSDT", market: "欧易OKX USDT" },
+      { key: "ETHUSDT", market: "欧易OKX USDT" },
+      { key: "SOLUSDT", market: "欧易OKX USDT" },
+      { key: "OKBUSDT", market: "欧易OKX USDT" },
+      { key: "BTCUSDT_BINANCE_SWAP", symbolKey: "BTCUSDT", label: "BTC/USDT", market: "币安USDT永续" },
+      { key: "ETHUSDT_BINANCE_SWAP", symbolKey: "ETHUSDT", label: "ETH/USDT", market: "币安USDT永续" },
+      { key: "SOLUSDT_BINANCE_SWAP", symbolKey: "SOLUSDT", label: "SOL/USDT", market: "币安USDT永续" },
+      { key: "BNBUSDT", market: "币安" }
+    ];
+
+    const PAGE_THEME_KEY = "zhidao_trade2_theme_v1";
+    const PAGE_LANG_KEY = "zhidao_trade2_lang_v1";
+    const PAGE_LEFT_PANE_KEY = "zhidao_trade2_left_pane_v1";
+    const PAGE_RIGHT_PANE_KEY = "zhidao_trade2_right_pane_v1";
+    const I18N = {
+      zh: {
+        back: "返回首页",
+        title: "行情终端 2",
+        login: "登录与授权",
+        theme: "切换亮暗色",
+      },
+      en: {
+        back: "Back",
+        title: "Market Terminal 2",
+        login: "Login & Authorization",
+        theme: "Toggle theme",
+      }
+    };
+
+    let activeSymbol = "BTCUSDT";
+    let watchTab = "favorites";
+    let selectedExchange = "欧易OKX";
+    let currentLanguage = "zh";
+    let currentTheme = "dark";
+    let leftPaneCollapsed = false;
+    let rightPaneCollapsed = false;
+    let favoriteSelections = new Set(FAVORITE_CANDIDATES.map((item) => item.key));
+    let favoriteSymbols = [];
+
+    function formatUsd(value, digits = 2) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return "--";
+      return `$${num.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits })}`;
+    }
+
+    function formatCompact(value) {
+      const num = Number(value);
+      if (!Number.isFinite(num)) return "--";
+      return new Intl.NumberFormat("en-US", { notation: "compact", maximumFractionDigits: 2 }).format(num);
+    }
+
+    function formatSignedPercent(value) {
+      const num = Number(value || 0);
+      return `${num >= 0 ? "+" : ""}${num.toFixed(2)}%`;
+    }
+
+    function getSymbolMeta(key) {
+      return SYMBOLS.find((item) => item.key === key)
+        || EXTRA_SYMBOL_META.find((item) => item.key === key)
+        || SYMBOLS[0];
+    }
+
+    function getSymbolQuote(tickerMap, key) {
+      return tickerMap[key] || {
+        symbol: key,
+        lastPrice: null,
+        openPrice: null,
+        highPrice: null,
+        lowPrice: null,
+        quoteVolume: null,
+        priceChangePercent: 0,
+        priceChange: 0,
+      };
+    }
+
+    function updateThemeIcon() {
+      const icon = document.getElementById("themeToggleIcon");
+      if (!icon) return;
+      icon.innerHTML = currentTheme === "light"
+        ? '<circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"></circle><path d="M12 2v2.2M12 19.8V22M4.93 4.93l1.56 1.56M17.5 17.5l1.57 1.57M2 12h2.2M19.8 12H22M4.93 19.07l1.56-1.56M17.5 6.5l1.57-1.57" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"></path>'
+        : '<path d="M21 12.79A9 9 0 1 1 11.21 3c0 .34-.02.68-.02 1.03A7.98 7.98 0 0 0 19.97 13c.35 0 .69-.02 1.03-.21Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>';
+    }
+
+    function applyTheme(theme) {
+      currentTheme = theme === "light" ? "light" : "dark";
+      document.body.classList.toggle("light-theme", currentTheme === "light");
+      localStorage.setItem(PAGE_THEME_KEY, currentTheme);
+      updateThemeIcon();
+    }
+
+    function applyLanguage(lang) {
+      currentLanguage = lang === "en" ? "en" : "zh";
+      localStorage.setItem(PAGE_LANG_KEY, currentLanguage);
+      const dict = I18N[currentLanguage];
+      const backLink = document.querySelector('header a[href="index.html"]');
+      const titleEl = document.querySelector("header .font-bold.tracking-wide.text-sm");
+      const userBtn = document.querySelector("[data-login-avatar]");
+      const themeBtn = document.getElementById("themeToggleBtn");
+      const languageSelect = document.getElementById("languageSelect");
+      if (backLink) backLink.textContent = dict.back;
+      if (titleEl) titleEl.textContent = dict.title;
+      if (userBtn) userBtn.setAttribute("aria-label", dict.login);
+      if (themeBtn) themeBtn.setAttribute("aria-label", dict.theme);
+      if (languageSelect) languageSelect.value = currentLanguage;
+    }
+
+    function initHeaderControls() {
+      const savedTheme = localStorage.getItem(PAGE_THEME_KEY) || "dark";
+      const savedLang = localStorage.getItem(PAGE_LANG_KEY) || "zh";
+      applyTheme(savedTheme);
+      applyLanguage(savedLang);
+      document.addEventListener("zhidao-ui-change", (event) => {
+        const detail = event.detail || {};
+        if (detail.theme) applyTheme(detail.theme);
+        if (detail.language) applyLanguage(detail.language);
+      });
+    }
+
+    function syncPaneButtons() {
+      const leftBtn = document.getElementById("leftPaneToggleBtn");
+      const rightBtn = document.getElementById("rightPaneToggleBtn");
+      if (leftBtn) {
+        leftBtn.textContent = leftPaneCollapsed ? "›" : "‹";
+        leftBtn.setAttribute("aria-label", leftPaneCollapsed ? "展开左侧栏" : "收起左侧栏");
+      }
+      if (rightBtn) {
+        rightBtn.textContent = rightPaneCollapsed ? "‹" : "›";
+        rightBtn.setAttribute("aria-label", rightPaneCollapsed ? "展开右侧栏" : "收起右侧栏");
+      }
+    }
+
+    function applyPaneState() {
+      const layout = document.querySelector(".layout");
+      if (!layout) return;
+      layout.classList.toggle("left-collapsed", leftPaneCollapsed);
+      layout.classList.toggle("right-collapsed", rightPaneCollapsed);
+      syncPaneButtons();
+    }
+
+    function setupPaneToggles() {
+      leftPaneCollapsed = localStorage.getItem(PAGE_LEFT_PANE_KEY) === "collapsed";
+      rightPaneCollapsed = localStorage.getItem(PAGE_RIGHT_PANE_KEY) === "collapsed";
+      applyPaneState();
+
+      const leftBtn = document.getElementById("leftPaneToggleBtn");
+      const rightBtn = document.getElementById("rightPaneToggleBtn");
+      const leftReopenBtn = document.getElementById("leftPaneReopenBtn");
+      const rightReopenBtn = document.getElementById("rightPaneReopenBtn");
+
+      if (leftBtn) {
+        leftBtn.addEventListener("click", () => {
+          leftPaneCollapsed = !leftPaneCollapsed;
+          localStorage.setItem(PAGE_LEFT_PANE_KEY, leftPaneCollapsed ? "collapsed" : "expanded");
+          applyPaneState();
+        });
+      }
+      if (rightBtn) {
+        rightBtn.addEventListener("click", () => {
+          rightPaneCollapsed = !rightPaneCollapsed;
+          localStorage.setItem(PAGE_RIGHT_PANE_KEY, rightPaneCollapsed ? "collapsed" : "expanded");
+          applyPaneState();
+        });
+      }
+      if (leftReopenBtn) {
+        leftReopenBtn.addEventListener("click", () => {
+          leftPaneCollapsed = false;
+          localStorage.setItem(PAGE_LEFT_PANE_KEY, "expanded");
+          applyPaneState();
+        });
+      }
+      if (rightReopenBtn) {
+        rightReopenBtn.addEventListener("click", () => {
+          rightPaneCollapsed = false;
+          localStorage.setItem(PAGE_RIGHT_PANE_KEY, "expanded");
+          applyPaneState();
+        });
+      }
+    }
+
+    function getExchangeName(text = "") {
+      if (text.includes("Hyperliquid")) return "Hyperliquid";
+      if (text.includes("欧易") || text.includes("OKX")) return "欧易OKX";
+      if (text.includes("币安") || text.includes("Binance")) return "币安";
+      return "";
+    }
+
+    function matchExchange(text = "") {
+      return getExchangeName(text) === selectedExchange;
+    }
+
+    function renderFavoritesModule(tickerMap) {
+      const favoriteList = document.getElementById("favoritesList");
+      const favoritesEmpty = document.getElementById("favoritesEmpty");
+      const candidateGrid = document.getElementById("candidateGrid");
+      const addBtn = document.getElementById("favoriteAddBtn");
+      const visibleCandidates = FAVORITE_CANDIDATES.filter((item) => matchExchange(item.market || ""));
+
+      candidateGrid.innerHTML = visibleCandidates.map((item) => {
+        const meta = getSymbolMeta(item.symbolKey || item.key);
+        const label = item.label || meta.label;
+        const selected = favoriteSelections.has(item.key) ? "selected" : "";
+        return `
+          <button class="candidate-card ${selected}" type="button" data-candidate-key="${item.key}">
+            <span class="candidate-check">✓</span>
+            <span class="candidate-main">
+              <div class="candidate-symbol">${label}</div>
+            </span>
+          </button>
+        `;
+      }).join("");
+
+      const visibleFavoriteSymbols = favoriteSymbols.filter((key) => matchExchange(getSymbolMeta(key).market || ""));
+
+      if (visibleFavoriteSymbols.length) {
+        favoriteList.style.display = "grid";
+        favoritesEmpty.style.display = "none";
+        favoriteList.innerHTML = visibleFavoriteSymbols.map((key) => {
+          const meta = getSymbolMeta(key);
+          const ticker = getSymbolQuote(tickerMap, key);
+          const change = Number(ticker.priceChangePercent || 0);
+          const colorClass = change >= 0 ? "text-emerald-400" : "text-rose-400";
+          const active = key === activeSymbol ? "active" : "";
+          const priceText = Number.isFinite(Number(ticker.lastPrice))
+            ? Number(ticker.lastPrice).toLocaleString("en-US", { maximumFractionDigits: 4 })
+            : "--";
+          const symbolAttr = meta.fetchable === false ? "" : `data-symbol="${key}"`;
+          return `
+            <button class="watch-item ${active}" ${symbolAttr}>
+              <div>
+                <div class="watch-item-symbol">${meta.label}</div>
+              </div>
+              <div class="watch-item-price ${colorClass}">${priceText}</div>
+              <div class="watch-item-change ${colorClass}">${formatSignedPercent(change)}</div>
+            </button>
+          `;
+        }).join("");
+      } else {
+        favoriteList.style.display = "none";
+        favoriteList.innerHTML = "";
+        favoritesEmpty.style.display = "block";
+      }
+
+      addBtn.disabled = favoriteSelections.size === 0;
+      addBtn.textContent = favoriteSymbols.length ? "更新自选列表" : "一键添加到自选";
+
+      document.querySelectorAll("[data-candidate-key]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const key = button.dataset.candidateKey;
+          if (favoriteSelections.has(key)) {
+            favoriteSelections.delete(key);
+          } else {
+            favoriteSelections.add(key);
+          }
+          renderFavoritesModule(tickerMap);
+          bindSymbolButtons();
+        });
+      });
+    }
+
+    function renderMarketList(tickerMap) {
+      const root = document.getElementById("marketWatchList");
+      if (!root) return;
+      const visibleSymbols = SYMBOLS.filter((item) => matchExchange(item.market || ""));
+      if (!visibleSymbols.length) {
+        root.innerHTML = '<div class="watch-item-empty">当前交易所暂无市场数据</div>';
+        return;
+      }
+      root.innerHTML = visibleSymbols.map((item) => {
+        const ticker = getSymbolQuote(tickerMap, item.key);
+        const change = Number(ticker.priceChangePercent || 0);
+        const changeClass = change >= 0 ? "text-emerald-400" : "text-rose-400";
+        const active = item.key === activeSymbol ? "active" : "";
+        return `
+          <button class="market-row ${active}" data-symbol="${item.key}">
+            <svg class="market-star" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M10 2.8l2.16 4.38 4.84.7-3.5 3.41.83 4.82L10 13.85 5.67 16.1l.83-4.82L3 7.88l4.84-.7L10 2.8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+            <div class="market-pair">
+              <div class="market-pair-symbol">${item.label}</div>
+            </div>
+            <div class="market-cell">${formatUsd(ticker.lastPrice)}</div>
+            <div class="market-cell ${changeClass}">${formatSignedPercent(change)}</div>
+            <div class="market-cell">${formatCompact(ticker.quoteVolume)}</div>
+          </button>
+        `;
+      }).join("");
+    }
+
+    function bindSymbolButtons() {
+      document.querySelectorAll("[data-symbol]").forEach((button) => {
+        button.addEventListener("click", async () => {
+          activeSymbol = button.dataset.symbol;
+          await loadMarketData();
+        });
+      });
+    }
+
+    function buildTradingView(symbol, ticker = null) {
+      const meta = getSymbolMeta(symbol);
+      const root = document.getElementById("tvChart");
+      const width = 960;
+      const height = 420;
+      const padX = 22;
+      const padY = 24;
+      const chartH = height - padY * 2;
+      const chartW = width - padX * 2 - 56;
+      const seed = (symbol || "BTCUSDT").split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const points = Array.from({ length: 28 }, (_, index) => {
+        const waveA = Math.sin((index + seed / 18) * 0.55) * 48;
+        const waveB = Math.cos((index + seed / 23) * 0.34) * 22;
+        const drift = index * 3.4;
+        return 154 + waveA + waveB + drift;
+      });
+      const min = Math.min(...points);
+      const max = Math.max(...points);
+      const scaleY = (value) => height - padY - ((value - min) / (max - min || 1)) * chartH;
+      const stepX = chartW / (points.length - 1);
+      const linePoints = points.map((value, index) => `${padX + index * stepX},${scaleY(value)}`).join(" ");
+      const areaPoints = `${padX},${height - padY} ${linePoints} ${padX + chartW},${height - padY}`;
+      const candleBars = points.map((value, index) => {
+        const x = padX + index * stepX;
+        const prev = points[Math.max(0, index - 1)];
+        const open = (prev + value) / 2;
+        const close = value;
+        const high = Math.max(open, close) + 10 + (index % 3) * 3;
+        const low = Math.min(open, close) - 10 - (index % 4) * 2;
+        const gain = close >= open;
+        const color = gain ? "#22c55e" : "#f43f5e";
+        const bodyTop = scaleY(Math.max(open, close));
+        const bodyBottom = scaleY(Math.min(open, close));
+        const wickTop = scaleY(high);
+        const wickBottom = scaleY(low);
+        return `
+          <line x1="${x}" x2="${x}" y1="${wickTop}" y2="${wickBottom}" stroke="${color}" stroke-width="1.5" opacity="0.9"></line>
+          <rect x="${x - 4}" y="${bodyTop}" width="8" height="${Math.max(6, bodyBottom - bodyTop)}" rx="2" fill="${color}" opacity="0.9"></rect>
+        `;
+      }).join("");
+      const latest = ticker && Number.isFinite(Number(ticker.lastPrice)) ? formatUsd(ticker.lastPrice) : "--";
+      const change = Number(ticker?.priceChangePercent || 0);
+      const tone = change >= 0 ? "#22c55e" : "#f43f5e";
+      const priceLabels = Array.from({ length: 5 }, (_, idx) => {
+        const raw = max - ((max - min) * idx) / 4;
+        return `<span>${raw.toFixed(2)}</span>`;
+      }).join("");
+
+      root.innerHTML = `
+        <div class="fallback-chart">
+          <div class="fallback-chart-head">
+            <div class="fallback-chart-badge">
+              <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${meta.color || "#60a5fa"};"></span>
+              <span>${meta.label}</span>
+            </div>
+            <div class="fallback-chart-meta">
+              <div style="color:${tone};font-weight:800;">${latest}</div>
+              <div>${formatSignedPercent(change)} · 15m</div>
+            </div>
+          </div>
+          <svg class="fallback-chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="${meta.label} chart">
+            <defs>
+              <linearGradient id="chartArea" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="rgba(34,197,94,0.34)"></stop>
+                <stop offset="100%" stop-color="rgba(34,197,94,0.02)"></stop>
+              </linearGradient>
+            </defs>
+            <polygon points="${areaPoints}" fill="url(#chartArea)"></polygon>
+            <polyline points="${linePoints}" fill="none" stroke="#93c5fd" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.92"></polyline>
+            ${candleBars}
+          </svg>
+          <div class="fallback-chart-axis">${priceLabels}</div>
+        </div>
+      `;
+    }
+
+    async function fetchTicker(symbol) {
+      try {
+        const resp = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`);
+        const data = await resp.json();
+        if (!resp.ok || data?.code) {
+          throw new Error(data?.msg || "ticker request failed");
+        }
+        return data;
+      } catch (error) {
+        return {
+          symbol,
+          lastPrice: null,
+          openPrice: null,
+          highPrice: null,
+          lowPrice: null,
+          quoteVolume: null,
+          priceChangePercent: 0,
+          priceChange: 0,
+        };
+      }
+    }
+
+    async function fetchDepth(symbol) {
+      try {
+        const resp = await fetch(`https://api.binance.com/api/v3/depth?symbol=${symbol}&limit=12`);
+        const data = await resp.json();
+        if (!resp.ok || data?.code) {
+          throw new Error(data?.msg || "depth request failed");
+        }
+        return data;
+      } catch (error) {
+        return { asks: [], bids: [] };
+      }
+    }
+
+    async function loadMarketData() {
+      const tickers = await Promise.all(SYMBOLS.map((item) => fetchTicker(item.key)));
+      const tickerMap = Object.fromEntries(tickers.map((item) => [item.symbol, item]));
+      renderFavoritesModule(tickerMap);
+      renderMarketList(tickerMap);
+
+      document.getElementById("pairTabs").innerHTML = SYMBOLS.slice(0, 5).map((item) => {
+        const ticker = tickerMap[item.key];
+        const change = Number(ticker?.priceChangePercent || 0);
+        const changeClass = change >= 0 ? "text-emerald-400" : "text-rose-400";
+        const active = item.key === activeSymbol ? "active" : "";
+        return `
+          <button class="pair-tab ${active}" data-symbol="${item.key}">
+            <div class="symbol-badge"><span class="spark" style="background:${item.color}"></span><span>${item.label}</span></div>
+            <div class="${changeClass} mt-1 text-xl font-black">${formatUsd(ticker?.lastPrice)} <span class="text-sm">${change >= 0 ? "+" : ""}${change.toFixed(2)}%</span></div>
+          </button>
+        `;
+      }).join("") + `<div class="pair-tab" style="min-width:60px;display:flex;align-items:center;justify-content:center;font-size:32px;">+</div>`;
+
+      const activeTicker = getSymbolQuote(tickerMap, activeSymbol);
+      await updateActivePanels(activeTicker);
+      buildTradingView(activeSymbol, activeTicker);
+      bindSymbolButtons();
+    }
+
+    async function updateActivePanels(ticker) {
+      const change = Number(ticker?.priceChangePercent || 0);
+      const changeClass = change >= 0 ? "text-emerald-400" : "text-rose-400";
+      const symbolLabel = getSymbolMeta(activeSymbol)?.label || activeSymbol;
+      document.getElementById("activePrice").textContent = Number(ticker?.lastPrice || 0).toLocaleString("en-US", { maximumFractionDigits: 4 });
+      document.getElementById("activePrice").className = `text-4xl font-black ${changeClass}`;
+      document.getElementById("activeChangeValue").textContent = `${Number(ticker?.priceChange || 0).toFixed(2)} ${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+      document.getElementById("activeChangeValue").className = `${changeClass} font-bold`;
+      document.getElementById("activeMark").textContent = `最新价格 ${formatUsd(ticker?.lastPrice)}`;
+      document.getElementById("activeFunding").textContent = `开盘价格 ${formatUsd(ticker?.openPrice)}`;
+      document.getElementById("statHigh").textContent = `24h最高价 ${Number(ticker?.highPrice || 0).toLocaleString("en-US", { maximumFractionDigits: 4 })}`;
+      document.getElementById("statLow").textContent = `24h最低价 ${Number(ticker?.lowPrice || 0).toLocaleString("en-US", { maximumFractionDigits: 4 })}`;
+      document.getElementById("statVolume").textContent = `24h成交量 ${formatCompact(ticker?.quoteVolume)}`;
+      document.getElementById("rightSymbol").textContent = symbolLabel;
+      document.getElementById("rightChange").textContent = `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`;
+      document.getElementById("rightChange").className = `${changeClass} font-bold mt-1`;
+      document.getElementById("rightPrice").textContent = formatUsd(ticker?.lastPrice);
+      document.getElementById("rightVolume").textContent = formatCompact(ticker?.quoteVolume);
+      document.getElementById("rightHigh").textContent = Number(ticker?.highPrice || 0).toLocaleString("en-US", { maximumFractionDigits: 4 });
+      document.getElementById("orderMid").textContent = `${formatUsd(ticker?.lastPrice)} ${change >= 0 ? "↑" : "↓"}`;
+      document.getElementById("orderMid").className = `order-mid ${changeClass}`;
+
+      const depth = await fetchDepth(activeSymbol);
+      const asks = (depth.asks || []).slice(0, 6).map(([price, qty]) => `<div class="order-row"><span class="text-rose-400">${formatUsd(price, 2)}</span><span>${Number(qty).toFixed(6)}</span><span>${(Number(price) * Number(qty)).toFixed(2)}</span></div>`).join("");
+      const bids = (depth.bids || []).slice(0, 6).map(([price, qty]) => `<div class="order-row"><span class="text-emerald-400">${formatUsd(price, 2)}</span><span>${Number(qty).toFixed(6)}</span><span>${(Number(price) * Number(qty)).toFixed(2)}</span></div>`).join("");
+      const orderbookList = document.querySelector(".orderbook-list");
+      orderbookList.innerHTML = `<div class="order-row text-slate-400"><span>价格(USDT)</span><span>数量</span><span>总量</span></div>${asks}<div id="orderMid" class="order-mid ${changeClass}">${formatUsd(ticker?.lastPrice)} ${change >= 0 ? "↑" : "↓"}</div>${bids}`;
+
+      const ethTicker = await fetchTicker("ETHUSDT");
+      const solTicker = await fetchTicker("SOLUSDT");
+      document.getElementById("ethValue").textContent = formatUsd(Number(ethTicker.lastPrice) * 0.0579, 4);
+      document.getElementById("ethEntry").textContent = formatUsd(Number(ethTicker.openPrice));
+      document.getElementById("ethMark").textContent = formatUsd(Number(ethTicker.lastPrice));
+      document.getElementById("ethPnl").textContent = `${Number(ethTicker.priceChangePercent).toFixed(2)}%`;
+      document.getElementById("solValue").textContent = formatUsd(Number(solTicker.lastPrice) * 1.6, 4);
+      document.getElementById("solEntry").textContent = formatUsd(Number(solTicker.openPrice));
+      document.getElementById("solMark").textContent = formatUsd(Number(solTicker.lastPrice));
+      document.getElementById("solPnl").textContent = `${Number(solTicker.priceChangePercent).toFixed(2)}%`;
+    }
+
+    function setupDeskTabs() {
+      const tabs = document.querySelectorAll(".desk-tab");
+      const panels = {
+        positions: document.getElementById("positionsPanel"),
+        openOrders: document.getElementById("openOrdersPanel"),
+        trades: document.getElementById("tradesPanel"),
+        historyOrders: document.getElementById("historyOrdersPanel"),
+      };
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          tabs.forEach((btn) => btn.classList.remove("active"));
+          Object.values(panels).forEach((panel) => panel.classList.remove("active"));
+          tab.classList.add("active");
+          panels[tab.dataset.deskTab].classList.add("active");
+        });
+      });
+    }
+
+    function setupWatchTabs() {
+      const tabs = document.querySelectorAll("[data-watch-tab]");
+      const panels = {
+        favorites: document.getElementById("favoritesPanel"),
+        market: document.getElementById("marketPanel"),
+      };
+      tabs.forEach((tab) => {
+        tab.addEventListener("click", () => {
+          watchTab = tab.dataset.watchTab;
+          tabs.forEach((btn) => btn.classList.toggle("active", btn === tab));
+          Object.entries(panels).forEach(([key, panel]) => {
+            panel.classList.toggle("active", key === watchTab);
+          });
+        });
+      });
+
+      const addBtn = document.getElementById("favoriteAddBtn");
+      if (addBtn) {
+        addBtn.addEventListener("click", async () => {
+          favoriteSymbols = FAVORITE_CANDIDATES
+            .filter((item) => favoriteSelections.has(item.key))
+            .map((item) => item.symbolKey || item.key)
+            .filter((key, index, arr) => arr.indexOf(key) === index);
+          await loadMarketData();
+        });
+      }
+
+      const exchangeSelect = document.getElementById("exchangeSelect");
+      if (exchangeSelect) {
+        exchangeSelect.value = selectedExchange;
+        exchangeSelect.addEventListener("change", async () => {
+          selectedExchange = exchangeSelect.value;
+          await loadMarketData();
+        });
+      }
+    }
+
+    window.addEventListener("DOMContentLoaded", async () => {
+      initHeaderControls();
+      setupPaneToggles();
+      setupDeskTabs();
+      setupWatchTabs();
+      await loadMarketData();
+    });
+  </script>
+  <script src="./shared-topbar.js?v=8"></script>
+</body>
+</html>
